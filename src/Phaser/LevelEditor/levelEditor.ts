@@ -6,13 +6,15 @@ import { defineBlocks } from './Blockly/Block_Code';
 
 export default class LevelEditor extends Phaser.Scene {
     workspace: Blockly.WorkspaceSvg;
+    blocklyArea = <HTMLElement>document.getElementById('blocklyArea');
+    blocklyDiv = <HTMLElement>document.getElementById('blocklyDiv');
 
     constructor() {
         super('LevelEditor');
     }
 
     preload() {
-        
+
     }
 
     create() {
@@ -23,27 +25,29 @@ export default class LevelEditor extends Phaser.Scene {
         Blockly.defineBlocksWithJsonArray(customBlocks);
         defineBlocks();
 
-        const blocklyArea = <HTMLElement>document.getElementById('blocklyArea');
-        const blocklyDiv = <HTMLElement>document.getElementById('blocklyDiv');
-        this.workspace = Blockly.inject(blocklyDiv, { toolbox });
+        this.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
         document.getElementById("play")?.addEventListener("click", e => this.log());
-        
+
+        const localBlocklyDiv = this.blocklyDiv;
+        const localBlocklyArea = this.blocklyArea;
+        const localWorkspace = this.workspace;
+
         const onresize = function () {
             // Compute the absolute coordinates and dimensions of blocklyArea.
-            let element = blocklyArea;
+            let element = localBlocklyArea;
             let x = 0;
             let y = 0;
             do {
                 x += element.offsetLeft;
                 y += element.offsetTop;
-                element =  <HTMLElement>element.offsetParent;
+                element = <HTMLElement>element.offsetParent;
             } while (element);
             // Position blocklyDiv over blocklyArea.
-            blocklyDiv.style.left = x + 'px';
-            blocklyDiv.style.top = y + 'px';
-            blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
-            blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
-            Blockly.svgResize(this.workspace);
+            localBlocklyDiv.style.left = x + 'px';
+            localBlocklyDiv.style.top = y + 'px';
+            localBlocklyDiv.style.width = localBlocklyArea.offsetWidth + 'px';
+            localBlocklyDiv.style.height = localBlocklyArea.offsetHeight + 'px';
+            Blockly.svgResize(localWorkspace);
         };
         window.addEventListener('resize', onresize, false);
         onresize();
