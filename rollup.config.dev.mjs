@@ -24,53 +24,6 @@ export default [
         },
 
         plugins: [
-
-            //  Toggle the booleans here to enable / disable Phaser 3 features:
-            replace({
-                preventAssignment: true,
-                'typeof CANVAS_RENDERER': JSON.stringify(true),
-                'typeof WEBGL_RENDERER': JSON.stringify(true),
-                'typeof WEBGL_DEBUG': JSON.stringify(true),
-                'typeof EXPERIMENTAL': JSON.stringify(true),
-                'typeof PLUGIN_CAMERA3D': JSON.stringify(false),
-                'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
-                'typeof FEATURE_SOUND': JSON.stringify(true)
-            }),
-
-            //  Parse our .ts source files
-            nodeResolve({
-                extensions: ['.ts', '.tsx']
-            }),
-
-            //  We need to convert the Phaser 3 CJS modules into a format Rollup can use:
-            commonjs({
-                include: [
-                    'node_modules/eventemitter3/**',
-                    'node_modules/phaser/**'
-                ],
-                exclude: [
-                    'node_modules/phaser/src/polyfills/requestAnimationFrame.js',
-                    'node_modules/phaser/src/phaser-esm.js'
-                ],
-                sourceMap: true,
-                ignoreGlobal: true
-            }),
-
-            //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
-            typescript(),
-        ]
-    },
-
-    // Blockly
-    {
-        input: './src/Blockly/blocklyDemo.js',
-        output: {
-            sourcemap: true,
-            format: 'iife',
-            name: 'app',
-            file: './public/blocklyDemo.js'
-        },
-        plugins: [
             // If you have external dependencies installed from
             // npm, you'll most likely need these plugins. In
             // some cases you'll need additional configuration —
@@ -82,14 +35,8 @@ export default [
             commonjs(),
 
             //  See https://www.npmjs.com/package/rollup-plugin-serve for config options
-            serve({
-                open: true,
-                contentBase: 'public',
-                host: 'localhost',
-                port: 8080,
-                headers: {
-                    'Access-Control-Allow-Origin': '*'
-                }
+            typescript({
+                include: "node_modules/phaser/**"
             })
         ]
     }
