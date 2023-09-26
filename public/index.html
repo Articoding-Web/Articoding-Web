@@ -9,10 +9,18 @@
 <body>
     <button id="play">play</button>
 
-    <div id="blocklyDiv" style="height: 480px; width: 400px;">
-    </div>
-
-    <!-- <script src='./blocklyDemo.js'></script> -->
+    <table>
+        <tbody>
+            <tr style="height: 480px;">
+                <td id="blocklyArea" style="background-color: aquamarine; width: 20%; min-width: 400px;">
+                    <div id="blocklyDiv" style="position: absolute"></div>
+                </td>
+                <td>
+                    <div id="phaserDiv"></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>    
 </body>
 
 </html>

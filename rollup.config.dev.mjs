@@ -24,19 +24,46 @@ export default [
         },
 
         plugins: [
-            // If you have external dependencies installed from
-            // npm, you'll most likely need these plugins. In
-            // some cases you'll need additional configuration —
-            // consult the documentation for details:
-            // https://github.com/rollup/rollup-plugin-commonjs
-            nodeResolve({
-                browser: true
+
+            //  Toggle the booleans here to enable / disable Phaser 3 features:
+            replace({
+                preventAssignment: true,
+                'typeof CANVAS_RENDERER': JSON.stringify(true),
+                'typeof WEBGL_RENDERER': JSON.stringify(true),
+                'typeof WEBGL_DEBUG': JSON.stringify(true),
+                'typeof EXPERIMENTAL': JSON.stringify(true),
+                'typeof PLUGIN_CAMERA3D': JSON.stringify(false),
+                'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
+                'typeof FEATURE_SOUND': JSON.stringify(true)
             }),
+
+            // Resolve for Blockly
+            nodeResolve({
+                browser: true,
+            }),
+
+            //  Resolve for Phaser
+            nodeResolve({
+                extensions: ['.ts', '.tsx']
+            }),            
+
+            //  We need to convert the CJS modules into a format Rollup can use:
             commonjs(),
 
-            //  See https://www.npmjs.com/package/rollup-plugin-serve for config options
+            //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
             typescript({
-                include: "node_modules/phaser/**"
+                include: 'node_modules/phaser/**',
+                include: 'src/**'
+            }),
+
+            serve({
+                open: true,
+                contentBase: 'public',
+                host: 'localhost',
+                port: 8080,
+                headers: {
+                    'Access-Control-Allow-Origin': '*'
+                }
             })
         ]
     }
