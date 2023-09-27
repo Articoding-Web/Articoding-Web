@@ -1,9 +1,10 @@
+import Phaser from 'phaser';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript'
 import customBlocks from './Blockly/customBlocks';
 import toolbox from './Blockly/toolbox';
 import { defineBlocks } from './Blockly/Block_Code';
-import Phaser from 'phaser';
+
 export default class LevelEditor extends Phaser.Scene {
     workspace: Blockly.WorkspaceSvg;
     blocklyArea = <HTMLElement>document.getElementById('blocklyArea');
@@ -16,6 +17,7 @@ export default class LevelEditor extends Phaser.Scene {
     preload(): void {
         this.load.image('tileAsset', 'assets/Tiles/tile_0059.png');
     }
+
     generateLevel(dimX: number, dimY: number, tileValue: number): number[][] {
         //create 2d array to hold the level data
         let level: number[][] = [];
@@ -29,34 +31,37 @@ export default class LevelEditor extends Phaser.Scene {
         console.log(level);
         return level;
     }
+
     create() {
 
         this.loadBlockly();
-         // Load a map from a 2D array of tile indices
+        // Load a map from a 2D array of tile indices
         // const level = this.generateLevel(dimX, dimY, 0);
-        let level = this.generateLevel(6, 12, 0);
+        let level = this.generateLevel(3, 3, 0);
 
 
         // When loading from an array, make sure to specify the tileWidth and tileHeight
         let map = this.make.tilemap({ data: level, tileWidth: 16, tileHeight: 16 });
 
         let tiles = map.addTilesetImage('tileAsset')!;
-        let layer = map.createLayer(0, tiles, 0, 0);
+        let layer = map.createLayer(0, tiles, 0, 0)!;
 
         document.getElementById("resize")?.addEventListener("click", e => {
 
             //get values from input fields into variables:
             let dimX = parseInt((<HTMLInputElement>document.getElementById("dimX")).value, 10);
             let dimY = parseInt((<HTMLInputElement>document.getElementById("dimY")).value, 10);
-                let tileValue = 0;
-                //if values are not empty, generate level with given values:
-                if (dimX > 0 && dimY > 0) {
-                  level = this.generateLevel(dimX, dimY, tileValue);
-                  map = this.make.tilemap({ data: level, tileWidth: 16, tileHeight: 16 });
-                  let tiles = map.addTilesetImage('tileAsset')!;
-                  layer = map.createLayer(0, tiles, 0, 0);
-                }
-            });
+            let tileValue = 0;
+            //if values are not empty, generate level with given values:
+            if (dimX > 0 && dimY > 0) {
+                level = this.generateLevel(dimX, dimY, tileValue);
+                map.destroy();
+
+                map = this.make.tilemap({ data: level, tileWidth: 16, tileHeight: 16 });
+                let tiles = map.addTilesetImage('tileAsset')!;
+                layer = map.createLayer(0, tiles, 0, 0)!;
+            }
+        });
     }
 
     loadBlockly() {
