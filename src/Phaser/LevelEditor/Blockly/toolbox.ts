@@ -69,5 +69,29 @@ export default {
                 }
             ]
         },
+        {
+            'kind': 'category',
+            'name': 'Conditions',
+            'colour': '#0b6b0c',
+            'contents': [
+                {
+                    'type': 'if_do',
+                    'kind': 'block',
+                },
+                {
+                    'type': 'if_else_do',
+                    'kind': 'block',
+                },
+                {
+                    'type': 'and_or',
+                    'kind': 'block',
+                },
+                {
+                    'type': 'comparator',
+                    'kind': 'block',
+                }
+
+            ]
+        }
     ]
 };
