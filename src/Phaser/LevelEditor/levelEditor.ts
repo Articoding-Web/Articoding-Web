@@ -5,6 +5,10 @@ import customBlocks from './Blockly/customBlocks';
 import toolbox from './Blockly/toolbox';
 import { defineBlocks } from './Blockly/Block_Code';
 
+const TILE_WIDTH = 16;
+const TILE_HEIGHT = 16;
+const INIT_TILES = 3;
+
 export default class LevelEditor extends Phaser.Scene {
     workspace: Blockly.WorkspaceSvg;
     blocklyArea = <HTMLElement>document.getElementById('blocklyArea');
@@ -37,14 +41,15 @@ export default class LevelEditor extends Phaser.Scene {
         this.loadBlockly();
         // Load a map from a 2D array of tile indices
         // const level = this.generateLevel(dimX, dimY, 0);
-        let level = this.generateLevel(3, 3, 0);
-
-
+        let level = this.generateLevel(INIT_TILES, INIT_TILES, 0);
+        // Varibles to center the tilemap
+        const SCREEN_X = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+        const SCREEN_Y = this.cameras.main.worldView.y + this.cameras.main.height / 2;
         // When loading from an array, make sure to specify the tileWidth and tileHeight
-        let map = this.make.tilemap({ data: level, tileWidth: 16, tileHeight: 16 });
+        let map = this.make.tilemap({ data: level, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
 
         let tiles = map.addTilesetImage('tileAsset')!;
-        let layer = map.createLayer(0, tiles, 0, 0)!;
+        let layer = map.createLayer(0, tiles, SCREEN_X - (INIT_TILES/2 * TILE_WIDTH), SCREEN_Y - (INIT_TILES/2 *TILE_HEIGHT))!;
 
         document.getElementById("resize")?.addEventListener("click", e => {
 
@@ -57,9 +62,9 @@ export default class LevelEditor extends Phaser.Scene {
                 level = this.generateLevel(dimX, dimY, tileValue);
                 map.destroy();
 
-                map = this.make.tilemap({ data: level, tileWidth: 16, tileHeight: 16 });
+                map = this.make.tilemap({ data: level, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
                 let tiles = map.addTilesetImage('tileAsset')!;
-                layer = map.createLayer(0, tiles, 0, 0)!;
+                layer = map.createLayer(0, tiles, SCREEN_X - (dimY/2 * TILE_WIDTH), SCREEN_Y - (dimX/2 * TILE_HEIGHT))!;
             }
         });
     }
