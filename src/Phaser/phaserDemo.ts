@@ -3,15 +3,16 @@ import LevelEditor from './LevelEditor/levelEditor';
 
 const config : Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    backgroundColor: '#125555',
+    backgroundColor: '#16161D',
     // width: 800,
     // height: 600,
-    width: 14 * 16,
-    height: 14 * 16,
-    zoom: 4,
+    width: 14 * 70,
+    height: 14 * 50,
+    zoom: 1,
     parent: 'phaserDiv',
     scene: LevelEditor,
 };
+ 
 
 const game = new Phaser.Game(config);
 

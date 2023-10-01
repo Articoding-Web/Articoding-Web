@@ -5,8 +5,8 @@ import customBlocks from './Blockly/customBlocks';
 import toolbox from './Blockly/toolbox';
 import { defineBlocks } from './Blockly/Block_Code';
 
-const TILE_WIDTH = 16;
-const TILE_HEIGHT = 16;
+const TILE_WIDTH = 100;
+const TILE_HEIGHT = 100;
 const INIT_TILES = 3;
 
 export default class LevelEditor extends Phaser.Scene {
@@ -19,7 +19,8 @@ export default class LevelEditor extends Phaser.Scene {
     }
 
     preload(): void {
-        this.load.image('tileAsset', 'assets/Tiles/tile_0059.png');
+        this.load.image('tileAsset', 'assets/Tiles/tile.png');
+        this.load.image('Turret', 'assets/LaserTurret.png');
     }
 
     generateLevel(dimX: number, dimY: number, tileValue: number): number[][] {
@@ -37,7 +38,21 @@ export default class LevelEditor extends Phaser.Scene {
     }
 
     create() {
+        var turret = this.add.sprite(100,100,'Turret');
+        turret.setInteractive();
+        const targetWidth = 200;
+        const targetHeight = 200;
+        const scaleFactor = Math.min(targetWidth / turret.width, targetHeight / turret.height);
+        turret.setScale(scaleFactor);
+    
+    // Enable drag behavior for the sprite
+    this.input.setDraggable(turret);
 
+    // Define what happens when the sprite is dragged
+    this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+        gameObject.x = dragX;
+        gameObject.y = dragY;
+    });
         this.loadBlockly();
         // Load a map from a 2D array of tile indices
         // const level = this.generateLevel(dimX, dimY, 0);
@@ -50,7 +65,8 @@ export default class LevelEditor extends Phaser.Scene {
 
         let tiles = map.addTilesetImage('tileAsset')!;
         let layer = map.createLayer(0, tiles, SCREEN_X - (INIT_TILES/2 * TILE_WIDTH), SCREEN_Y - (INIT_TILES/2 *TILE_HEIGHT))!;
-
+        // Add a collider to the map (used for several things, such as the player)
+       // map.setCollisionByExclusion([-1]);
         document.getElementById("resize")?.addEventListener("click", e => {
 
             //get values from input fields into variables:
