@@ -8,11 +8,11 @@ import { defineBlocks } from './Blockly/Block_Code';
 const TILE_WIDTH = 100;
 const TILE_HEIGHT = 100;
 const INIT_TILES = 3;
-
 export default class LevelEditor extends Phaser.Scene {
     workspace: Blockly.WorkspaceSvg;
     blocklyArea = <HTMLElement>document.getElementById('blocklyArea');
     blocklyDiv = <HTMLElement>document.getElementById('blocklyDiv');
+    dropZones: Phaser.GameObjects.Zone[][];
 
     constructor() {
         super('LevelEditor');
@@ -38,21 +38,21 @@ export default class LevelEditor extends Phaser.Scene {
     }
 
     create() {
-        var turret = this.add.sprite(100,100,'Turret');
+        var turret = this.add.sprite(100, 100, 'Turret');
         turret.setInteractive();
         const targetWidth = 200;
         const targetHeight = 200;
         const scaleFactor = Math.min(targetWidth / turret.width, targetHeight / turret.height);
         turret.setScale(scaleFactor);
-    
-    // Enable drag behavior for the sprite
-    this.input.setDraggable(turret);
 
-    // Define what happens when the sprite is dragged
-    this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-    });
+        // Enable drag behavior for the sprite
+        this.input.setDraggable(turret);
+
+        // Define what happens when the sprite is dragged
+        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+        });
         this.loadBlockly();
         // Load a map from a 2D array of tile indices
         // const level = this.generateLevel(dimX, dimY, 0);
@@ -64,9 +64,8 @@ export default class LevelEditor extends Phaser.Scene {
         let map = this.make.tilemap({ data: level, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
 
         let tiles = map.addTilesetImage('tileAsset')!;
-        let layer = map.createLayer(0, tiles, SCREEN_X - (INIT_TILES/2 * TILE_WIDTH), SCREEN_Y - (INIT_TILES/2 *TILE_HEIGHT))!;
-        // Add a collider to the map (used for several things, such as the player)
-       // map.setCollisionByExclusion([-1]);
+        let layer = map.createLayer(0, tiles, SCREEN_X - (INIT_TILES / 2 * TILE_WIDTH), SCREEN_Y - (INIT_TILES / 2 * TILE_HEIGHT))!;
+       // this.createDropZones(layer);
         document.getElementById("resize")?.addEventListener("click", e => {
 
             //get values from input fields into variables:
@@ -79,10 +78,29 @@ export default class LevelEditor extends Phaser.Scene {
                 map.destroy();
 
                 map = this.make.tilemap({ data: level, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
-                let tiles = map.addTilesetImage('tileAsset')!;
-                layer = map.createLayer(0, tiles, SCREEN_X - (dimY/2 * TILE_WIDTH), SCREEN_Y - (dimX/2 * TILE_HEIGHT))!;
+                tiles = map.addTilesetImage('tileAsset')!;
+                layer = map.createLayer(0, tiles, SCREEN_X - (dimY / 2 * TILE_WIDTH), SCREEN_Y - (dimX / 2 * TILE_HEIGHT))!;
+                this.createDropZones(layer);
             }
         });
+    }
+
+
+    createDropZones(layer: Phaser.Tilemaps.TilemapLayer) {
+        this.dropZones = [];
+        layer.forEachTile((tile, indexX, indexY) => {
+            let zone = this.add.zone(tile.getCenterX(), tile.getCenterY(), TILE_WIDTH, TILE_HEIGHT).setOrigin(0.5);
+            zone.setData('x', indexX);
+            zone.setData('y', indexY);
+            zone.setData('tile', tile);
+            zone.setData('color', 0x00ffff);
+            zone.setData('border', this.add.rectangle(zone.x, zone.y, TILE_WIDTH, TILE_HEIGHT, zone.getData('color')).setOrigin(0));
+            if (!this.dropZones[indexX]) {
+                this.dropZones[indexX] = [];
+            }
+            this.dropZones[indexX][indexY] = zone;
+        });
+
     }
 
     loadBlockly() {
@@ -90,7 +108,6 @@ export default class LevelEditor extends Phaser.Scene {
         defineBlocks();
 
         this.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
-        document.getElementById("play")?.addEventListener("click", e => this.log());
 
         const localBlocklyDiv = this.blocklyDiv;
         const localBlocklyArea = this.blocklyArea;
@@ -114,11 +131,6 @@ export default class LevelEditor extends Phaser.Scene {
             Blockly.svgResize(localWorkspace);
         };
         window.addEventListener('resize', onresize, false);
-        onresize();
-    }
-
-    log() {
-        console.log(javascriptGenerator.workspaceToCode(this.workspace));
-        console.log("here");
+        onresize(); 
     }
 }
