@@ -12,8 +12,4 @@ const config : Phaser.Types.Core.GameConfig = {
     parent: 'phaserDiv',
     scene: LevelEditor,
 };
- 
-
 const game = new Phaser.Game(config);
-
-
