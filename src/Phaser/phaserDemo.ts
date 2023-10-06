@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
-import LevelLoader from './LevelEditor/levelLoader';
+import LevelEditor from './LevelEditor/levelEditor';
+// import LevelLoader from './LevelEditor/levelLoader';
 
 const config : Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -10,6 +11,6 @@ const config : Phaser.Types.Core.GameConfig = {
     height: 700,
     zoom: 1,
     parent: 'phaserDiv',
-    scene: LevelLoader,
+    scene: LevelEditor,
 };
 const game = new Phaser.Game(config);
