@@ -65,7 +65,7 @@ class Editor extends Phaser.Scene {
     });
   }
 
-  create() {
+  create(): void {
     this.turret();
     this.rows = INITIAL_TILES;
     this.columns = INITIAL_TILES;
@@ -81,13 +81,13 @@ class Editor extends Phaser.Scene {
       horizontal: 5,
       vertical: 5,
     }).on("resize", function (horizontal: integer, vertical: integer) {
-      this.scene.rows = horizontal;
-      this.scene.columns = vertical;
+      this.scene.rows = vertical;
+      this.scene.columns = horizontal;
       this.scene.level();
     });
   }
 
-  setDragEvents() {
+  setDragEvents(): void {
     this.input.on("dragenter", (pointer, gameObject, dropZone) => {
       dropZone.setTint(0x00ff00);
     });
@@ -104,7 +104,7 @@ class Editor extends Phaser.Scene {
     });
   }
 
-  turret() {
+  turret(): void {
     this.laser = this.add.sprite(LASER_START_X, LASER_START_Y, "laser");
     this.laser.setInteractive();
     const targetWidth = 200;
