@@ -1,12 +1,13 @@
-const express = require('express');
-const path = require('path');
+const express = require("express");
+const path = require("path");
 
 const app = express();
-app.use(express.static(path.join(__dirname, 'public')));
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (request, response) => {
+  response.render("index");
 });
 
-app.listen(port, () => console.log(`Example app is listening on port ${port}.`));
+app.listen(port, () => console.log(`Server running on port ${port}.`));

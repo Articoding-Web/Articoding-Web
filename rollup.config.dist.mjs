@@ -64,30 +64,5 @@ export default [
             terser()
     
         ]
-    },
-
-    // Blockly
-    {
-        input: './src/Blockly/blocklyDemo.js',
-        output: {
-            sourcemap: true,
-            format: 'iife',
-            name: 'app',
-            file: './public/blocklyDemo.js'
-        },
-        plugins: [
-            // If you have external dependencies installed from
-            // npm, you'll most likely need these plugins. In
-            // some cases you'll need additional configuration —
-            // consult the documentation for details:
-            // https://github.com/rollup/rollup-plugin-commonjs
-            nodeResolve({
-                browser: true
-            }),
-            commonjs(),
-
-            //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
-            terser()
-        ]
     }
 ];
