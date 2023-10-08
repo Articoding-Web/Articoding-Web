@@ -10,22 +10,22 @@ export default [
 
         //  Our games entry point (edit as required)
         input: [
-            './src/game.ts'
+            './src/Phaser/main.ts'
         ],
-    
+
         //  Where the build file is to be generated.
         //  Most games being built for distribution can use iife as the module type.
         //  You can also use 'umd' if you need to ingest your game into another system.
         //  If using Phaser 3.21 or **below**, add: `intro: 'var global = window;'` to the output object.
         output: {
-            file: './dist/game.js',
-            name: 'MyGame',
+            file: './public/main.js',
+            name: 'PhaserGame',
             format: 'iife',
-            sourcemap: false
+            sourcemap: true
         },
-    
+
         plugins: [
-    
+
             //  Toggle the booleans here to enable / disable Phaser 3 features:
             replace({
                 preventAssignment: true,
@@ -37,32 +37,24 @@ export default [
                 'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
                 'typeof FEATURE_SOUND': JSON.stringify(true)
             }),
-    
+
             //  Parse our .ts source files
             nodeResolve({
-                extensions: [ '.ts', '.tsx' ]
+                browser: true,
             }),
-    
-            //  We need to convert the Phaser 3 CJS modules into a format Rollup can use:
-            commonjs({
-                include: [
-                    'node_modules/eventemitter3/**',
-                    'node_modules/phaser/**'
-                ],
-                exclude: [ 
-                    'node_modules/phaser/src/polyfills/requestAnimationFrame.js',
-                    'node_modules/phaser/src/phaser-esm.js'
-                ],
-                sourceMap: false,
-                ignoreGlobal: true
-            }),
-    
+
+            //  We need to convert the CJS modules into a format Rollup can use:
+            commonjs(),
+
             //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
-            typescript(),
-    
+            typescript({
+                include: ['node_modules/phaser/**', 'src/**', 'node_modules/phaser3-rex-plugins/**'],
+                compilerOptions: {allowSyntheticDefaultImports: true, allowJs: true}
+            }),
+
             //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
             terser()
-    
+
         ]
     }
 ];
