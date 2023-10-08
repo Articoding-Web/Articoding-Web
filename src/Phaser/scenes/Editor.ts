@@ -30,7 +30,7 @@ export default class Editor extends Phaser.Scene {
 
   preload(): void {
     this.plugins.installScenePlugin('rexUI', RexUIPlugin, 'rexUI');
-    this.load.image("tile", "assets/tiles/tile.png");
+    this.load.image("tile", "assets/Tiles/tile.png");
     this.load.image("laser", "assets/sprites/laser.png");
   }
 
