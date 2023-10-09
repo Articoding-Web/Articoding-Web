@@ -1,6 +1,4 @@
-import Phaser from 'phaser';
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin';
-
+import * as Phaser from 'phaser';
 import Menu from "./scenes/Menu";
 import Editor from "./scenes/Editor";
 
@@ -17,15 +15,7 @@ const configuration = {
   dom: {
     createContainer: true,
   },
-  scene: [Menu, Editor],
-  plugins: {
-    scene: [{
-      key: 'rexUI',
-      plugin: RexUIPlugin,
-      mapping: 'rexUI'
-    },
-    ]
-  }
+  scene: [Menu, Editor]
 };
 
-const game = new Phaser.Game(configuration);
+globalThis.game = new Phaser.Game(configuration);

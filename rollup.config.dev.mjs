@@ -37,25 +37,52 @@ export default [
         'typeof FEATURE_SOUND': JSON.stringify(true)
       }),
 
-      // Resolve for Blockly
-      nodeResolve({
-        browser: true,
-      }),
-
-      //  Resolve for Phaser
+      //  Parse our .ts source files
       nodeResolve({
         extensions: ['.ts', '.tsx']
       }),
 
-      //  We need to convert the CJS modules into a format Rollup can use:
+      //  We need to convert the Phaser 3 CJS modules into a format Rollup can use:
+      commonjs({
+        include: [
+          'node_modules/eventemitter3/**',
+          'node_modules/phaser/**'
+        ],
+        exclude: [
+          'node_modules/phaser/src/polyfills/requestAnimationFrame.js',
+          'node_modules/phaser/src/phaser-esm.js'
+        ],
+        sourceMap: true,
+        ignoreGlobal: true
+      }),
+
+      //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
+      typescript()
+    ]
+  },
+
+  // Blockly
+  {
+    input: './src/Blockly/main.ts',
+
+    output: {
+      sourcemap: true,
+      format: 'iife',
+      name: 'blockly',
+      file: './public/blockly.js'
+    },
+
+    plugins: [
+      nodeResolve({
+        browser: true
+      }),
+
       commonjs(),
 
       //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
-      typescript({
-        include: ['node_modules/phaser/**', 'src/**', 'node_modules/phaser3-rex-plugins/**'],
-        compilerOptions: {allowSyntheticDefaultImports: true, allowJs: true}
-      }),
+      typescript(),
 
+      //  See https://www.npmjs.com/package/rollup-plugin-serve for config options
       serve({
         open: true,
         contentBase: 'public',
