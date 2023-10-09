@@ -17,7 +17,7 @@ export default [
     //  You can also use 'umd' if you need to ingest your game into another system.
     //  If using Phaser 3.21 or **below**, add: `intro: 'var global = window;'` to the output object.
     output: {
-      file: './public/main.js',
+      file: './public/phaser.js',
       name: 'PhaserGame',
       format: 'iife',
       sourcemap: true

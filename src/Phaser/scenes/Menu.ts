@@ -11,8 +11,8 @@ export default class Menu extends Phaser.Scene {
 
   create() {
     const logo = this.add.image(
-      window.innerWidth / 2,
-      window.innerHeight / 2,
+      this.cameras.main.centerX, 
+      this.cameras.main.centerY,
       "logo"
     );
     this.tweens.add({
