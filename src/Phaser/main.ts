@@ -2,10 +2,10 @@ import * as Phaser from 'phaser';
 import Menu from "./scenes/Menu";
 import Editor from "./scenes/Editor";
 
-const configuration = {
+const PhaserConfig : Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   backgroundColor: "#FFFFFF",
-  parent: "game",
+  parent: "phaserDiv",
   scale: {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -16,4 +16,4 @@ const configuration = {
   scene: [Menu, Editor]
 };
 
-globalThis.game = new Phaser.Game(configuration);
+export default PhaserConfig;

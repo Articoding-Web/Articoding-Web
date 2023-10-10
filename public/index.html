@@ -23,36 +23,45 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">Play</a>
+                        <a id="playBtn" class="nav-link" aria-current="page" href="#">Play</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="#">Guide</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">Build</a>
+                        <a id="buildBtn" class="nav-link" aria-current="page" href="#">Build</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">Community</a>
+                        <a id="communityBtn" class="nav-link" aria-current="page" href="#">Community</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid vh-100">
-        <div class="row row-cols-1 row-cols-lg-2 h-100">
-            <div id="blocklyArea" class="col col-lg-4 h-100">
-                <div id="blocklyDiv" style="height: 100%; width: 100%;"></div>
+    <div class="container-fluid mt-3 vh-100">
+        <div id="interactiveRow" class="row justify-content-between d-none">
+            <div id="runBlocklyBtnCol" class="col-4 d-none">
+                <button class="btn btn-primary">
+                    Run Code
+                </button>
             </div>
-            <div class="col col-lg-8 h-100">
-                <div id="game" class="mx-auto h-100 m-0"></div>
+            <div id="phaserGridSizeCol" class="col-4">
+                Set Size
             </div>
         </div>
-    </div>
+        <div class="row row-cols-1 row-cols-lg-2 h-100">
+            <div id="blocklyArea" class="col col-lg-5 h-100 d-none">
+                <div id="blocklyDiv" style="height: 100%; width: 100%;"></div>
+            </div>
+            <div class="col col-lg-7 mx-auto">
+                <div id="phaserDiv"></div>
+            </div>
+        </div>
+    </div>    
 
     <script src="./js/bootstrap5.3.2.min.js"></script>
-    <script src="./blockly.js"></script>
-    <script src="./phaser.js"></script>
+    <script src="./client.js"></script>
 </body>
 
 </html>

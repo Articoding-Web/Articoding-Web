@@ -1,65 +1,62 @@
 import * as Phaser from 'phaser';
-
-const COLOR_LIGHT = 0x7b5e57;
-const COLOR_PRIMARY = 0x4e342e;
+import { LevelData } from '../LevelData';
 
 const TILE_SIZE = 100;
 const INITIAL_TILES = 5;
-const MIN_TILES = 2;
-const MAX_TILES = 10;
 
 const LASER_START_X = 200;
 const LASER_START_Y = 500;
-
-// Dialog x, y coordinates
-const DIAG_X = 110;
-const DIAG_Y = 100;
 
 export default class Editor extends Phaser.Scene {
   rows: integer;
   columns: integer;
   tiles: Phaser.GameObjects.Sprite[] = [];
   laser: Phaser.GameObjects.Sprite;
+  level: LevelData;
 
   constructor() {
     super("Editor");
   }
 
+  init(level? : LevelData): void {
+    if(typeof level !== 'object'){
+      this.level = level;
+    }
+  }
+
   preload(): void {
+    this.rows = this.level? this.level.rows : INITIAL_TILES;
+    this.columns = this.level? this.level.columns : INITIAL_TILES;
+    this.tiles = [];
+
     this.load.image("tile", "assets/Tiles/tile.png");
     this.load.image("laser", "assets/sprites/laser.png");
   }
 
   create(): void {
     this.turret();
-    this.rows = INITIAL_TILES;
-    this.columns = INITIAL_TILES;
-
-    this.level();
-
+    this.createLevel();
     this.setDragEvents();
   }
 
-  level(): void {
+  createLevel(): void {
     const SCREEN_WIDTH = this.cameras.main.width;
     const SCREEN_HEIGHT = this.cameras.main.height;
     let x = (SCREEN_WIDTH - this.rows * TILE_SIZE) / 2;
     let y = (SCREEN_HEIGHT - this.columns * TILE_SIZE) / 2;
 
-    let tiles = this.rows * this.columns;
+    let numTiles = this.rows * this.columns;
 
-    if (tiles < this.tiles.length) {
+    if (numTiles < this.tiles.length) {
       this.laser.setPosition(LASER_START_X, LASER_START_Y);
 
-      while (this.tiles.length > tiles) {
-        console.debug("Destroying tiles");
+      while (this.tiles.length > numTiles) {
         this.tiles.pop()?.destroy();
       }
-    } else if (tiles > this.tiles.length) {
+    } else if (numTiles > this.tiles.length) {
       this.laser.setPosition(LASER_START_X, LASER_START_Y);
 
-      while (this.tiles.length < tiles) {
-        console.debug("Creating tiles");
+      while (this.tiles.length < numTiles) {
         const tile = this.add.sprite(0, 0, "tile").setInteractive();
         tile.input!.dropZone = true;
         this.tiles.push(tile);
