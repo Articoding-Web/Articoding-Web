@@ -9,7 +9,7 @@ export default [
   {
     //  Our game entry point (edit as required)
     input: [
-      './src/Phaser/main.ts'
+      './src/client.ts'
     ],
 
     //  Where the build file is to be generated.
@@ -17,8 +17,8 @@ export default [
     //  You can also use 'umd' if you need to ingest your game into another system.
     //  If using Phaser 3.21 or **below**, add: `intro: 'var global = window;'` to the output object.
     output: {
-      file: './public/main.js',
-      name: 'PhaserGame',
+      file: './public/client.js',
+      name: 'client',
       format: 'iife',
       sourcemap: true
     },
@@ -51,10 +51,7 @@ export default [
       commonjs(),
 
       //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
-      typescript({
-        include: ['node_modules/phaser/**', 'src/**', 'node_modules/phaser3-rex-plugins/**'],
-        compilerOptions: {allowSyntheticDefaultImports: true, allowJs: true}
-      }),
+      typescript(),
 
       serve({
         open: true,

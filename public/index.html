@@ -1,14 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="./css/bootstrap.min.css" rel="stylesheet">
-        <link href="./css/style.css" rel="stylesheet">
-        <title>Articoding</title>
-    </head>
-    <body>
-        <div id="game"></div>
-        <script src="./main.js"></script>
-    </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./css/bootstrap5.3.2.min.css" rel="stylesheet">
+    <!-- <link href="./css/style.css" rel="stylesheet"> -->
+    <title>Articoding</title>
+</head>
+
+<body class="vh-100">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="./img/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                Articoding
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a id="playBtn" class="nav-link" aria-current="page" href="#">Play</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="#">Guide</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="buildBtn" class="nav-link" aria-current="page" href="#">Build</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="communityBtn" class="nav-link" aria-current="page" href="#">Community</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid h-100">
+        <div id="interactiveRow" class="row justify-content-between d-none">
+            <div id="runBlocklyBtnCol" class="col-4">
+                <button class="btn btn-primary">
+                    Run Code
+                </button>
+            </div>
+            <div id="phaserGridSizeCol" class="col-4">
+                Set Size
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-lg-2 h-100">
+            <div id="blocklyArea" class="col col-lg-5 h-100 d-none">
+                <div id="blocklyDiv" style="height: 100%; width: 100%;"></div>
+            </div>
+            <div id="phaserDiv" class="col w-100 mx-auto mh-100 p-0">
+                <canvas id="phaserCanvas"></canvas>
+            </div>
+        </div>
+    </div>    
+
+    <script src="./js/bootstrap5.3.2.min.js"></script>
+    <script src="./client.js"></script>
+</body>
+
 </html>
