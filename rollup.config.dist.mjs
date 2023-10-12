@@ -5,11 +5,10 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 
 export default [
-    // Phaser
     {
         //  Our game entry point (edit as required)
         input: [
-            './src/Phaser/main.ts'
+            './src/client.ts'
         ],
 
         //  Where the build file is to be generated.
@@ -17,8 +16,8 @@ export default [
         //  You can also use 'umd' if you need to ingest your game into another system.
         //  If using Phaser 3.21 or **below**, add: `intro: 'var global = window;'` to the output object.
         output: {
-            file: './public/main.js',
-            name: 'phaser',
+            file: './public/client.js',
+            name: 'client',
             format: 'iife',
             sourcemap: true
         },
@@ -37,60 +36,21 @@ export default [
                 'typeof FEATURE_SOUND': JSON.stringify(true)
             }),
 
-            // Find node modules
-            nodeResolve(),
-
-            //  Convert Phaser 3 CJS modules into Rollup format:
-            commonjs({
-                include: [
-                    'node_modules/eventemitter3/**',
-                    'node_modules/phaser/**'
-                ],
-                exclude: [
-                    'node_modules/phaser/src/polyfills/requestAnimationFrame.js',
-                    'node_modules/phaser/src/phaser-esm.js'
-                ],
-                sourceMap: true,
-                ignoreGlobal: true
-            }),
-
-            //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
-            typescript({
-                include: ['node_modules/phaser/**', 'src/Phaser/**'],
-                compilerOptions: { allowSyntheticDefaultImports: true, allowJs: true }
-            }),
-
-            //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
-            terser()
-        ]
-    },
-
-    // Blockly
-    {
-        input: './src/Blockly/main.js',
-        output: {
-            sourcemap: true,
-            format: 'iife',
-            name: 'blockly',
-            file: './public/blockly.js'
-        },
-        plugins: [
-            // If you have external dependencies installed from
-            // npm, you'll most likely need these plugins. In
-            // some cases you'll need additional configuration —
-            // consult the documentation for details:
-            // https://github.com/rollup/rollup-plugin-commonjs
+            // Resolve for Blockly
             nodeResolve({
-                browser: true
+                browser: true,
             }),
 
+            //  Resolve for Phaser
+            nodeResolve({
+                extensions: ['.ts', '.tsx']
+            }),
+
+            //  We need to convert the CJS modules into a format Rollup can use:
             commonjs(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
-            typescript({
-                include: ['src/Blockly/**'],
-                compilerOptions: { allowSyntheticDefaultImports: true, allowJs: true }
-            }),
+            typescript(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
             terser()
