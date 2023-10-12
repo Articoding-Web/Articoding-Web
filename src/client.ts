@@ -1,20 +1,15 @@
-import PhaserConfig from './Phaser/main';
-import BlocklyObj from './Blockly/main';
+import PhaserController from './Phaser/PhaserController';
+import BlocklyController from './Blockly/BlocklyController';
 
 globalThis.blocklyArea = document.getElementById('blocklyArea') as HTMLElement;
 globalThis.blocklyDiv = document.getElementById('blocklyDiv') as HTMLDivElement;
 globalThis.phaserDiv = document.getElementById('phaserDiv') as HTMLDivElement;
-let blocklyObj: BlocklyObj;
-
-let game: Phaser.Game;
-enum LevelSource {
-    Official,
-    Community
-}
+let blocklyController: BlocklyController;
+let phaserController: PhaserController;
 
 window.addEventListener("load", e => {
-    game = new Phaser.Game(PhaserConfig);
-    blocklyObj = new BlocklyObj();
+    phaserController = new PhaserController();
+    blocklyController = new BlocklyController();
     addNavbarListeners();
 })
 
@@ -27,32 +22,12 @@ function addNavbarListeners() {
 }
 
 function playLevel() {
-    showBlockly();
-    phaserStopActiveScenes();
-    game.scene.start("Menu");
-}
-
-function showBlockly(){
-    globalThis.blocklyArea.classList.remove("d-none");
-    window.dispatchEvent(new Event('resize'));
-}
-/**
-* 
-* @param source The source of levels to choose from. "official" or "community"
-*/
-function levelChooser(source: LevelSource) {
-    phaserStopActiveScenes();
-    game.scene.start("Menu");
+    blocklyController.showWorkspace();
+    phaserController.reduceSize();
 }
 
 function editLevel() {
-    globalThis.blocklyArea.classList.add("d-none");
-
-    phaserStopActiveScenes();
-    game.scene.start("Editor");
-}
-
-// Stop all active scenes
-function phaserStopActiveScenes() {
-    game.scene.getScenes(true).forEach(scene => game.scene.stop(scene));
+    blocklyController.hideWorkspace();
+    phaserController.increaseSize();
+    phaserController.startScene("Editor");
 }

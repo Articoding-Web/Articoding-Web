@@ -4,7 +4,7 @@ import blocks from './Workspace/blocks';
 import toolbox from './Workspace/toolbox';
 import * as block_code from './Workspace/block_code';
 
-export default class {
+export default class BlocklyController {
     blocklyArea = globalThis.blocklyArea;
     blocklyDiv = globalThis.blocklyDiv;
 
@@ -40,6 +40,16 @@ export default class {
         this.blocklyDiv.style.width =  width + 'px';
         this.blocklyDiv.style.height = globalThis.phaserDiv.offsetHeight + 'px';
         Blockly.svgResize(globalThis.workspace);
+    }
+
+    showWorkspace(){
+        globalThis.blocklyArea.classList.remove("d-none");
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    hideWorkspace(){
+        globalThis.blocklyArea.classList.add("d-none");
+        window.dispatchEvent(new Event('resize'));
     }
 
     log() {
