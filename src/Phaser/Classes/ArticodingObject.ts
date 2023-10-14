@@ -6,14 +6,18 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     onDropZone: Boolean = false;
     origX : number;
     origY: number;
-
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture, allowMultiple: Boolean, frame?: string | number | undefined) {
+    scene: Phaser.Scene;
+    objects: Phaser.GameObjects.Sprite[] = [];
+    constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture, allowMultiple: Boolean,
+        objects: Phaser.GameObjects.Sprite[], frame?: string | number | undefined) {
         super(scene, x, y, texture, frame);
         this.scene = scene;
         this.frameString = frame;
         this.allowMultiple = allowMultiple;
         this.origX = x;
         this.origY = y;
+        this.objects = objects;
+        this.objects.push(this);
         
         const scaleFactor = Math.min(100 / this.width, 100 / this.height); //TODO change texture
         this.setScale(scaleFactor);
@@ -25,18 +29,18 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         this.on("dragstart", () => this.onDragStart());
         this.on("dragenter", (pointer, dropZone) => this.onDragEnter(pointer, dropZone));
         this.on("dragleave", (pointer, dropZone) => this.onDragLeave(pointer, dropZone));
-        this.on("dragend", (pointer) => this.onDragEnd());
+        this.on("dragend", (pointer) => this.onDragEnd(this.x, this.y));
         this.on("drop", (pointer, dropZone) => this.onDrop(dropZone.x, dropZone.y));
 
         this.scene.add.existing(this);
     }
 
-    onDrag(dragX, dragY){
+    onDrag(dragX, dragY) {
         this.x = dragX;
         this.y = dragY;
     }
 
-    onDragStart(){
+    onDragStart() {
         this.scene.children.bringToTop(this);
     }
 
@@ -50,24 +54,27 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         this.onDropZone = false;
     }
 
-    onDragEnd(){
-        if(!this.onDropZone){
-            this.x = this.origX;
-            this.y = this.origY;
+    onDragEnd(x: number, y: number) {
+        if (!this.onDropZone){
+            this.destroy();
+            this.objects.filter((object) =>{
+                if (object.x !== x && object.y !== y) return object;
+            })
         }
     }
 
-    onDrop(x : number, y : number){
-        console.log("Dropped");
-        if(this.allowMultiple){
-            console.log("New obj");
-            // Reset and create new obj on drop
+    onDrop(x : number, y : number) {
+        if (this.allowMultiple) {
             this.x = this.origX;
             this.y = this.origY;
-            return new ArticodingObject(this.scene, x, y, this.texture, false, this.frameString);
+            this.objects.map(function(object) {
+                if (object.x !== this.x && object.y !== this.y) {
+                    new ArticodingObject(this.scene, x, y, this.texture, false, this.objects, this.frameString);
+                    return;
+                }
+            })
+            
         } else {
-            console.log("same obj");
-            // Drop
             this.x = x;
             this.y = y;
         }
