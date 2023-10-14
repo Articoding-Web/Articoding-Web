@@ -1,6 +1,6 @@
-import * as Phaser from 'phaser';
-import { LevelData } from '../Classes/LevelData';
-import ArticodingObject from '../Classes/ArticodingObject';
+import * as Phaser from "phaser";
+import { LevelData } from "../Classes/LevelData";
+import ArticodingObject from "../Classes/ArticodingObject";
 
 const TILE_SIZE = 100;
 const INITIAL_TILES = 5;
@@ -14,14 +14,13 @@ export default class Editor extends Phaser.Scene {
   tiles: Phaser.GameObjects.Sprite[];
   laser: Phaser.GameObjects.Sprite;
   level: LevelData;
-  objects: ArticodingObject[];
 
   constructor() {
     super("Editor");
   }
 
   init(level?: LevelData): void {
-    if (typeof level !== 'object') {
+    if (typeof level !== "object") {
       this.level = level;
     }
   }
@@ -30,15 +29,22 @@ export default class Editor extends Phaser.Scene {
     this.rows = this.level ? this.level.rows : INITIAL_TILES;
     this.columns = this.level ? this.level.columns : INITIAL_TILES;
     this.tiles = [];
-    this.objects = [];
     this.load.image("tile", "assets/Tiles/tile.png");
-    
-    // Load froggy
-    this.load.multiatlas('FrogSpriteSheet', 'assets/sprites/FrogSpriteSheet.json', 'assets/sprites/');
-    // Load chest
-    this.load.multiatlas('BigTreasureChest', 'assets/sprites/BigTreasureChest.json', 'assets/sprites/');
 
-    this.load.image('tile', 'assets/Tiles/tile.png');
+    // Load froggy
+    this.load.multiatlas(
+      "FrogSpriteSheet",
+      "assets/sprites/FrogSpriteSheet.json",
+      "assets/sprites/"
+    );
+    // Load chest
+    this.load.multiatlas(
+      "BigTreasureChest",
+      "assets/sprites/BigTreasureChest.json",
+      "assets/sprites/"
+    );
+
+    this.load.image("tile", "assets/Tiles/tile.png");
     // this.load.image('Obstacle', 'assets/obstacle.png');
     // this.load.image('Mirror', 'assets/mirror.png');
     // this.load.image('Door', 'assets/door.png');
@@ -46,8 +52,22 @@ export default class Editor extends Phaser.Scene {
   }
 
   create(): void {
-    this.laser = new ArticodingObject(this, LASER_START_X, LASER_START_Y, 'FrogSpriteSheet', false, this.objects,'down/SpriteSheet-02.png');
-    new ArticodingObject(this, LASER_START_X, LASER_START_Y + 100, 'BigTreasureChest', true, this.objects,'BigTreasureChest-0.png');
+    this.laser = new ArticodingObject(
+      this,
+      LASER_START_X,
+      LASER_START_Y,
+      "FrogSpriteSheet",
+      true,
+      "down/SpriteSheet-02.png"
+    );
+    new ArticodingObject(
+      this,
+      LASER_START_X,
+      LASER_START_Y + 100,
+      "BigTreasureChest",
+      true,
+      "BigTreasureChest-0.png"
+    );
     this.createLevel();
     this.setDragEvents();
     this.zoom();
@@ -117,5 +137,4 @@ export default class Editor extends Phaser.Scene {
       dropZone.clearTint();
     });
   }
-
 }
