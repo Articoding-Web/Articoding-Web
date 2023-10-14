@@ -57,7 +57,7 @@ export default [
         open: true,
         contentBase: 'public',
         host: 'localhost',
-        port: 8080,
+        port: 3000,
         headers: {
           'Access-Control-Allow-Origin': '*'
         }

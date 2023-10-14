@@ -11,9 +11,10 @@ const LASER_START_Y = 200;
 export default class Editor extends Phaser.Scene {
   rows: integer;
   columns: integer;
-  tiles: Phaser.GameObjects.Sprite[] = [];
+  tiles: Phaser.GameObjects.Sprite[];
   laser: Phaser.GameObjects.Sprite;
   level: LevelData;
+  objects: ArticodingObject[];
 
   constructor() {
     super("Editor");
@@ -29,7 +30,7 @@ export default class Editor extends Phaser.Scene {
     this.rows = this.level ? this.level.rows : INITIAL_TILES;
     this.columns = this.level ? this.level.columns : INITIAL_TILES;
     this.tiles = [];
-
+    this.objects = [];
     this.load.image("tile", "assets/Tiles/tile.png");
     
     // Load froggy
@@ -45,10 +46,28 @@ export default class Editor extends Phaser.Scene {
   }
 
   create(): void {
-    this.laser = new ArticodingObject(this, LASER_START_X, LASER_START_Y, 'FrogSpriteSheet', false, 'down/SpriteSheet-02.png');
-    new ArticodingObject(this, LASER_START_X, LASER_START_Y + 100, 'BigTreasureChest', true, 'BigTreasureChest-0.png');
+    this.laser = new ArticodingObject(this, LASER_START_X, LASER_START_Y, 'FrogSpriteSheet', false, this.objects,'down/SpriteSheet-02.png');
+    new ArticodingObject(this, LASER_START_X, LASER_START_Y + 100, 'BigTreasureChest', true, this.objects,'BigTreasureChest-0.png');
     this.createLevel();
     this.setDragEvents();
+    this.zoom();
+  }
+
+  zoom() {
+    this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+      if (deltaY > 0) {
+        var zoom = this.cameras.main.zoom - 0.05;
+        if (zoom > 0.3) {
+          this.cameras.main.zoom = zoom;
+        }
+      }
+      if (deltaY < 0) {
+        var zoom = this.cameras.main.zoom + 0.05;
+        if (zoom < 1.3) {
+          this.cameras.main.zoom = zoom;
+        }
+      }
+    });
   }
 
   createLevel(): void {
@@ -98,4 +117,5 @@ export default class Editor extends Phaser.Scene {
       dropZone.clearTint();
     });
   }
+
 }
