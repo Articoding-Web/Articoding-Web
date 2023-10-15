@@ -1,7 +1,8 @@
 import * as Phaser from "phaser";
 import { LevelData } from "../Classes/LevelData";
 import ArticodingObject from "../Classes/ArticodingObject";
-
+import TIleObject from "../Classes/TileObject";
+import TileObject from "../Classes/TileObject";
 const TILE_SIZE = 100;
 const INITIAL_TILES = 5;
 
@@ -108,8 +109,7 @@ export default class Editor extends Phaser.Scene {
       this.laser.setPosition(LASER_START_X, LASER_START_Y);
 
       while (this.tiles.length < numTiles) {
-        const tile = this.add.sprite(0, 0, "tile").setInteractive();
-        tile.input!.dropZone = true;
+        const tile = new TileObject(this,0,0,"tile",false);
         this.tiles.push(tile);
       }
     }

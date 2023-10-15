@@ -37,7 +37,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
       this.onDragLeave(pointer, dropZone)
     );
     this.on("dragend", (pointer) => this.onDragEnd(this.x, this.y));
-    this.on("drop", (pointer, dropZone) => this.onDrop(dropZone.x, dropZone.y));
+    this.on("drop", (pointer, dropZone) => this.onDrop(dropZone));
 
     this.scene.add.existing(this);
   }
@@ -60,31 +60,44 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     dropZone.clearTint();
     console.log(dropZone.gameObject);
     this.onDropZone = false;
+    dropZone.occupied = false;
   }
 
   onDragEnd(x: number, y: number) {
-    if (!this.onDropZone) {
-      this.x = this.origX;
-      this.y = this.origY;
-      if (!this.allowMultiple) this.destroy();
-    }
+      if(!this.onDropZone){
+        this.x = this.origX;
+        this.y = this.origY;
+        if (!this.allowMultiple) this.destroy();
+      }
   }
 
-  onDrop(x: number, y: number) {
+  onDrop(dropZone) {
     if (this.allowMultiple) {
       this.x = this.origX;
       this.y = this.origY;
-      new ArticodingObject(
-        this.scene,
-        x,
-        y,
-        this.texture,
-        false,
-        this.frameString
-      );
+      if(this.onDropZone && !dropZone.occupied){
+        new ArticodingObject(
+          this.scene,
+          dropZone.x,
+          dropZone.y,
+          this.texture,
+          false,
+          this.frameString
+        );
+        dropZone.occupied = true;
+      }
     } else {
-      this.x = x;
-      this.y = y;
+      if(!dropZone.occupied){
+        this.x = dropZone.x;
+        this.y = dropZone.y;
+        this.origX = this.x;
+        this.origY = this.y;
+        dropZone.occupied = true;
+      }
+      else{
+        this.x = this.origX;
+        this.y = this.origY;
+      }
     }
   }
 }
