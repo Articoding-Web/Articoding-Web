@@ -58,7 +58,7 @@ export default class Editor extends Phaser.Scene {
       LASER_START_X,
       LASER_START_Y,
       "FrogSpriteSheet",
-      true,
+      false,
       "down/SpriteSheet-02.png"
     );
     new ArticodingObject(
@@ -69,8 +69,8 @@ export default class Editor extends Phaser.Scene {
       true,
       "BigTreasureChest-0.png"
     );
+    
     this.createLevel();
-    this.setDragEvents();
     this.zoom();
   }
 
@@ -109,7 +109,7 @@ export default class Editor extends Phaser.Scene {
       this.laser.setPosition(LASER_START_X, LASER_START_Y);
 
       while (this.tiles.length < numTiles) {
-        const tile = new TileObject(this,0,0,"tile",false);
+        const tile = new TileObject(this, 0, 0, "tile");
         this.tiles.push(tile);
       }
     }
@@ -121,20 +121,6 @@ export default class Editor extends Phaser.Scene {
       cellHeight: TILE_SIZE,
       x,
       y,
-    });
-  }
-
-  setDragEvents(): void {
-    this.input.on("dragenter", (pointer, gameObject, dropZone) => {
-      dropZone.setTint(0x00ff00);
-    });
-
-    this.input.on("dragleave", (pointer, gameObject, dropZone) => {
-      dropZone.clearTint();
-    });
-
-    this.input.on("drop", (pointer, gameObject, dropZone) => {
-      dropZone.clearTint();
     });
   }
 }
