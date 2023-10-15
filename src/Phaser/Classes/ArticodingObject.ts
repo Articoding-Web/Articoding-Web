@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 import TileObject from "./TileObject";
 
 export default class ArticodingObject extends Phaser.GameObjects.Sprite {
-    allowMultiple: Boolean; // allow object to be duplicated or not
+    allowMultiple: Boolean = false; // allow object to be duplicated or not
     allowDestruction: Boolean = false;
     frameString: string | number | undefined;
     isOnDropZone: Boolean = false;
@@ -10,7 +10,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     origY: number;
     dropZone: TileObject | undefined;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture, allowMultiple: Boolean, frame?: string | number | undefined, allowDestruction?: Boolean) {
+    constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture, frame?: string | number | undefined, allowMultiple?: Boolean, allowDestruction?: Boolean) {
         super(scene, x, y, texture, frame);
         this.scene = scene;
         this.frameString = frame;
@@ -77,8 +77,8 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
                     dropZone.x,
                     dropZone.y,
                     this.texture,
-                    false,
                     this.frameString,
+                    false,
                     true
                 );
                 newObj.dropZone = dropZone;
@@ -91,8 +91,6 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
                 // Set position
                 this.x = dropZone.x;
                 this.y = dropZone.y;
-                this.origX = this.x;
-                this.origY = this.y;
                 this.dropZone = dropZone;
             }
 
@@ -101,11 +99,11 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         } else {
             this.x = this.origX;
             this.y = this.origY;
+            this.resetDropZone();
         }
     }
 
     resetDropZone(){
-        console.log(this.dropZone);
         if(this.dropZone !== undefined){
             this.dropZone.occupied = false;
             this.dropZone = undefined;
