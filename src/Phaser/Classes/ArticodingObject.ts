@@ -91,6 +91,8 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
                 // Set position
                 this.x = dropZone.x;
                 this.y = dropZone.y;
+                this.origX = this.x;
+                this.origY = this.y;
                 this.dropZone = dropZone;
             }
 
