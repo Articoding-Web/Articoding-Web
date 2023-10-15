@@ -58,7 +58,6 @@ export default class Editor extends Phaser.Scene {
       LASER_START_X,
       LASER_START_Y,
       "FrogSpriteSheet",
-      false,
       "down/SpriteSheet-02.png"
     );
     new ArticodingObject(
@@ -66,8 +65,8 @@ export default class Editor extends Phaser.Scene {
       LASER_START_X,
       LASER_START_Y + 100,
       "BigTreasureChest",
-      true,
-      "BigTreasureChest-0.png"
+      "BigTreasureChest-0.png",
+      true
     );
     
     this.createLevel();
