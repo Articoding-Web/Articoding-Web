@@ -29,7 +29,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         this.on("dragstart", () => this.onDragStart());
         this.on("dragenter", (pointer, dropZone) => this.onDragEnter());
         this.on("dragleave", (pointer, dropZone) => this.onDragLeave());
-        this.on("dragend", (pointer) => this.onDragEnd(this.x, this.y));
+        this.on("dragend", (pointer) => this.onDragEnd());
         this.on("drop", (pointer, dropZone) => this.onDrop(dropZone));
 
         this.scene.add.existing(this);
@@ -42,6 +42,8 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
     onDragStart() {
         this.scene.children.bringToTop(this);
+        if(this.dropZone !== undefined)
+            this.isOnDropZone = true;
     }
 
     onDragEnter() {
@@ -52,7 +54,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         this.isOnDropZone = false;
     }
 
-    onDragEnd(x: number, y: number) {
+    onDragEnd() {
         if (!this.isOnDropZone) {
             this.resetDropZone();
 
@@ -96,10 +98,13 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
             // Zone occupied
             dropZone.occupied = true;
-        } else {
+        } else if(this.dropZone !== undefined){
+            this.x = this.dropZone.x;
+            this.y = this.dropZone.y;
+        } 
+        else {
             this.x = this.origX;
             this.y = this.origY;
-            this.resetDropZone();
         }
     }
 
