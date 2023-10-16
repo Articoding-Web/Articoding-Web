@@ -8,8 +8,7 @@ export default [
         "args0": [
             {
                 "type": "input_value",
-                "name": "STEPS",
-                "check": "Number"
+                "name": "STEPS"
             },
             {
                 "type": "field_dropdown",
@@ -150,15 +149,16 @@ export default [
     },
     //HERE ENDS TEXT BLOCKS (BRIGHT RED SECTION TOOLBOX)
     {
-        "type": "number",
+        "type": "numberSpecial",
         "message0": "%1",
         "args0": [
             {
                 "type": "field_number",
                 "name": "NUMBER",
                 "value": 0,
-                "min": 0,
-                "max": 30
+                "min": 1,
+                "max": 30,
+                "precision": 1
 
             }
         ],

@@ -49,7 +49,7 @@ export default {
             'colour': '#0d44ba',
             'contents': [
                 {
-                    'type': 'number',
+                    'type': 'numberSpecial',
                     'kind': 'block',
                 }
             ]

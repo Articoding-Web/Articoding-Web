@@ -39,6 +39,7 @@ function playLevel() {
     blocklyToggler.classList.remove("d-none");
     phaserController.reduceSize();
     phaserController.startScene("Menu");
+    blocklyController.executeCode(); 
 }
 
 function editLevel() {

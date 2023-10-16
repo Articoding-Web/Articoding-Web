@@ -5,16 +5,15 @@ import { javascriptGenerator } from "blockly/javascript";
 export function defineAllBlocks() {
     //Some functions don't need generator, but others will, so it's been left on purpose.
     //generic movement block (movement steps in parsed direction)
-    javascriptGenerator.forBlock['movement'] = function (block, generator) {
-        var number_steps = block.getFieldValue('STEPS');
+    javascriptGenerator.forBlock['movement'] = function (block:any, generator:any) {
+        var innerCode = generator.statementToCode(block, 'STEPS');
         var dropdown_direction = block.getFieldValue('DIRECTION');
-        // TODO: Assemble javascript into code variable.
-        var code = 'move(' + number_steps + ', ' + dropdown_direction + ');';
+        var code = 'move(' + innerCode + ', ' + dropdown_direction + ');';
         return code;
     };
     //Start Block, init call for phaserJS scene
     javascriptGenerator.forBlock['start'] = function (block, generator) {
-        var code = 'start();';
+        var code = '';
         return code;
     }
     //rotate block, action toolbox
@@ -39,9 +38,10 @@ export function defineAllBlocks() {
         return code; //TODO order atomic check
     }
     //Number block
-    javascriptGenerator.forBlock['number'] = function (block, generator) {
+    javascriptGenerator.forBlock['numberSpecial'] = function (block, generator) {
         var number = block.getFieldValue('NUMBER');
         var code = number.toString();
+        console.log("the var code is: " + code);
         return code;
     }
     //For X times block

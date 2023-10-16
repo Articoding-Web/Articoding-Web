@@ -55,8 +55,23 @@ export default class BlocklyController {
         window.dispatchEvent(new Event('resize'));
     }
 
-    log() {
-        console.log(javascriptGenerator.workspaceToCode(globalThis.workspace));
-        console.log("here");
+    // log() {
+    //     console.log(javascriptGenerator.workspaceToCode(globalThis.workspace));
+    // }
+
+    executeCode() {
+       var runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+        runCodeBtn.addEventListener("click", () => {
+         var code2 =  `globalThis.PhaserController.game.getScene("Editor").ocultar()`;
+            this.hideWorkspace();
+
+            var code =`globalThis.PhaserController.game.getScene("Editor").exec` + javascriptGenerator.workspaceToCode(globalThis.workspace);
+            console.log("code being executed: ", code);
+            var code1 = `globalThis.PhaserController.game.getScene("Editor").ocultar()`
+            eval(code2);
+            //eval(code1);    
+            //TODO vuelve aca no te ovldies
+        });
     }
+
 }
