@@ -59,15 +59,9 @@ export default class BlocklyController {
     //     console.log(javascriptGenerator.workspaceToCode(globalThis.workspace));
     // }
 
-    executeCode() {
-       var runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
-        runCodeBtn.addEventListener("click", () => {
-            //ESTO SI SE EJECUTA
-            var code =`globalThis.PhaserController.game.getScene("Menu").exec` + javascriptGenerator.workspaceToCode(globalThis.workspace);
-            console.log("code being executed from blocklyController with eval: ", code);
-            globalThis.PhaserController.game.getScene("Menu").execmove(1,'UP');
-            eval(code);
-        });
+    getCode(){
+        let code = javascriptGenerator.workspaceToCode(globalThis.workspace);
+        console.log("code being executed from blocklyController with eval: ", code);
+        return code;
     }
-
 }

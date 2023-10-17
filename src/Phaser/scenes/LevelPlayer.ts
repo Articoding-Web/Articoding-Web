@@ -1,8 +1,8 @@
 import * as Phaser from 'phaser';
 
-export default class Menu extends Phaser.Scene {
+export default class LevelPlayer extends Phaser.Scene {
   constructor() {
-    super("Menu");
+    super("LevelPlayer");
   }
 
   preload() {
@@ -31,9 +31,17 @@ export default class Menu extends Phaser.Scene {
       },
       this
     );
+
+    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    runCodeBtn.addEventListener("click", () => this.runCode());
+  }
+
+  runCode(){
+      let code = globalThis.blocklyController.getCode();
+      eval(code);
   }
   
-  execmove(steps : number, direction: string) {
+  move(steps : number, direction: string) {
     console.log("se esta ejecutando dentro de Menu la siguiente funcion: execmove(", steps, direction,")");
   }
 }

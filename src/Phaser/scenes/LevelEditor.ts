@@ -9,7 +9,7 @@ const INITIAL_TILES = 5;
 const LASER_START_X = 200;
 const LASER_START_Y = 500;
 
-export default class Editor extends Phaser.Scene {
+export default class LevelEditor extends Phaser.Scene {
   resizeDialog = <HTMLDivElement>document.getElementById("gridResizeDialog");
   numRowsInput = <HTMLInputElement>document.getElementById("numRowsInput");
   numColsInput = <HTMLInputElement>document.getElementById("numColsInput");
@@ -20,7 +20,7 @@ export default class Editor extends Phaser.Scene {
   level: LevelData;
 
   constructor() {
-    super("Editor");
+    super("LevelEditor");
   }
 
   init(level? : LevelData): void {

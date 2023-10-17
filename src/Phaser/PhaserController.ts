@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
-import Menu from "./scenes/Menu";
-import Editor from "./scenes/Editor";
+import LevelPlayer from "./scenes/LevelPlayer";
+import LevelEditor from "./scenes/LevelEditor";
 
 const PhaserConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.CANVAS,
@@ -10,7 +10,7 @@ const PhaserConfig: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Menu, Editor]
+  scene: [LevelPlayer, LevelEditor]
 };
 
 export default class PhaserController {

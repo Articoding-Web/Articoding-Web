@@ -11,13 +11,16 @@ let phaserController: PhaserController;
 window.addEventListener("load", e => {
     phaserController = new PhaserController();
     blocklyController = new BlocklyController();
+    globalThis.phaserController = phaserController;
+    globalThis.blocklyController = blocklyController;
+
     addNavbarListeners();
 
     blocklyToggler.addEventListener("click", ev => toggleBlockly());
 })
 
-function toggleBlockly(){
-    if(blocklyController.isVisible){
+function toggleBlockly() {
+    if (blocklyController.isVisible) {
         blocklyController.hideWorkspace();
         phaserController.increaseSize();
     } else {
@@ -38,13 +41,12 @@ function playLevel() {
     blocklyController.showWorkspace();
     blocklyToggler.classList.remove("d-none");
     phaserController.reduceSize();
-    phaserController.startScene("Menu");
-    blocklyController.executeCode(); 
+    phaserController.startScene("LevelPlayer");
 }
 
 function editLevel() {
     blocklyController.hideWorkspace();
     blocklyToggler.classList.add("d-none");
     phaserController.increaseSize();
-    phaserController.startScene("Editor");
+    phaserController.startScene("LevelEditor");
 }
