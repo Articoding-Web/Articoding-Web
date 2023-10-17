@@ -1,10 +1,10 @@
-import * as Phaser from 'phaser';
-import { LevelData } from '../LevelData';
+import * as Phaser from "phaser";
+import { LevelData } from "../LevelData";
 
 const TILE_SIZE = 100;
 const INITIAL_TILES = 5;
 
-const LASER_START_X = 200;
+const LASER_START_X = 100;
 const LASER_START_Y = 500;
 
 export default class Editor extends Phaser.Scene {
@@ -18,18 +18,17 @@ export default class Editor extends Phaser.Scene {
     super("Editor");
   }
 
-  init(level? : LevelData): void {
-    if(typeof level !== 'object'){
-      this.level = level;
-    }
+  init(data?): void {
+    this.cameras.main.width = data.width;
+    this.cameras.main.height = data.height;
   }
 
   preload(): void {
-    this.rows = this.level? this.level.rows : INITIAL_TILES;
-    this.columns = this.level? this.level.columns : INITIAL_TILES;
+    this.rows = this.level ? this.level.rows : INITIAL_TILES;
+    this.columns = this.level ? this.level.columns : INITIAL_TILES;
     this.tiles = [];
 
-    this.load.image("tile", "assets/Tiles/tile.png");
+    this.load.image("tile", "assets/tiles/tile.png");
     this.load.image("laser", "assets/sprites/laser.png");
   }
 
