@@ -1,5 +1,8 @@
+
 import * as Phaser from 'phaser';
-import { LevelData } from '../LevelData';
+import { LevelData } from '../Classes/LevelData';
+import ArticodingObject from "../Classes/ArticodingObject";
+import TileObject from "../Classes/TileObject";
 
 const TILE_SIZE = 100;
 const MIN_NUM_TILES = 2;
@@ -23,33 +26,60 @@ export default class LevelEditor extends Phaser.Scene {
     super("LevelEditor");
   }
 
-  init(level? : LevelData): void {
-    if(typeof level !== 'object'){
+  init(level?: LevelData): void {
+    if (typeof level !== 'object') {
       this.level = level;
     }
   }
 
   preload(): void {
     this.resizeDialog.classList.remove("d-none");
-    this.rows = this.level? this.level.rows : INITIAL_TILES;
-    this.columns = this.level? this.level.columns : INITIAL_TILES;
+    this.rows = this.level ? this.level.rows : INITIAL_TILES;
+    this.columns = this.level ? this.level.columns : INITIAL_TILES;
     this.setMinMaxNumTiles();
     this.tiles = [];
 
+    // Load froggy
+    this.load.multiatlas(
+      "FrogSpriteSheet",
+      "assets/sprites/FrogSpriteSheet.json",
+      "assets/sprites/"
+    );
+    // Load chest
+    this.load.multiatlas(
+      "BigTreasureChest",
+      "assets/sprites/BigTreasureChest.json",
+      "assets/sprites/"
+    );
+
     this.load.image("tile", "assets/Tiles/tile.png");
-    this.load.image("laser", "assets/sprites/laser.png");
   }
 
   create(): void {
-    this.turret();
+    this.laser = new ArticodingObject(
+      this,
+      LASER_START_X,
+      LASER_START_Y,
+      "FrogSpriteSheet",
+      "down/SpriteSheet-02.png"
+    );
+    new ArticodingObject(
+      this,
+      LASER_START_X,
+      LASER_START_Y + 100,
+      "BigTreasureChest",
+      "BigTreasureChest-0.png",
+      true
+    );
+
     this.createLevel();
-    this.setDragEvents();
+    this.zoom();
 
     document.getElementById("changeGridSize").addEventListener("click", ev => {
-      if(+this.numRowsInput.value < MIN_NUM_TILES || +this.numRowsInput.value > MAX_NUM_TILES){
+      if (+this.numRowsInput.value < MIN_NUM_TILES || +this.numRowsInput.value > MAX_NUM_TILES) {
         console.error("Invalid grid HEIGHT");
       }
-      else if(+this.numColsInput.value < MIN_NUM_TILES && +this.numColsInput.value > MAX_NUM_TILES){
+      else if (+this.numColsInput.value < MIN_NUM_TILES && +this.numColsInput.value > MAX_NUM_TILES) {
         console.error("Invalid grid WIDTH");
       } else {
         this.rows = +this.numRowsInput.value;
@@ -61,6 +91,23 @@ export default class LevelEditor extends Phaser.Scene {
     this.events.on('shutdown', e => {
       this.resizeDialog.classList.add("d-none");
     })
+  }
+
+  zoom() {
+    this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+      if (deltaY > 0) {
+        var zoom = this.cameras.main.zoom - 0.05;
+        if (zoom > 0.3) {
+          this.cameras.main.zoom = zoom;
+        }
+      }
+      if (deltaY < 0) {
+        var zoom = this.cameras.main.zoom + 0.05;
+        if (zoom < 1.3) {
+          this.cameras.main.zoom = zoom;
+        }
+      }
+    });
   }
 
   setMinMaxNumTiles() {
@@ -149,8 +196,8 @@ export default class LevelEditor extends Phaser.Scene {
       gameObject.y = dragY;
     });
   }
-  
-  ocultar(){
+
+  ocultar() {
     this.laser.destroy();
   }
 }
