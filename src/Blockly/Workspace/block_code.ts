@@ -8,7 +8,7 @@ export function defineAllBlocks() {
     javascriptGenerator.forBlock['movement'] = function (block:any, generator:any) {
         var innerCode = generator.statementToCode(block, 'STEPS');
         var dropdown_direction = block.getFieldValue('DIRECTION');
-        var code = 'move(' + innerCode + ', ' + dropdown_direction + ');';
+        var code = 'move('+innerCode +',' + dropdown_direction +');';
         return code;
     };
     //Start Block, init call for phaserJS scene

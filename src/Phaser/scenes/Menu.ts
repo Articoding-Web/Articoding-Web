@@ -32,4 +32,8 @@ export default class Menu extends Phaser.Scene {
       this
     );
   }
+  
+  execmove(steps : number, direction: string) {
+    console.log("se esta ejecutando dentro de Menu la siguiente funcion: execmove(", steps, direction,")");
+  }
 }

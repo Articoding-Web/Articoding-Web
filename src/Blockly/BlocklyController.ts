@@ -62,15 +62,11 @@ export default class BlocklyController {
     executeCode() {
        var runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
         runCodeBtn.addEventListener("click", () => {
-         var code2 =  `globalThis.PhaserController.game.getScene("Editor").ocultar()`;
-            this.hideWorkspace();
-
-            var code =`globalThis.PhaserController.game.getScene("Editor").exec` + javascriptGenerator.workspaceToCode(globalThis.workspace);
-            console.log("code being executed: ", code);
-            var code1 = `globalThis.PhaserController.game.getScene("Editor").ocultar()`
-            eval(code2);
-            //eval(code1);    
-            //TODO vuelve aca no te ovldies
+            //ESTO SI SE EJECUTA
+            var code =`globalThis.PhaserController.game.getScene("Menu").exec` + javascriptGenerator.workspaceToCode(globalThis.workspace);
+            console.log("code being executed from blocklyController with eval: ", code);
+            globalThis.PhaserController.game.getScene("Menu").execmove(1,'UP');
+            eval(code);
         });
     }
 

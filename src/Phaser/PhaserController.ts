@@ -18,6 +18,7 @@ export default class PhaserController {
 
   constructor() {
     this.game = new Phaser.Game(PhaserConfig);
+    const gameInstance = this.game;
   }
 
   increaseSize() {

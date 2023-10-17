@@ -149,9 +149,6 @@ export default class Editor extends Phaser.Scene {
       gameObject.y = dragY;
     });
   }
-  execmove(steps : number, direction: string) {
-    console.log("execmove", steps, direction);
-  }
   
   ocultar(){
     this.laser.destroy();
