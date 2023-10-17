@@ -31,10 +31,15 @@ export default class PhaserController {
     globalThis.phaserDiv.classList.remove("w-100");
     globalThis.phaserDiv.classList.remove("mx-auto");
     globalThis.phaserDiv.classList.add("col-lg-8");
+    globalThis.phaserDiv.classList.add("col-lg-8");
   }
 
   startScene(key: string | Phaser.Scene, data?: object) {
     // Stop all active scenes
+    this.game.scene
+      .getScenes(true)
+      .forEach((scene) => this.game.scene.stop(scene));
+    this.game.scene.start(key, data);
     this.game.scene
       .getScenes(true)
       .forEach((scene) => this.game.scene.stop(scene));

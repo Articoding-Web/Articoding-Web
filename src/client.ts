@@ -1,5 +1,7 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
+import PhaserController from "./Phaser/PhaserController";
+import BlocklyController from "./Blockly/BlocklyController";
 
 globalThis.blocklyArea = document.getElementById("blocklyArea") as HTMLElement;
 globalThis.blocklyDiv = document.getElementById("blocklyDiv") as HTMLDivElement;
@@ -34,7 +36,11 @@ function toggleBlockly() {
 function addNavbarListeners() {
   let playBtn = document.getElementById("playBtn");
   playBtn.addEventListener("click", (e) => playLevel());
+  let playBtn = document.getElementById("playBtn");
+  playBtn.addEventListener("click", (e) => playLevel());
 
+  let buildBtn = document.getElementById("buildBtn");
+  buildBtn.addEventListener("click", (e) => editLevel());
   let buildBtn = document.getElementById("buildBtn");
   buildBtn.addEventListener("click", (e) => editLevel());
 }
