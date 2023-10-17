@@ -27,7 +27,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.input.once(
       "pointerdown",
       function (event) {
-        this.scene.start("Editor");
+        this.scene.start("LevelEditor");
       },
       this
     );
