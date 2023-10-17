@@ -7,6 +7,7 @@ import * as block_code from './Workspace/block_code';
 export default class BlocklyController {
     blocklyArea = globalThis.blocklyArea;
     blocklyDiv = globalThis.blocklyDiv;
+    isVisible: Boolean = false;
 
     constructor() {
         globalThis.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
@@ -44,16 +45,23 @@ export default class BlocklyController {
 
     showWorkspace(){
         globalThis.blocklyArea.classList.remove("d-none");
+        this.isVisible = true;
         window.dispatchEvent(new Event('resize'));
     }
 
     hideWorkspace(){
         globalThis.blocklyArea.classList.add("d-none");
+        this.isVisible = false;
         window.dispatchEvent(new Event('resize'));
     }
 
-    log() {
-        console.log(javascriptGenerator.workspaceToCode(globalThis.workspace));
-        console.log("here");
+    // log() {
+    //     console.log(javascriptGenerator.workspaceToCode(globalThis.workspace));
+    // }
+
+    getCode(){
+        let code = javascriptGenerator.workspaceToCode(globalThis.workspace);
+        console.log("code being executed from blocklyController with eval: ", code);
+        return code;
     }
 }

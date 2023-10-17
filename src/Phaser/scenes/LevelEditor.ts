@@ -2,12 +2,17 @@ import * as Phaser from 'phaser';
 import { LevelData } from '../LevelData';
 
 const TILE_SIZE = 100;
+const MIN_NUM_TILES = 2;
+const MAX_NUM_TILES = 15;
 const INITIAL_TILES = 5;
 
 const LASER_START_X = 200;
 const LASER_START_Y = 500;
 
-export default class Editor extends Phaser.Scene {
+export default class LevelEditor extends Phaser.Scene {
+  resizeDialog = <HTMLDivElement>document.getElementById("gridResizeDialog");
+  numRowsInput = <HTMLInputElement>document.getElementById("numRowsInput");
+  numColsInput = <HTMLInputElement>document.getElementById("numColsInput");
   rows: integer;
   columns: integer;
   tiles: Phaser.GameObjects.Sprite[] = [];
@@ -15,7 +20,7 @@ export default class Editor extends Phaser.Scene {
   level: LevelData;
 
   constructor() {
-    super("Editor");
+    super("LevelEditor");
   }
 
   init(level? : LevelData): void {
@@ -25,8 +30,10 @@ export default class Editor extends Phaser.Scene {
   }
 
   preload(): void {
+    this.resizeDialog.classList.remove("d-none");
     this.rows = this.level? this.level.rows : INITIAL_TILES;
     this.columns = this.level? this.level.columns : INITIAL_TILES;
+    this.setMinMaxNumTiles();
     this.tiles = [];
 
     this.load.image("tile", "assets/Tiles/tile.png");
@@ -37,6 +44,32 @@ export default class Editor extends Phaser.Scene {
     this.turret();
     this.createLevel();
     this.setDragEvents();
+
+    document.getElementById("changeGridSize").addEventListener("click", ev => {
+      if(+this.numRowsInput.value < MIN_NUM_TILES || +this.numRowsInput.value > MAX_NUM_TILES){
+        console.error("Invalid grid HEIGHT");
+      }
+      else if(+this.numColsInput.value < MIN_NUM_TILES && +this.numColsInput.value > MAX_NUM_TILES){
+        console.error("Invalid grid WIDTH");
+      } else {
+        this.rows = +this.numRowsInput.value;
+        this.columns = +this.numColsInput.value;
+        this.createLevel();
+      }
+    })
+
+    this.events.on('shutdown', e => {
+      this.resizeDialog.classList.add("d-none");
+    })
+  }
+
+  setMinMaxNumTiles() {
+    this.numColsInput.setAttribute("min", MIN_NUM_TILES.toString());
+    this.numColsInput.setAttribute("max", MAX_NUM_TILES.toString());
+    this.numColsInput.value = this.columns.toString();
+    this.numRowsInput.setAttribute("min", MIN_NUM_TILES.toString());
+    this.numRowsInput.setAttribute("max", MAX_NUM_TILES.toString());
+    this.numRowsInput.value = this.rows.toString();
   }
 
   createLevel(): void {
@@ -115,5 +148,9 @@ export default class Editor extends Phaser.Scene {
       gameObject.x = dragX;
       gameObject.y = dragY;
     });
+  }
+  
+  ocultar(){
+    this.laser.destroy();
   }
 }
