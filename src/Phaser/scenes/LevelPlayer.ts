@@ -1,4 +1,4 @@
-import * as Phaser from 'phaser';
+import * as Phaser from "phaser";
 
 export default class LevelPlayer extends Phaser.Scene {
   constructor() {
@@ -11,7 +11,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
   create() {
     const logo = this.add.image(
-      this.cameras.main.centerX, 
+      this.cameras.main.centerX,
       this.cameras.main.centerY,
       "logo"
     );
@@ -36,12 +36,17 @@ export default class LevelPlayer extends Phaser.Scene {
     runCodeBtn.addEventListener("click", () => this.runCode());
   }
 
-  runCode(){
-      let code = globalThis.blocklyController.getCode();
-      eval(code);
+  runCode() {
+    let code = globalThis.blocklyController.getCode();
+    eval(code);
   }
-  
-  move(steps : number, direction: string) {
-    console.log("se esta ejecutando dentro de Menu la siguiente funcion: execmove(", steps, direction,")");
+
+  move(steps: number, direction: string) {
+    console.log(
+      "se esta ejecutando dentro de Menu la siguiente funcion: execmove(",
+      steps,
+      direction,
+      ")"
+    );
   }
 }
