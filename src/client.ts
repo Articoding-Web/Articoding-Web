@@ -1,7 +1,5 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
-import PhaserController from "./Phaser/PhaserController";
-import BlocklyController from "./Blockly/BlocklyController";
 
 globalThis.blocklyArea = document.getElementById("blocklyArea") as HTMLElement;
 globalThis.blocklyDiv = document.getElementById("blocklyDiv") as HTMLDivElement;
@@ -12,7 +10,7 @@ let blocklyToggler = document.getElementById(
 let blocklyController: BlocklyController;
 let phaserController: PhaserController;
 
-window.addEventListener("load", (e) => {
+window.addEventListener("load", (event) => {
   phaserController = new PhaserController();
   blocklyController = new BlocklyController();
   globalThis.phaserController = phaserController;
@@ -20,7 +18,7 @@ window.addEventListener("load", (e) => {
 
   addNavbarListeners();
 
-  blocklyToggler.addEventListener("click", (ev) => toggleBlockly());
+  blocklyToggler.addEventListener("click", (event) => toggleBlockly());
 });
 
 function toggleBlockly() {
@@ -30,23 +28,14 @@ function toggleBlockly() {
   } else {
     blocklyController.showWorkspace();
     phaserController.reduceSize();
-    phaserController.startScene("LevelEditor", {
-      width: globalThis.phaserDiv.clientWidth,
-      height: globalThis.phaserDiv.clientHeight,
-    });
   }
 }
 
 function addNavbarListeners() {
   let playBtn = document.getElementById("playBtn");
-  playBtn.addEventListener("click", (e) => playLevel());
-  let playBtn = document.getElementById("playBtn");
-  playBtn.addEventListener("click", (e) => playLevel());
-
+  playBtn.addEventListener("click", (event) => playLevel());
   let buildBtn = document.getElementById("buildBtn");
-  buildBtn.addEventListener("click", (e) => editLevel());
-  let buildBtn = document.getElementById("buildBtn");
-  buildBtn.addEventListener("click", (e) => editLevel());
+  buildBtn.addEventListener("click", (event) => editLevel());
 }
 
 function playLevel() {
