@@ -18,7 +18,6 @@ export default class PhaserController {
 
   constructor() {
     this.game = new Phaser.Game(PhaserConfig);
-    const gameInstance = this.game;
   }
 
   increaseSize() {
@@ -34,7 +33,6 @@ export default class PhaserController {
   }
 
   startScene(key: string | Phaser.Scene, data?: object) {
-    // Stop all active scenes
     this.game.scene
       .getScenes(true)
       .forEach((scene) => this.game.scene.stop(scene));

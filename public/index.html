@@ -1,106 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="./css/bootstrap5.3.2.min.css" rel="stylesheet">
-    <!-- <link href="./css/style.css" rel="stylesheet"> -->
-    <title>Articoding</title>
-</head>
-
-<body class="vh-100">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="./img/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
-                Articoding
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a id="playBtn" class="nav-link" aria-current="page" href="#">Play</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">Guide</a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="buildBtn" class="nav-link" aria-current="page" href="#">Build</a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="communityBtn" class="nav-link" aria-current="page" href="#">Community</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container-fluid h-100">
-        <div class="row row-cols-1 row-cols-lg-2 h-100">
-            <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative">
-                <div id="blocklyDiv" style="height: 100%; width: 100%;"></div>
-                <div class="position-absolute top-0 end-0">
-                    <button class="btn btn-primary" id="runCodeBtn">
-                        Run Code
-                    </button>
-                </div>
-            </div>
-            <div id="phaserDiv" class="col w-100 mx-auto mh-100 p-0 position-relative">
-                <canvas id="phaserCanvas"></canvas>
-                
-                <!-- Toggle Blockly -->
-                <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0 d-none">
-                    Toggle Blockly
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="./css/bootstrap5.3.2.min.css" rel="stylesheet">
+        <link href="./css/style.css" rel="stylesheet">
+        <title>Articoding</title>
+    </head>
+    <body class="vh-100">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="./img/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                    Articoding
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-
-                <!-- Resize grid -->
-                <div id="gridResizeDialog" class="position-absolute top-0 end-0 d-none">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gridResizeModal">
-                        Resize Grid
-                    </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a id="playBtn" class="nav-link" aria-current="page" href="#">Play</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="#">Guide</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="buildBtn" class="nav-link" aria-current="page" href="#">Build</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="communityBtn" class="nav-link" aria-current="page" href="#">Community</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </div>
+        </nav>
 
-    <div class="modal fade" id="gridResizeModal" tabindex="-1" aria-labelledby="gridResizeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="gridResizeModalLabel">Level Editor</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row row-cols-2 g-2">
-                        <div class="col-4 text-end">
-                            Rows:
-                        </div>
-                        <div class="col-8 text-start">
-                            <input id="numRowsInput" name="numRowsInput" type="number" min="0" max="15">
-                        </div>
-                        <div class="col-4 text-end">
-                            Columns:
-                        </div>
-                        <div class="col-8 text-start">
-                            <input id="numColsInput" name="numColsInput" type="number" min="0" max="15">
-                        </div>
+        <div class="container-fluid h-100">
+            <div class="row row-cols-1 row-cols-lg-2 h-100">
+                <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative">
+                    <div id="blocklyDiv" class="blocks"></div>
+                    <div class="position-absolute top-0 end-0">
+                        <button class="btn btn-primary" id="runCodeBtn">
+                            Run Code
+                        </button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="changeGridSize" type="button" class="btn btn-primary">Change Size</button>
+                <div id="phaserDiv" class="col w-100 mx-auto mh-100 p-0 position-relative">
+                    <canvas id="phaserCanvas"></canvas>
+                    
+                    <!-- Toggle Blockly -->
+                    <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0 d-none">
+                        Toggle Blockly
+                    </button>
+
+                    <!-- Resize grid -->
+                    <div id="gridResizeDialog" class="position-absolute top-0 end-0 d-none">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gridResizeModal">
+                            Resize Grid
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
+        <div class="modal fade" id="gridResizeModal" tabindex="-1" aria-labelledby="gridResizeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="gridResizeModalLabel">Level Editor</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row row-cols-2 g-2">
+                            <div class="col-4 text-end">
+                                Rows:
+                            </div>
+                            <div class="col-8 text-start">
+                                <input id="numRowsInput" name="numRowsInput" type="number" min="0" max="15">
+                            </div>
+                            <div class="col-4 text-end">
+                                Columns:
+                            </div>
+                            <div class="col-8 text-start">
+                                <input id="numColsInput" name="numColsInput" type="number" min="0" max="15">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="changeGridSize" type="button" class="btn btn-primary">Change Size</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <script src="./js/bootstrap5.3.2.min.js"></script>
-    <script src="./client.js"></script>
-</body>
-
+        <script src="./js/bootstrap5.3.2.min.js"></script>
+        <script src="./client.js"></script>
+    </body>
 </html>

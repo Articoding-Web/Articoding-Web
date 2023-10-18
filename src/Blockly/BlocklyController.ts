@@ -17,6 +17,7 @@ export default class BlocklyController {
 
   showWorkspace() {
     globalThis.blocklyArea.classList.remove("d-none");
+    this.isVisible = true;
     window.dispatchEvent(new Event("resize"));
   }
 
@@ -25,10 +26,6 @@ export default class BlocklyController {
     this.isVisible = false;
     window.dispatchEvent(new Event("resize"));
   }
-
-  // log() {
-  //     console.log(javascriptGenerator.workspaceToCode(globalThis.workspace));
-  // }
 
   getCode() {
     let code = javascriptGenerator.workspaceToCode(globalThis.workspace);

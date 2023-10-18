@@ -28,6 +28,10 @@ function toggleBlockly() {
   } else {
     blocklyController.showWorkspace();
     phaserController.reduceSize();
+    phaserController.startScene("LevelEditor", {
+      width: globalThis.phaserDiv.clientWidth,
+      height: globalThis.phaserDiv.clientHeight,
+    });
   }
 }
 
