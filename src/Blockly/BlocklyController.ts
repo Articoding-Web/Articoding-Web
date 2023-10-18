@@ -7,7 +7,6 @@ import * as block_code from "./Workspace/block_code";
 export default class BlocklyController {
   blocklyArea = globalThis.blocklyArea;
   blocklyDiv = globalThis.blocklyDiv;
-  isVisible: Boolean = false;
 
   constructor() {
     globalThis.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
@@ -23,7 +22,6 @@ export default class BlocklyController {
 
   hideWorkspace() {
     globalThis.blocklyArea.classList.add("d-none");
-    this.isVisible = false;
     window.dispatchEvent(new Event("resize"));
   }
 
