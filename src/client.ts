@@ -4,6 +4,9 @@ import BlocklyController from "./Blockly/BlocklyController";
 globalThis.blocklyArea = document.getElementById("blocklyArea") as HTMLElement;
 globalThis.blocklyDiv = document.getElementById("blocklyDiv") as HTMLDivElement;
 globalThis.phaserDiv = document.getElementById("phaserDiv") as HTMLDivElement;
+globalThis.rows;
+globalThis.columns;
+
 let blocklyToggler = document.getElementById(
   "blocklyToggler"
 ) as HTMLButtonElement;
@@ -44,8 +47,8 @@ function playLevel() {
   phaserController.reduceSize();
   phaserController.startScene("LevelPlayer");
   phaserController.startScene("LevelEditor", {
-    width: globalThis.phaserDiv.clientWidth,
-    height: globalThis.phaserDiv.clientHeight,
+    rows: globalThis.rows,
+    columns: globalThis.columns,
   });
 }
 
@@ -54,7 +57,7 @@ function editLevel() {
   blocklyToggler.classList.add("d-none");
   phaserController.increaseSize();
   phaserController.startScene("LevelEditor", {
-    width: globalThis.phaserDiv.clientWidth,
-    height: globalThis.phaserDiv.clientHeight,
+    rows: globalThis.rows,
+    columns: globalThis.columns,
   });
 }

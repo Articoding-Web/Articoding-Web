@@ -1,5 +1,8 @@
 import * as Phaser from "phaser";
+
 import { LevelData } from "../Classes/LevelData";
+
+import TileObject from "../Classes/TileObject";
 import ArticodingObject from "../Classes/ArticodingObject";
 
 const TILE_SIZE = 100;
@@ -13,7 +16,7 @@ export default class LevelEditor extends Phaser.Scene {
   numColsInput = <HTMLInputElement>document.getElementById("numColsInput");
   rows: integer;
   columns: integer;
-  tiles: Phaser.GameObjects.Sprite[] = [];
+  tiles: TileObject[] = [];
   laser: Phaser.GameObjects.Sprite;
   chest: Phaser.GameObjects.Sprite;
   level: LevelData;
@@ -26,7 +29,7 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   init(level?: LevelData): void {
-    if (typeof level !== "object") {
+    if (level.rows !== undefined) {
       this.level = level;
     }
   }
@@ -35,6 +38,8 @@ export default class LevelEditor extends Phaser.Scene {
     this.resizeDialog.classList.remove("d-none");
     this.rows = this.level ? this.level.rows : INITIAL_TILES;
     this.columns = this.level ? this.level.columns : INITIAL_TILES;
+    globalThis.rows = this.rows;
+    globalThis.columns = this.columns;
     this.setMinMaxNumTiles();
     this.tiles = [];
     this.objectX = this.cameras.main.width / 10;
@@ -80,66 +85,13 @@ export default class LevelEditor extends Phaser.Scene {
       .getElementById("changeGridSize")
       .addEventListener("click", (event) => {
         if (
-          +this.numRowsInput.value < MIN_NUM_TILES ||
-          +this.numRowsInput.value > MAX_NUM_TILES
+          +this.numRowsInput.value > MIN_NUM_TILES ||
+          +this.numRowsInput.value < MAX_NUM_TILES
         ) {
-          console.error("Invalid grid HEIGHT");
-        } else if (
-          +this.numColsInput.value < MIN_NUM_TILES &&
-          +this.numColsInput.value > MAX_NUM_TILES
-        ) {
-          console.error("Invalid grid WIDTH");
-        } else {
-          let width = this.rows - +this.numRowsInput.value;
-          let height = this.columns - +this.numColsInput.value;
           this.rows = +this.numRowsInput.value;
           this.columns = +this.numColsInput.value;
-          if (width < 0) {
-            this.cameras.main.zoom -= +this.numRowsInput.value * 0.025;
-            this.objectX -= +this.numRowsInput.value * 25;
-            this.laser.destroy();
-            this.laser = new ArticodingObject(
-              this,
-              this.objectX,
-              this.objectY,
-              "FrogSpriteSheet",
-              "down/SpriteSheet-02.png"
-            );
-            this.chest.destroy();
-            this.chest = new ArticodingObject(
-              this,
-              this.objectX,
-              this.objectY + 100,
-              "BigTreasureChest",
-              "BigTreasureChest-0.png",
-              true
-            );
-          }
-          if (width > 0) {
-            this.cameras.main.zoom += +this.numRowsInput.value * 0.025;
-            this.objectX += +this.numRowsInput.value * 25;
-            this.laser.destroy();
-            this.laser = new ArticodingObject(
-              this,
-              this.objectX,
-              this.objectY,
-              "FrogSpriteSheet",
-              "down/SpriteSheet-02.png"
-            );
-            this.chest.destroy();
-            this.chest = new ArticodingObject(
-              this,
-              this.objectX,
-              this.objectY + 100,
-              "BigTreasureChest",
-              "BigTreasureChest-0.png",
-              true
-            );
-          }
-          if (height < 0)
-            this.cameras.main.zoom -= +this.numColsInput.value * 0.025;
-          if (height > 0)
-            this.cameras.main.zoom += +this.numColsInput.value * 0.025;
+          globalThis.rows = this.rows;
+          globalThis.columns = this.columns;
           this.createLevel();
         }
       });
@@ -149,7 +101,7 @@ export default class LevelEditor extends Phaser.Scene {
     });
   }
 
-  zoom() {
+  zoom(): void {
     this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       if (deltaY > 0) {
         var zoom = this.cameras.main.zoom - 0.05;
@@ -162,7 +114,7 @@ export default class LevelEditor extends Phaser.Scene {
     });
   }
 
-  setMinMaxNumTiles() {
+  setMinMaxNumTiles(): void {
     this.numColsInput.setAttribute("min", MIN_NUM_TILES.toString());
     this.numColsInput.setAttribute("max", MAX_NUM_TILES.toString());
     this.numColsInput.value = this.columns.toString();
@@ -191,8 +143,7 @@ export default class LevelEditor extends Phaser.Scene {
       this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length < numTiles) {
-        const tile = this.add.sprite(0, 0, "tile").setInteractive();
-        tile.input!.dropZone = true;
+        const tile = new TileObject(this, 0, 0, "tile");
         this.tiles.push(tile);
       }
     }
@@ -205,9 +156,5 @@ export default class LevelEditor extends Phaser.Scene {
       x,
       y,
     });
-  }
-
-  ocultar() {
-    this.laser.destroy();
   }
 }
