@@ -18,8 +18,8 @@ export default class LevelEditor extends Phaser.Scene {
   chest: Phaser.GameObjects.Sprite;
   level: LevelData;
 
-  objectWidth: integer;
-  objectHeight: integer;
+  objectX: integer;
+  objectY: integer;
 
   constructor() {
     super("LevelEditor");
@@ -37,8 +37,8 @@ export default class LevelEditor extends Phaser.Scene {
     this.columns = this.level ? this.level.columns : INITIAL_TILES;
     this.setMinMaxNumTiles();
     this.tiles = [];
-    this.objectWidth = this.cameras.main.width / 10;
-    this.objectHeight = this.cameras.main.height / 3;
+    this.objectX = this.cameras.main.width / 10;
+    this.objectY = this.cameras.main.height / 3;
 
     // Load froggy
     this.load.multiatlas(
@@ -59,15 +59,15 @@ export default class LevelEditor extends Phaser.Scene {
   create(): void {
     this.laser = new ArticodingObject(
       this,
-      this.objectWidth,
-      this.objectHeight,
+      this.objectX,
+      this.objectY,
       "FrogSpriteSheet",
       "down/SpriteSheet-02.png"
     );
     this.chest = new ArticodingObject(
       this,
-      this.objectWidth,
-      this.objectHeight + 100,
+      this.objectX,
+      this.objectY + 100,
       "BigTreasureChest",
       "BigTreasureChest-0.png",
       true
@@ -96,11 +96,45 @@ export default class LevelEditor extends Phaser.Scene {
           this.columns = +this.numColsInput.value;
           if (width < 0) {
             this.cameras.main.zoom -= +this.numRowsInput.value * 0.025;
-            this.objectWidth -= +this.numRowsInput.value * 25;
+            this.objectX -= +this.numRowsInput.value * 25;
+            this.laser.destroy();
+            this.laser = new ArticodingObject(
+              this,
+              this.objectX,
+              this.objectY,
+              "FrogSpriteSheet",
+              "down/SpriteSheet-02.png"
+            );
+            this.chest.destroy();
+            this.chest = new ArticodingObject(
+              this,
+              this.objectX,
+              this.objectY + 100,
+              "BigTreasureChest",
+              "BigTreasureChest-0.png",
+              true
+            );
           }
           if (width > 0) {
             this.cameras.main.zoom += +this.numRowsInput.value * 0.025;
-            this.objectWidth += +this.numRowsInput.value * 25;
+            this.objectX += +this.numRowsInput.value * 25;
+            this.laser.destroy();
+            this.laser = new ArticodingObject(
+              this,
+              this.objectX,
+              this.objectY,
+              "FrogSpriteSheet",
+              "down/SpriteSheet-02.png"
+            );
+            this.chest.destroy();
+            this.chest = new ArticodingObject(
+              this,
+              this.objectX,
+              this.objectY + 100,
+              "BigTreasureChest",
+              "BigTreasureChest-0.png",
+              true
+            );
           }
           if (height < 0)
             this.cameras.main.zoom -= +this.numColsInput.value * 0.025;
@@ -146,15 +180,15 @@ export default class LevelEditor extends Phaser.Scene {
     let numTiles = this.rows * this.columns;
 
     if (numTiles < this.tiles.length) {
-      this.laser.setPosition(this.objectWidth, this.objectHeight);
-      this.chest.setPosition(this.objectWidth, this.objectHeight + 100);
+      this.laser.setPosition(this.objectX, this.objectY);
+      this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length > numTiles) {
         this.tiles.pop()?.destroy();
       }
     } else if (numTiles > this.tiles.length) {
-      this.laser.setPosition(this.objectWidth, this.objectHeight);
-      this.chest.setPosition(this.objectWidth, this.objectHeight + 100);
+      this.laser.setPosition(this.objectX, this.objectY);
+      this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length < numTiles) {
         const tile = this.add.sprite(0, 0, "tile").setInteractive();
