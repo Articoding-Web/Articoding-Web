@@ -38,7 +38,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     this.scene.input.setDraggable(this);
 
     this.on("drag", (pointer, dragX, dragY) => this.onDrag(dragX, dragY));
-    this.on("dragstart", () => this.onDragStart());
+    this.on("dragstart", (dropZone) => this.onDragStart(dropZone));
     this.on("dragenter", (pointer, dropZone) => this.onDragEnter());
     this.on("dragleave", (pointer, dropZone) => this.onDragLeave());
     this.on("dragend", (pointer) => this.onDragEnd());
@@ -52,9 +52,12 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     this.y = dragY;
   }
 
-  onDragStart() {
+  onDragStart(dropZone) {
     this.scene.children.bringToTop(this);
-    //if (this.dropZone !== undefined) this.isOnDropZone = true;
+    let tile = this.board.findTile(this);
+    if (tile !== undefined){ 
+      this.isOnDropZone = true;
+    }
   }
 
   onDragEnter() {
@@ -67,7 +70,6 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDragEnd() {
     if (!this.isOnDropZone) {
-      this.resetDropZone();
 
       // Reset/Destroy object
       if (this.allowDestruction) {
@@ -97,15 +99,13 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         );
         this.board.addObject(newObj, dropZone);
         // Reset position
-        this.x = this.origX;
-        this.y = this.origY;
+        // this.x = this.origX; //MAYBE DELETE
+        // this.y = this.origY;
         this.isOnDropZone = false;
       } else {
         // Set position
-        this.x = dropZone.x;
-        this.y = dropZone.y;
+        this.board.move(this,dropZone);
       }
-
       // Zone occupied
     } else {
       this.x = this.origX;
@@ -114,9 +114,10 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
   }
 
   resetDropZone() {
-    // if (this.dropZone !== undefined) {
-    //   this.dropZone.occupied = false;
-    //   this.dropZone = undefined;
-    // }
+    let tile = this.board.findTile(this);
+    if (tile !== undefined) {
+      tile.occupied = false;
+      tile.object = undefined;
+    }
   }
 }

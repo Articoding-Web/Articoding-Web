@@ -10,6 +10,17 @@ export default class Board {
     this.tiles = tiles;
   }
 
+  findTile(obj: ArticodingObject) : TileObject {
+    let tileToFind  = undefined;
+    this.tiles.forEach((tile) => {
+        if(tile.object === obj ){
+           tileToFind = tile;
+           return;
+        }
+    });
+    return tileToFind;
+  }
+
   addObject(object: ArticodingObject, cell: TileObject) {
     this.tiles.map((tile) => {
       if (tile === cell) tile.addObject(object);
@@ -18,7 +29,10 @@ export default class Board {
 
   remove(obj: ArticodingObject) {
     this.tiles.map((tile) => {
-      if (tile.object === obj) tile.deleteObject();
+      if (tile.object === obj){ 
+        tile.deleteObject();
+        return;
+      }
     });
   }
 
@@ -31,8 +45,8 @@ export default class Board {
   move(object: ArticodingObject, cell: TileObject) {
     this.tiles.map((tile) => {
       if (tile === cell) {
-        //object.dropZone.occupied = false;
         tile.addObject(object);
+        return;
       }
     });
   }

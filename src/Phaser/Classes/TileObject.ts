@@ -22,17 +22,19 @@ export default class TileObject extends Phaser.GameObjects.Sprite {
 
   addObject(object: ArticodingObject) {
     if (!this.occupied) {
+      object.x = this.x;
+      object.y = this.y;
       this.object = object;
       this.occupied = true;
     }
   }
 
   deleteObject() {
-    if (this.object !== undefined) this.object.destroy();
-    this.occupied = false;
+    if (this.object !== undefined){
+      this.object.destroy();
+      this.occupied = false;
+      this.object = undefined;
+    }
   }
 
-  move() {
-    this.object = undefined;
-  }
 }
