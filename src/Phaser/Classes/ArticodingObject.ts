@@ -1,5 +1,7 @@
 import * as Phaser from "phaser";
+
 import TileObject from "./TileObject";
+import Board from "./Board";
 
 export default class ArticodingObject extends Phaser.GameObjects.Sprite {
   allowMultiple: Boolean = false; // allow object to be duplicated or not
@@ -8,13 +10,14 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
   isOnDropZone: Boolean = false;
   origX: number;
   origY: number;
-  dropZone: TileObject | undefined;
+  board: Board;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     texture: string | Phaser.Textures.Texture,
+    board: Board,
     frame?: string | number | undefined,
     allowMultiple?: Boolean,
     allowDestruction?: Boolean
@@ -25,6 +28,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     this.allowMultiple = allowMultiple;
     this.origX = x;
     this.origY = y;
+    this.board = board;
     this.allowDestruction = allowDestruction;
 
     const scaleFactor = Math.min(100 / this.width, 100 / this.height); //TODO change texture
@@ -50,7 +54,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDragStart() {
     this.scene.children.bringToTop(this);
-    if (this.dropZone !== undefined) this.isOnDropZone = true;
+    //if (this.dropZone !== undefined) this.isOnDropZone = true;
   }
 
   onDragEnter() {
@@ -67,7 +71,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
       // Reset/Destroy object
       if (this.allowDestruction) {
-        this.destroy();
+        this.board.remove(this);
       } else {
         this.x = this.origX;
         this.y = this.origY;
@@ -86,12 +90,12 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
           dropZone.x,
           dropZone.y,
           this.texture,
+          this.board,
           this.frameString,
           false,
           true
         );
-        newObj.dropZone = dropZone;
-
+        this.board.addObject(newObj, dropZone);
         // Reset position
         this.x = this.origX;
         this.y = this.origY;
@@ -100,14 +104,9 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         // Set position
         this.x = dropZone.x;
         this.y = dropZone.y;
-        this.dropZone = dropZone;
       }
 
       // Zone occupied
-      dropZone.occupied = true;
-    } else if (this.dropZone !== undefined) {
-      this.x = this.dropZone.x;
-      this.y = this.dropZone.y;
     } else {
       this.x = this.origX;
       this.y = this.origY;
@@ -115,9 +114,9 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
   }
 
   resetDropZone() {
-    if (this.dropZone !== undefined) {
-      this.dropZone.occupied = false;
-      this.dropZone = undefined;
-    }
+    // if (this.dropZone !== undefined) {
+    //   this.dropZone.occupied = false;
+    //   this.dropZone = undefined;
+    // }
   }
 }

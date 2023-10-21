@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 
 import { LevelData } from "../Classes/LevelData";
 
+import Board from "../Classes/Board";
 import TileObject from "../Classes/TileObject";
 import ArticodingObject from "../Classes/ArticodingObject";
 
@@ -20,6 +21,7 @@ export default class LevelEditor extends Phaser.Scene {
   frog: Phaser.GameObjects.Sprite;
   chest: Phaser.GameObjects.Sprite;
   level: LevelData;
+  board: Board;
 
   objectX: integer;
   objectY: integer;
@@ -60,11 +62,13 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   create(): void {
+    this.board = new Board();
     this.frog = new ArticodingObject(
       this,
       this.objectX,
       this.objectY,
       "FrogSpriteSheet",
+      this.board,
       "down/SpriteSheet-02.png"
     );
     this.chest = new ArticodingObject(
@@ -72,6 +76,7 @@ export default class LevelEditor extends Phaser.Scene {
       this.objectX,
       this.objectY + 100,
       "BigTreasureChest",
+      this.board,
       "BigTreasureChest-0.png",
       true
     );
@@ -86,9 +91,6 @@ export default class LevelEditor extends Phaser.Scene {
           +this.numRowsInput.value > MIN_NUM_TILES ||
           +this.numRowsInput.value < MAX_NUM_TILES
         ) {
-          let width = this.rows - +this.numRowsInput.value;
-          let height = this.columns - +this.numColsInput.value;
-          let total = width + height;
           this.rows = +this.numRowsInput.value;
           this.columns = +this.numColsInput.value;
           this.createLevel();
@@ -123,9 +125,6 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   createLevel(): void {
-    //let size: number = TILE_SIZE;
-    // size += total * 0.1 * size;
-
     const SCREEN_WIDTH = this.cameras.main.width;
     const SCREEN_HEIGHT = this.cameras.main.height;
     let x = (SCREEN_WIDTH - this.rows * TILE_SIZE) / 2;
@@ -159,9 +158,6 @@ export default class LevelEditor extends Phaser.Scene {
       y,
     });
 
-    /*this.tiles.forEach((tile) => {
-      tile.displayWidth = size;
-      tile.scaleY = tile.scaleX;
-    });*/
+    this.board.setTiles(this.tiles);
   }
 }
