@@ -1,8 +1,10 @@
 import * as Blockly from "blockly";
+import * as block_code from "./Workspace/block_code";
+
 import { javascriptGenerator } from "blockly/javascript";
+
 import blocks from "./Workspace/blocks";
 import toolbox from "./Workspace/toolbox";
-import * as block_code from "./Workspace/block_code";
 
 export default class BlocklyController {
   blocklyArea = globalThis.blocklyArea;

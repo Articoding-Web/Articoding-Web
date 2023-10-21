@@ -38,9 +38,5 @@ export default class PhaserController {
       .getScenes(true)
       .forEach((scene) => this.game.scene.stop(scene));
     this.game.scene.start(key, data);
-    this.game.scene
-      .getScenes(true)
-      .forEach((scene) => this.game.scene.stop(scene));
-    this.game.scene.start(key, data);
   }
 }

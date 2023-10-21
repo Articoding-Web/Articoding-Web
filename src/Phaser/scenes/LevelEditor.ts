@@ -17,7 +17,7 @@ export default class LevelEditor extends Phaser.Scene {
   rows: integer;
   columns: integer;
   tiles: TileObject[] = [];
-  laser: Phaser.GameObjects.Sprite;
+  frog: Phaser.GameObjects.Sprite;
   chest: Phaser.GameObjects.Sprite;
   level: LevelData;
 
@@ -38,8 +38,6 @@ export default class LevelEditor extends Phaser.Scene {
     this.resizeDialog.classList.remove("d-none");
     this.rows = this.level ? this.level.rows : INITIAL_TILES;
     this.columns = this.level ? this.level.columns : INITIAL_TILES;
-    globalThis.rows = this.rows;
-    globalThis.columns = this.columns;
     this.setMinMaxNumTiles();
     this.tiles = [];
     this.objectX = this.cameras.main.width / 10;
@@ -62,7 +60,7 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   create(): void {
-    this.laser = new ArticodingObject(
+    this.frog = new ArticodingObject(
       this,
       this.objectX,
       this.objectY,
@@ -88,10 +86,11 @@ export default class LevelEditor extends Phaser.Scene {
           +this.numRowsInput.value > MIN_NUM_TILES ||
           +this.numRowsInput.value < MAX_NUM_TILES
         ) {
+          let width = this.rows - +this.numRowsInput.value;
+          let height = this.columns - +this.numColsInput.value;
+          let total = width + height;
           this.rows = +this.numRowsInput.value;
           this.columns = +this.numColsInput.value;
-          globalThis.rows = this.rows;
-          globalThis.columns = this.columns;
           this.createLevel();
         }
       });
@@ -124,6 +123,9 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   createLevel(): void {
+    //let size: number = TILE_SIZE;
+    // size += total * 0.1 * size;
+
     const SCREEN_WIDTH = this.cameras.main.width;
     const SCREEN_HEIGHT = this.cameras.main.height;
     let x = (SCREEN_WIDTH - this.rows * TILE_SIZE) / 2;
@@ -132,14 +134,14 @@ export default class LevelEditor extends Phaser.Scene {
     let numTiles = this.rows * this.columns;
 
     if (numTiles < this.tiles.length) {
-      this.laser.setPosition(this.objectX, this.objectY);
+      this.frog.setPosition(this.objectX, this.objectY);
       this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length > numTiles) {
         this.tiles.pop()?.destroy();
       }
     } else if (numTiles > this.tiles.length) {
-      this.laser.setPosition(this.objectX, this.objectY);
+      this.frog.setPosition(this.objectX, this.objectY);
       this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length < numTiles) {
@@ -156,5 +158,10 @@ export default class LevelEditor extends Phaser.Scene {
       x,
       y,
     });
+
+    /*this.tiles.forEach((tile) => {
+      tile.displayWidth = size;
+      tile.scaleY = tile.scaleX;
+    });*/
   }
 }
