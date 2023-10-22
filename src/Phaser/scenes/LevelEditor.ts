@@ -93,6 +93,7 @@ export default class LevelEditor extends Phaser.Scene {
         ) {
           this.rows = +this.numRowsInput.value;
           this.columns = +this.numColsInput.value;
+          this.board.removeAll();
           this.createLevel();
         }
       });
