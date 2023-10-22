@@ -24,6 +24,8 @@ export default class TileObject extends Phaser.GameObjects.Sprite {
     if (!this.occupied) {
       object.x = this.x;
       object.y = this.y;
+      object.origX = this.x;
+      object.origY = this.y;
       this.object = object;
       this.occupied = true;
     }
