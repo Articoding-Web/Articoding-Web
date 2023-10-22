@@ -70,13 +70,17 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDragEnd() {
     if (!this.isOnDropZone) {
-
-      this.resetOrDestroy();
+      if (this.allowDestruction) {
+        this.board.remove(this);
+      } else {
+        this.x = this.origX;
+        this.y = this.origY;
+      }
     }
   }
 
   onDrop(dropZone: TileObject) {
-    if (this.isOnDropZone && !dropZone.occupied) {
+    if (this.isOnDropZone && !dropZone.isOccupied()) {
       this.resetDropZone();
 
       if (this.allowMultiple) {
@@ -110,7 +114,6 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
   resetDropZone() {
     let tile = this.board.findTile(this);
     if (tile !== undefined) {
-      tile.occupied = false;
       tile.object = undefined;
     }
   }
