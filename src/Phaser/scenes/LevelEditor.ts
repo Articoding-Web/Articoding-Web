@@ -1,16 +1,15 @@
+import * as Phaser from "phaser";
 
-import * as Phaser from 'phaser';
-import { LevelData } from '../Classes/LevelData';
-import ArticodingObject from "../Classes/ArticodingObject";
+import { LevelData } from "../Classes/LevelData";
+
+import Board from "../Classes/Board";
 import TileObject from "../Classes/TileObject";
+import ArticodingObject from "../Classes/ArticodingObject";
 
 const TILE_SIZE = 100;
 const MIN_NUM_TILES = 2;
-const MAX_NUM_TILES = 15;
+const MAX_NUM_TILES = 10;
 const INITIAL_TILES = 5;
-
-const LASER_START_X = 200;
-const LASER_START_Y = 500;
 
 export default class LevelEditor extends Phaser.Scene {
   resizeDialog = <HTMLDivElement>document.getElementById("gridResizeDialog");
@@ -18,16 +17,21 @@ export default class LevelEditor extends Phaser.Scene {
   numColsInput = <HTMLInputElement>document.getElementById("numColsInput");
   rows: integer;
   columns: integer;
-  tiles: Phaser.GameObjects.Sprite[] = [];
-  laser: Phaser.GameObjects.Sprite;
+  tiles: TileObject[] = [];
+  frog: Phaser.GameObjects.Sprite;
+  chest: Phaser.GameObjects.Sprite;
   level: LevelData;
+  board: Board;
+
+  objectX: integer;
+  objectY: integer;
 
   constructor() {
     super("LevelEditor");
   }
 
   init(level?: LevelData): void {
-    if (typeof level !== 'object') {
+    if (level.rows !== undefined) {
       this.level = level;
     }
   }
@@ -38,6 +42,8 @@ export default class LevelEditor extends Phaser.Scene {
     this.columns = this.level ? this.level.columns : INITIAL_TILES;
     this.setMinMaxNumTiles();
     this.tiles = [];
+    this.objectX = this.cameras.main.width / 10;
+    this.objectY = this.cameras.main.height / 3;
 
     // Load froggy
     this.load.multiatlas(
@@ -52,22 +58,25 @@ export default class LevelEditor extends Phaser.Scene {
       "assets/sprites/"
     );
 
-    this.load.image("tile", "assets/Tiles/tile.png");
+    this.load.image("tile", "assets/tiles/tile.png");
   }
 
   create(): void {
-    this.laser = new ArticodingObject(
+    this.board = new Board();
+    this.frog = new ArticodingObject(
       this,
-      LASER_START_X,
-      LASER_START_Y,
+      this.objectX,
+      this.objectY,
       "FrogSpriteSheet",
+      this.board,
       "down/SpriteSheet-02.png"
     );
-    new ArticodingObject(
+    this.chest = new ArticodingObject(
       this,
-      LASER_START_X,
-      LASER_START_Y + 100,
+      this.objectX,
+      this.objectY + 100,
       "BigTreasureChest",
+      this.board,
       "BigTreasureChest-0.png",
       true
     );
@@ -75,42 +84,39 @@ export default class LevelEditor extends Phaser.Scene {
     this.createLevel();
     this.zoom();
 
-    document.getElementById("changeGridSize").addEventListener("click", ev => {
-      if (+this.numRowsInput.value < MIN_NUM_TILES || +this.numRowsInput.value > MAX_NUM_TILES) {
-        console.error("Invalid grid HEIGHT");
-      }
-      else if (+this.numColsInput.value < MIN_NUM_TILES && +this.numColsInput.value > MAX_NUM_TILES) {
-        console.error("Invalid grid WIDTH");
-      } else {
-        this.rows = +this.numRowsInput.value;
-        this.columns = +this.numColsInput.value;
-        this.createLevel();
-      }
-    })
+    document
+      .getElementById("changeGridSize")
+      .addEventListener("click", (event) => {
+        if (
+          +this.numRowsInput.value > MIN_NUM_TILES ||
+          +this.numRowsInput.value < MAX_NUM_TILES
+        ) {
+          this.rows = +this.numRowsInput.value;
+          this.columns = +this.numColsInput.value;
+          this.board.removeAll();
+          this.createLevel();
+        }
+      });
 
-    this.events.on('shutdown', e => {
+    this.events.on("shutdown", (event) => {
       this.resizeDialog.classList.add("d-none");
-    })
+    });
   }
 
-  zoom() {
+  zoom(): void {
     this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       if (deltaY > 0) {
         var zoom = this.cameras.main.zoom - 0.05;
-        if (zoom > 0.3) {
-          this.cameras.main.zoom = zoom;
-        }
+        if (zoom > 0.5) this.cameras.main.zoom -= 0.05;
       }
       if (deltaY < 0) {
         var zoom = this.cameras.main.zoom + 0.05;
-        if (zoom < 1.3) {
-          this.cameras.main.zoom = zoom;
-        }
+        if (zoom < 1.5) this.cameras.main.zoom = zoom;
       }
     });
   }
 
-  setMinMaxNumTiles() {
+  setMinMaxNumTiles(): void {
     this.numColsInput.setAttribute("min", MIN_NUM_TILES.toString());
     this.numColsInput.setAttribute("max", MAX_NUM_TILES.toString());
     this.numColsInput.value = this.columns.toString();
@@ -128,17 +134,18 @@ export default class LevelEditor extends Phaser.Scene {
     let numTiles = this.rows * this.columns;
 
     if (numTiles < this.tiles.length) {
-      this.laser.setPosition(LASER_START_X, LASER_START_Y);
+      this.frog.setPosition(this.objectX, this.objectY);
+      this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length > numTiles) {
         this.tiles.pop()?.destroy();
       }
     } else if (numTiles > this.tiles.length) {
-      this.laser.setPosition(LASER_START_X, LASER_START_Y);
+      this.frog.setPosition(this.objectX, this.objectY);
+      this.chest.setPosition(this.objectX, this.objectY + 100);
 
       while (this.tiles.length < numTiles) {
-        const tile = this.add.sprite(0, 0, "tile").setInteractive();
-        tile.input!.dropZone = true;
+        const tile = new TileObject(this, 0, 0, "tile");
         this.tiles.push(tile);
       }
     }
@@ -151,53 +158,7 @@ export default class LevelEditor extends Phaser.Scene {
       x,
       y,
     });
-  }
 
-  setDragEvents(): void {
-    this.input.on("dragenter", (pointer, gameObject, dropZone) => {
-      dropZone.setTint(0x00ff00);
-    });
-
-    this.input.on("dragleave", (pointer, gameObject, dropZone) => {
-      dropZone.clearTint();
-    });
-
-    this.input.on("drop", (pointer, gameObject, dropZone) => {
-      gameObject.x = dropZone.x;
-      gameObject.y = dropZone.y;
-
-      dropZone.clearTint();
-    });
-  }
-
-  turret(): void {
-    this.laser = this.add.sprite(LASER_START_X, LASER_START_Y, "laser");
-    this.laser.setInteractive();
-    const targetWidth = 200;
-    const targetHeight = 200;
-    const scaleFactor = Math.min(
-      targetWidth / this.laser.width,
-      targetHeight / this.laser.height
-    );
-    this.laser.setScale(scaleFactor);
-
-    this.input.setDraggable(this.laser);
-
-    this.input.on(
-      "dragstart",
-      function (pointer, gameObject) {
-        this.children.bringToTop(gameObject);
-      },
-      this
-    );
-
-    this.input.on("drag", (pointer, gameObject, dragX, dragY) => {
-      gameObject.x = dragX;
-      gameObject.y = dragY;
-    });
-  }
-
-  ocultar() {
-    this.laser.destroy();
+    this.board.setTiles(this.tiles);
   }
 }

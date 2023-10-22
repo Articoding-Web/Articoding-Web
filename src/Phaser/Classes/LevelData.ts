@@ -1,5 +1,4 @@
-
 export type LevelData = {
-    rows: number;
-    columns: number;
-}
+  rows: integer;
+  columns: integer;
+};
