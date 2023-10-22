@@ -33,10 +33,9 @@ export default class TileObject extends Phaser.GameObjects.Sprite {
 
   deleteObject() {
     if (this.object !== undefined){
-      this.object.destroy();
+      this.object.resetOrDestroy();
       this.occupied = false;
       this.object = undefined;
     }
   }
-
 }
