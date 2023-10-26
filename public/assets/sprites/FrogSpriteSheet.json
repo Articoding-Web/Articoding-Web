@@ -4,13 +4,13 @@
 			"image": "FrogSpriteSheet.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 18,
-				"h": 487
+				"w": 192,
+				"h": 16
 			},
 			"scale": 1,
 			"frames": [
 				{
-					"filename": "down/SpriteSheet-05.png",
+					"filename": "down/0.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -24,14 +24,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 1,
+						"x": 0,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "left/SpriteSheet-20.png",
+					"filename": "down/2.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -45,14 +45,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 19,
+						"x": 0,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "left/SpriteSheet-21.png",
+					"filename": "down/1.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -66,14 +66,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 37,
+						"x": 16,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "left/SpriteSheet-22.png",
+					"filename": "down/3.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -87,14 +87,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 55,
+						"x": 32,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "left/SpriteSheet-23.png",
+					"filename": "left/0.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -108,14 +108,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 73,
+						"x": 48,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "left/SpriteSheet-24.png",
+					"filename": "left/2.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -129,14 +129,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 91,
+						"x": 48,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "left/SpriteSheet-25.png",
+					"filename": "left/1.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -150,14 +150,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 109,
+						"x": 64,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "right/SpriteSheet-30.png",
+					"filename": "left/3.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -171,14 +171,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 127,
+						"x": 80,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "right/SpriteSheet-32.png",
+					"filename": "right/0.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -192,14 +192,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 145,
+						"x": 96,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "right/SpriteSheet-33.png",
+					"filename": "right/2.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -213,14 +213,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 163,
+						"x": 96,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "right/SpriteSheet-34.png",
+					"filename": "right/1.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -234,14 +234,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 181,
+						"x": 112,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "right/SpriteSheet-35.png",
+					"filename": "right/3.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -255,14 +255,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 199,
+						"x": 128,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "up/SpriteSheet-10.png",
+					"filename": "up/0.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -276,14 +276,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 217,
+						"x": 144,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "up/SpriteSheet-11.png",
+					"filename": "up/2.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -297,14 +297,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 235,
+						"x": 144,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "up/SpriteSheet-12.png",
+					"filename": "up/1.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -318,14 +318,14 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 253,
+						"x": 160,
+						"y": 0,
 						"w": 16,
 						"h": 16
 					}
 				},
 				{
-					"filename": "up/SpriteSheet-13.png",
+					"filename": "up/3.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -339,261 +339,9 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 1,
-						"y": 271,
-						"w": 16,
-						"h": 16
-					}
-				},
-				{
-					"filename": "up/SpriteSheet-14.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
+						"x": 176,
 						"y": 0,
 						"w": 16,
-						"h": 16
-					},
-					"frame": {
-						"x": 1,
-						"y": 289,
-						"w": 16,
-						"h": 16
-					}
-				},
-				{
-					"filename": "up/SpriteSheet-15.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 16,
-						"h": 16
-					},
-					"frame": {
-						"x": 1,
-						"y": 307,
-						"w": 16,
-						"h": 16
-					}
-				},
-				{
-					"filename": "dance/SpriteSheet-40.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 1,
-						"w": 16,
-						"h": 15
-					},
-					"frame": {
-						"x": 1,
-						"y": 325,
-						"w": 16,
-						"h": 15
-					}
-				},
-				{
-					"filename": "dance/SpriteSheet-41.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 1,
-						"w": 16,
-						"h": 15
-					},
-					"frame": {
-						"x": 1,
-						"y": 342,
-						"w": 16,
-						"h": 15
-					}
-				},
-				{
-					"filename": "dance/SpriteSheet-42.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 16,
-						"h": 14
-					},
-					"frame": {
-						"x": 1,
-						"y": 359,
-						"w": 16,
-						"h": 14
-					}
-				},
-				{
-					"filename": "dance/SpriteSheet-43.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 16,
-						"h": 14
-					},
-					"frame": {
-						"x": 1,
-						"y": 375,
-						"w": 16,
-						"h": 14
-					}
-				},
-				{
-					"filename": "down/SpriteSheet-00.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 16,
-						"h": 14
-					},
-					"frame": {
-						"x": 1,
-						"y": 391,
-						"w": 16,
-						"h": 14
-					}
-				},
-				{
-					"filename": "down/SpriteSheet-01.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 16,
-						"h": 14
-					},
-					"frame": {
-						"x": 1,
-						"y": 407,
-						"w": 16,
-						"h": 14
-					}
-				},
-				{
-					"filename": "down/SpriteSheet-02.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 16,
-						"h": 14
-					},
-					"frame": {
-						"x": 1,
-						"y": 423,
-						"w": 16,
-						"h": 14
-					}
-				},
-				{
-					"filename": "down/SpriteSheet-03.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 16,
-						"h": 14
-					},
-					"frame": {
-						"x": 1,
-						"y": 439,
-						"w": 16,
-						"h": 14
-					}
-				},
-				{
-					"filename": "down/SpriteSheet-04.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 3,
-						"w": 16,
-						"h": 13
-					},
-					"frame": {
-						"x": 1,
-						"y": 455,
-						"w": 16,
-						"h": 13
-					}
-				},
-				{
-					"filename": "right/SpriteSheet-31.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 16,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 15,
-						"h": 16
-					},
-					"frame": {
-						"x": 1,
-						"y": 470,
-						"w": 15,
 						"h": 16
 					}
 				}
@@ -603,6 +351,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:09b8d4380331699f9d0f0c1c298819ac:411bcc87136090c7b8fd2199cd629b3b:8dde0dd0197344c2f9f9f01d8d204375$"
+		"smartupdate": "$TexturePacker:SmartUpdate:1f1dfe00f865b95aa6d15abbe86a892b:1a6586fa1b53ff969bd9a75740ca8a44:61b7c8df18c2cc942c192a534965d30a$"
 	}
 }
