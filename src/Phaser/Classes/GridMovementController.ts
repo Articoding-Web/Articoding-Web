@@ -1,22 +1,22 @@
 import { Direction } from "../types/Direction";
-import { GridPhysics } from "./GridPhysics";
+import { Player } from "./Player";
 
-export class GridControls {
+export class GridMovementController {
     constructor(
+        private player: Player,
         private input: Phaser.Input.InputPlugin,
-        private gridPhysics: GridPhysics
     ) { }
 
     update() {
         const cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            this.gridPhysics.movePlayer(Direction.LEFT);
+            this.player.movePlayer(Direction.LEFT);
         } else if (cursors.right.isDown) {
-            this.gridPhysics.movePlayer(Direction.RIGHT);
+            this.player.movePlayer(Direction.RIGHT);
         } else if (cursors.up.isDown) {
-            this.gridPhysics.movePlayer(Direction.UP);
+            this.player.movePlayer(Direction.UP);
         } else if (cursors.down.isDown) {
-            this.gridPhysics.movePlayer(Direction.DOWN);
+            this.player.movePlayer(Direction.DOWN);
         }
     }
 }

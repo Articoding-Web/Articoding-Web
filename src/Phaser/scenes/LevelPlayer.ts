@@ -5,7 +5,7 @@ import ArticodingObject from "../Classes/ArticodingObject";
 import Board from "../Classes/Board";
 import TileObject from "../Classes/TileObject";
 import { Player } from "../Classes/Player";
-import { GridControls } from "../Classes/GridControls";
+import { GridMovementController } from "../Classes/GridMovementController";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
 
@@ -20,8 +20,8 @@ export default class LevelPlayer extends Phaser.Scene {
   private mapCoordX : number;
   private mapCoordY : number;
   private tilemap: Phaser.Tilemaps.Tilemap;
-  private gridControls: GridControls;
-  private gridPhysics: GridPhysics;
+  private player : Player;
+  private gridPhysics : GridPhysics;
 
   constructor() {
     super("LevelPlayer");
@@ -61,10 +61,9 @@ export default class LevelPlayer extends Phaser.Scene {
     const playerSprite = this.add.sprite(0, 0, "player", "down/0.png");
     playerSprite.setDepth(2);
     this.cameras.main.roundPixels = true;
-    const player = new Player(playerSprite, new Phaser.Math.Vector2(1, 2), this.mapCoordX, this.mapCoordY);
 
-    this.gridPhysics = new GridPhysics(player, this.tilemap);
-    this.gridControls = new GridControls(this.input, this.gridPhysics);
+    this.gridPhysics = new GridPhysics(this.tilemap);
+    this.player = new Player(playerSprite, new Phaser.Math.Vector2(1, 2), this.mapCoordX, this.mapCoordY, this.gridPhysics);
 
     this.createPlayerAnimation(Direction.UP);
     this.createPlayerAnimation(Direction.RIGHT);
@@ -106,8 +105,7 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   public update(_time: number, delta: number) {
-    this.gridControls.update();
-    this.gridPhysics.update(delta);
+    this.player.update(delta);
   }
 
 
