@@ -1,7 +1,6 @@
 import * as Phaser from "phaser";
 
 import { Direction } from "../types/Direction";
-import { Player } from "./Player";
 import config from "../config"
 
 const Vector2 = Phaser.Math.Vector2;
@@ -49,7 +48,7 @@ export class GridPhysics {
     }
 
     tilePosInDirection(sourceTilePos: Phaser.Math.Vector2, direction: Direction): Vector2 {
-        return sourceTilePos.add(this.movementDirectionVectors[direction]!);
+        return sourceTilePos.add(this.movementDirectionVectors[direction]);
     }
 
     hasBlockingTile(pos: Vector2): boolean {

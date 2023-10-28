@@ -1,20 +1,18 @@
 import { Direction } from "../types/Direction";
 import config from "../config"
 import { GridPhysics } from "./GridPhysics";
-import { GridMovementController } from "./GridMovementController";
 
 export class Player {
-    private gridControls: GridMovementController;
     private movementDirection: Direction = Direction.NONE;
     private lastMovementIntent = Direction.NONE;
     private tileSizePixelsWalked: number = 0;
 
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
+        private gridPhysics : GridPhysics,
         private tilePos: Phaser.Math.Vector2,
         mapCoordX : number,
         mapCoordY : number,
-        private gridPhysics : GridPhysics,
     ) {
         const offsetX = config.TILE_SIZE / 2 + mapCoordX;
         const offsetY = config.TILE_SIZE + mapCoordY;
@@ -25,7 +23,17 @@ export class Player {
             tilePos.y * config.TILE_SIZE + offsetY
         );
 
-        this.gridControls = new GridMovementController(this, this.sprite.scene.input);
+        this.addEventListener();
+    }
+
+    private addEventListener(){
+        this.sprite.scene.events.on("runCode", (steps: number, direction : Direction) => {
+            if(steps == 0)
+                return;
+
+            
+            this.movePlayer(direction);
+        });
     }
 
     private isMoving(): boolean {
@@ -109,17 +117,19 @@ export class Player {
     movePlayer(direction: Direction): void {
         this.lastMovementIntent = direction;
         if (this.isMoving()){
+            console.log("already moving");
             return;
         }
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
+            console.log("blocked");
             this.stopAnimation(direction);
         } else {
+            console.log("start moving");
             this.startMoving(direction);
         }
     }
 
     update(delta: number) {
-        this.gridControls.update();
         if (this.isMoving()) {
             this.updatePlayerPosition(delta);
         }

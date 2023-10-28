@@ -1,22 +1,11 @@
 import * as Phaser from "phaser";
 import config from "../config";
 
-import ArticodingObject from "../Classes/ArticodingObject";
-import Board from "../Classes/Board";
-import TileObject from "../Classes/TileObject";
 import { Player } from "../Classes/Player";
-import { GridMovementController } from "../Classes/GridMovementController";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
 
 export default class LevelPlayer extends Phaser.Scene {
-  frog: ArticodingObject;
-  chest: ArticodingObject;
-  rows: integer;
-  columns: integer;
-  tiles: TileObject[];
-  board: Board;
-
   private mapCoordX : number;
   private mapCoordY : number;
   private tilemap: Phaser.Tilemaps.Tilemap;
@@ -31,13 +20,9 @@ export default class LevelPlayer extends Phaser.Scene {
   init() { }
 
   preload() {
+    console.log("Preload");
     this.load.image("tiles", "assets/Dungeon_Tileset.png");
     this.load.tilemapTiledJSON("5x5map", "assets/5x5_map.json");
-
-    // cargar el juego con el JSON
-    this.tiles = [];
-    this.rows = 3;
-    this.columns = 3;
 
     // Load frog
     this.load.multiatlas(
@@ -56,6 +41,7 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   create() {
+    console.log("Create");
     this.createTileMap();
 
     const playerSprite = this.add.sprite(0, 0, "player", "down/0.png");
@@ -63,12 +49,27 @@ export default class LevelPlayer extends Phaser.Scene {
     this.cameras.main.roundPixels = true;
 
     this.gridPhysics = new GridPhysics(this.tilemap);
-    this.player = new Player(playerSprite, new Phaser.Math.Vector2(1, 2), this.mapCoordX, this.mapCoordY, this.gridPhysics);
+    this.player = new Player(playerSprite, this.gridPhysics, new Phaser.Math.Vector2(1, 1), this.mapCoordX, this.mapCoordY);
 
     this.createPlayerAnimation(Direction.UP);
     this.createPlayerAnimation(Direction.RIGHT);
     this.createPlayerAnimation(Direction.DOWN);
     this.createPlayerAnimation(Direction.LEFT);
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+
+    this.events.on('shutdown', () => {
+      console.log("Scene shutdown");
+      this.textures.remove('tiles');
+      this.textures.remove('player');
+      this.textures.remove('BigTreasureChest');
+      this.anims.remove(Direction.UP);
+      this.anims.remove(Direction.RIGHT);
+      this.anims.remove(Direction.DOWN);
+      this.anims.remove(Direction.LEFT);
+    });
   }
 
   createPlayerAnimation(
@@ -108,8 +109,6 @@ export default class LevelPlayer extends Phaser.Scene {
     this.player.update(delta);
   }
 
-
-
   zoom(): void {
     this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       if (deltaY > 0) {
@@ -124,72 +123,12 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   runCode() {
-    console.log("runcode is gonna run: ", globalThis.blocklyController.getCode());
-    eval(globalThis.blocklyController.getCode());
+    const code = globalThis.blocklyController.getCode();
+    console.log(`runcode is gonna run: ${code}`);
+    eval(code);
   }
 
-  // createLevel(): void {
-  //   const SCREEN_WIDTH = this.cameras.main.width;
-  //   const SCREEN_HEIGHT = this.cameras.main.height;
-  //   let x = (SCREEN_WIDTH - this.rows * env.TILE_SIZE) / 2;
-  //   let y = (SCREEN_HEIGHT - this.columns * env.TILE_SIZE) / 2;
-
-  //   let numTiles = this.rows * this.columns;
-
-  //   if (numTiles < this.tiles.length) {
-  //     while (this.tiles.length > numTiles) {
-  //       this.tiles.pop()?.destroy();
-  //     }
-  //   } else if (numTiles > this.tiles.length) {
-  //     while (this.tiles.length < numTiles) {
-  //       const tile = new TileObject(this, 0, 0, "tile");
-  //       this.tiles.push(tile);
-  //     }
-  //   }
-
-  //   this.tiles = Phaser.Actions.GridAlign(this.tiles, {
-  //     width: this.rows,
-  //     height: this.columns,
-  //     cellWidth: env.TILE_SIZE,
-  //     cellHeight: env.TILE_SIZE,
-  //     x,
-  //     y,
-  //   });
-
-  //   this.loadObjects();
-
-  //   this.board.setTiles(this.tiles);
-  // }
-
-  // loadObjects() {
-  //   this.frog = new ArticodingObject(
-  //     this,
-  //     // Primera casilla del tablero
-  //     this.tiles[0].returnGlobalCoordinates().x,
-  //     this.tiles[0].returnGlobalCoordinates().y,
-  //     "FrogSpriteSheet",
-  //     this.board,
-  //     "down/SpriteSheet-02.png",
-  //     false,
-  //     false,
-  //     false
-  //   );
-
-  //   this.tiles[0].addObject(this.frog);
-
-  //   this.chest = new ArticodingObject(
-  //     this,
-  //     // Segunda casilla del tablero
-  //     this.tiles[1].returnGlobalCoordinates().x,
-  //     this.tiles[1].returnGlobalCoordinates().y,
-  //     "BigTreasureChest",
-  //     this.board,
-  //     "BigTreasureChest-0.png",
-  //     false,
-  //     false,
-  //     false
-  //   );
-
-  //   this.tiles[0].addObject(this.chest);
-  // }
+  move(steps: number, direction: string) {
+    this.events.emit('runCode', steps, Direction[direction]);
+  }
 }

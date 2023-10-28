@@ -44,7 +44,7 @@ function playLevel() {
   blocklyController.showWorkspace();
   blocklyToggler.classList.remove("d-none");
   phaserController.reduceSize();
-  phaserController.startScene("LevelEditor");
+  phaserController.startScene("LevelPlayer");
 }
 
 function editLevel() {
