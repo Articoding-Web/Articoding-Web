@@ -45,7 +45,24 @@
             0, 0, 0, 0, 0, 0],
          "height":6,
          "id":3,
-         "name":"Playing",
+         "name":"Interactables",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":6,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 0, 0, 0,
+            0, 101, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 101, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0],
+         "height":6,
+         "id":4,
+         "name":"Players",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
@@ -53,8 +70,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":1,
+ "nextlayerid":9,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
@@ -435,7 +452,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -811,7 +828,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -820,7 +837,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -829,7 +846,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -838,7 +855,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 },
             
@@ -848,7 +865,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -857,7 +874,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -866,7 +883,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -875,7 +892,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -884,7 +901,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -893,7 +910,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 },
             
@@ -967,7 +984,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -976,7 +993,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -985,9 +1002,22 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":12,
+         "firstgid":101,
+         "image":"sprites\/FrogSpriteSheet.png",
+         "imageheight":16,
+         "imagewidth":192,
+         "margin":0,
+         "name":"FrogSpriteSheet",
+         "spacing":0,
+         "tilecount":12,
+         "tileheight":16,
          "tilewidth":16
         }],
  "tilewidth":16,

@@ -6,6 +6,9 @@ function createPhaserConfig(scenes: Phaser.Types.Scenes.SceneType | Phaser.Types
   const PhaserConfig: Phaser.Types.Core.GameConfig = {
     type: Phaser.CANVAS,
     parent: "phaserDiv",
+    physics: {
+      default: 'arcade',
+    },
     canvas: <HTMLCanvasElement>document.getElementById("phaserCanvas"),
     scale: {
       mode: Phaser.Scale.RESIZE,

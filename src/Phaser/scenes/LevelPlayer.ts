@@ -6,11 +6,12 @@ import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
 
 export default class LevelPlayer extends Phaser.Scene {
-  private mapCoordX : number;
-  private mapCoordY : number;
+  private mapCoordX: number;
+  private mapCoordY: number;
   private tilemap: Phaser.Tilemaps.Tilemap;
-  private player : Player;
-  private gridPhysics : GridPhysics;
+  private players: Player[] = [];
+  private gridPhysics: GridPhysics;
+  private interactablesLayer: Phaser.Tilemaps.TilemapLayer;
 
   constructor() {
     super("LevelPlayer");
@@ -22,34 +23,64 @@ export default class LevelPlayer extends Phaser.Scene {
   preload() {
     console.log("Preload");
     this.load.image("tiles", "assets/Dungeon_Tileset.png");
-    this.load.tilemapTiledJSON("5x5map", "assets/5x5_map.json");
+    this.load.tilemapTiledJSON("4x4map", "assets/4x4_map.json");
 
     // Load frog
     this.load.multiatlas(
-      "player",
+      "playerSprite",
       "assets/sprites/FrogSpriteSheet.json",
       "assets/sprites/"
     );
+
     // Load chest
     this.load.multiatlas(
       "BigTreasureChest",
       "assets/sprites/BigTreasureChest.json",
       "assets/sprites/"
     );
+
     // Load tile
     this.load.image("tile", "assets/tiles/tile.png");
   }
 
   create() {
     console.log("Create");
+    this.zoom();
     this.createTileMap();
+    this.createPlayers();
+  }
 
-    const playerSprite = this.add.sprite(0, 0, "player", "down/0.png");
-    playerSprite.setDepth(2);
-    this.cameras.main.roundPixels = true;
-
+  createPlayers(){
     this.gridPhysics = new GridPhysics(this.tilemap);
-    this.player = new Player(playerSprite, this.gridPhysics, new Phaser.Math.Vector2(1, 1), this.mapCoordX, this.mapCoordY);
+    // Create sprites
+    const sprites = this.tilemap.createFromTiles(101, null, { key: "playerSprite", frame: "down/0.png" }, this, undefined, "Players");
+
+    let i = 0;
+    // Destroy each tile and position sprites correctly
+    this.tilemap.forEachTile(tile => {
+      const layer = tile.tilemapLayer;
+      const sprite = sprites[i];
+      sprite.setDepth(layer.depth);
+      const offsetX = config.TILE_SIZE / 2 + this.mapCoordX;
+      const offsetY = config.TILE_SIZE + this.mapCoordY;
+
+      sprite.setOrigin(0.5, 1);
+      sprite.setPosition(
+        tile.x * config.TILE_SIZE + offsetX,
+        tile.y * config.TILE_SIZE + offsetY
+      );
+
+      this.physics.add.existing(sprite);
+      this.physics.add.overlap(sprite, this.interactablesLayer);
+
+      // Create player
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y)));
+      layer.removeTileAt(tile.x, tile.y);
+
+      i++;
+    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, "Players");
+
+    this.cameras.main.roundPixels = true;
 
     this.createPlayerAnimation(Direction.UP);
     this.createPlayerAnimation(Direction.RIGHT);
@@ -59,17 +90,6 @@ export default class LevelPlayer extends Phaser.Scene {
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
     runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
-
-    this.events.on('shutdown', () => {
-      console.log("Scene shutdown");
-      this.textures.remove('tiles');
-      this.textures.remove('player');
-      this.textures.remove('BigTreasureChest');
-      this.anims.remove(Direction.UP);
-      this.anims.remove(Direction.RIGHT);
-      this.anims.remove(Direction.DOWN);
-      this.anims.remove(Direction.LEFT);
-    });
   }
 
   createPlayerAnimation(
@@ -77,7 +97,7 @@ export default class LevelPlayer extends Phaser.Scene {
   ) {
     this.anims.create({
       key: name,
-      frames: this.anims.generateFrameNames("player", {
+      frames: this.anims.generateFrameNames("playerSprite", {
         start: 0,
         end: 3,
         prefix: `${name}/`,
@@ -90,8 +110,9 @@ export default class LevelPlayer extends Phaser.Scene {
   };
 
   createTileMap() {
-    this.tilemap = this.make.tilemap({ key: "5x5map" });
+    this.tilemap = this.make.tilemap({ key: "4x4map" });
     this.tilemap.addTilesetImage("Dungeon_Tileset", "tiles");
+    this.tilemap.addTilesetImage("FrogSpriteSheet", "playerSprite");
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
     const layerHeight = this.tilemap.height * config.TILE_SIZE;
@@ -100,13 +121,24 @@ export default class LevelPlayer extends Phaser.Scene {
     this.mapCoordY = (this.cameras.main.height - layerHeight) / 2;
 
     for (let i = 0; i < this.tilemap.layers.length; i++) {
-      const layer = this.tilemap.createLayer(i, "Dungeon_Tileset", this.mapCoordX, this.mapCoordY);
+      const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet"], this.mapCoordX, this.mapCoordY);
+      if(i == 2){
+        this.interactablesLayer = layer;
+        // Create collisions for interactable objects
+        console.log(this.interactablesLayer.setTileIndexCallback(85, this.interact, this));
+      }
       layer.setDepth(i);
     }
   }
 
+  interact(){
+    console.log("Hit interactable obj");
+  }
+
   public update(_time: number, delta: number) {
-    this.player.update(delta);
+    for (let p in this.players) {
+      this.players[p].update(delta);
+    }
   }
 
   zoom(): void {

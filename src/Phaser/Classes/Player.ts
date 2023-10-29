@@ -11,26 +11,15 @@ export class Player {
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics : GridPhysics,
         private tilePos: Phaser.Math.Vector2,
-        mapCoordX : number,
-        mapCoordY : number,
     ) {
-        const offsetX = config.TILE_SIZE / 2 + mapCoordX;
-        const offsetY = config.TILE_SIZE + mapCoordY;
-
-        this.sprite.setOrigin(0.5, 1);
-        this.sprite.setPosition(
-            tilePos.x * config.TILE_SIZE + offsetX,
-            tilePos.y * config.TILE_SIZE + offsetY
-        );
-
         this.addEventListener();
     }
 
     private addEventListener(){
         this.sprite.scene.events.on("runCode", (steps: number, direction : Direction) => {
+            console.log("received move");
             if(steps == 0)
                 return;
-
             
             this.movePlayer(direction);
         });
