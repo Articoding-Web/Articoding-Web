@@ -14,11 +14,14 @@ export class GridPhysics {
             [Direction.RIGHT]: Vector2.RIGHT,
         };
 
-    private readonly speedPixelsPerSecond: number = config.TILE_SIZE * 4;
+    private speedPixelsPerSecond: number;
 
     constructor(
-        private tileMap: Phaser.Tilemaps.Tilemap
-    ) { }
+        private tileMap: Phaser.Tilemaps.Tilemap,
+        private scaleFactor: number,
+    ) {
+        this.speedPixelsPerSecond = config.TILE_SIZE * this.scaleFactor;
+    }
 
     getMovementVector(movementDirection: Direction) : Phaser.Math.Vector2 {
         return this.movementDirectionVectors[movementDirection]!.clone();
@@ -39,7 +42,7 @@ export class GridPhysics {
         pixelsToWalkThisUpdate: number
     ): boolean {
         return (
-            tileSizePixelsWalked + pixelsToWalkThisUpdate >= config.TILE_SIZE
+            tileSizePixelsWalked + pixelsToWalkThisUpdate >= (config.TILE_SIZE * this.scaleFactor)
         );
     }
 

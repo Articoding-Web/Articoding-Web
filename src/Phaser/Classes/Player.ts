@@ -11,6 +11,7 @@ export class Player {
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics : GridPhysics,
         private tilePos: Phaser.Math.Vector2,
+        private scaleFactor: number
     ) {
         this.addEventListener();
     }
@@ -44,7 +45,7 @@ export class Player {
             this.movePlayerSprite(pixelsToWalkThisUpdate);
             this.updatePlayerTilePos();
         } else {
-            this.movePlayerSprite(config.TILE_SIZE - this.tileSizePixelsWalked);
+            this.movePlayerSprite(config.TILE_SIZE * this.scaleFactor - this.tileSizePixelsWalked);
             this.stopMoving();
         }
     }
@@ -60,7 +61,7 @@ export class Player {
         this.setPosition(newPlayerPos);
 
         this.tileSizePixelsWalked += pixelsToMove;
-        this.tileSizePixelsWalked %= config.TILE_SIZE;
+        this.tileSizePixelsWalked %= (config.TILE_SIZE * this.scaleFactor);
     }
 
     private stopMoving(): void {

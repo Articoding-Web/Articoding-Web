@@ -11,8 +11,11 @@ function createPhaserConfig(scenes: Phaser.Types.Scenes.SceneType | Phaser.Types
     },
     canvas: <HTMLCanvasElement>document.getElementById("phaserCanvas"),
     scale: {
-      mode: Phaser.Scale.RESIZE,
+      // Fit to window
+      mode: Phaser.Scale.ScaleModes.RESIZE,
+      // Center vertically and horizontally
       autoCenter: Phaser.Scale.CENTER_BOTH,
+      zoom: Phaser.Scale.ZOOM_2X,
     },
     scene: scenes,
   };

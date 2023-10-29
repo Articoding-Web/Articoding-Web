@@ -8,6 +8,7 @@ import { Direction } from "../types/Direction";
 export default class LevelPlayer extends Phaser.Scene {
   private mapCoordX: number;
   private mapCoordY: number;
+  private scaleFactor: number;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private players: Player[] = [];
   private gridPhysics: GridPhysics;
@@ -50,8 +51,33 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createPlayers();
   }
 
+  createTileMap() {
+    this.tilemap = this.make.tilemap({ key: "4x4map" });
+    this.tilemap.addTilesetImage("Dungeon_Tileset", "tiles");
+    this.tilemap.addTilesetImage("FrogSpriteSheet", "playerSprite");
+
+    const layerWidth = this.tilemap.width * config.TILE_SIZE;
+    const layerHeight = this.tilemap.height * config.TILE_SIZE;
+
+    this.scaleFactor = Math.floor((this.cameras.main.height) / layerHeight / 2);
+
+    this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
+    this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
+
+    for (let i = 0; i < this.tilemap.layers.length; i++) {
+      const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet"], this.mapCoordX, this.mapCoordY);
+      layer.scale = this.scaleFactor;
+      if(i == 2){
+        this.interactablesLayer = layer;
+        // Create collisions for interactable objects
+        console.log(this.interactablesLayer.setTileIndexCallback(85, this.interact, this));
+      }
+      layer.setDepth(i);
+    }
+  }
+
   createPlayers(){
-    this.gridPhysics = new GridPhysics(this.tilemap);
+    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor);
     // Create sprites
     const sprites = this.tilemap.createFromTiles(101, null, { key: "playerSprite", frame: "down/0.png" }, this, undefined, "Players");
 
@@ -61,20 +87,21 @@ export default class LevelPlayer extends Phaser.Scene {
       const layer = tile.tilemapLayer;
       const sprite = sprites[i];
       sprite.setDepth(layer.depth);
-      const offsetX = config.TILE_SIZE / 2 + this.mapCoordX;
-      const offsetY = config.TILE_SIZE + this.mapCoordY;
+      const offsetX = config.TILE_SIZE / 2 * this.scaleFactor  + this.mapCoordX;
+      const offsetY = config.TILE_SIZE * this.scaleFactor  + this.mapCoordY;
 
       sprite.setOrigin(0.5, 1);
       sprite.setPosition(
-        tile.x * config.TILE_SIZE + offsetX,
-        tile.y * config.TILE_SIZE + offsetY
+        tile.x * config.TILE_SIZE * this.scaleFactor + offsetX,
+        tile.y * config.TILE_SIZE * this.scaleFactor + offsetY
       );
+      sprite.scale = this.scaleFactor;
 
       this.physics.add.existing(sprite);
       this.physics.add.overlap(sprite, this.interactablesLayer);
 
       // Create player
-      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y)));
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y), this.scaleFactor));
       layer.removeTileAt(tile.x, tile.y);
 
       i++;
@@ -108,28 +135,6 @@ export default class LevelPlayer extends Phaser.Scene {
       yoyo: true,
     });
   };
-
-  createTileMap() {
-    this.tilemap = this.make.tilemap({ key: "4x4map" });
-    this.tilemap.addTilesetImage("Dungeon_Tileset", "tiles");
-    this.tilemap.addTilesetImage("FrogSpriteSheet", "playerSprite");
-
-    const layerWidth = this.tilemap.width * config.TILE_SIZE;
-    const layerHeight = this.tilemap.height * config.TILE_SIZE;
-
-    this.mapCoordX = (this.cameras.main.width - layerWidth) / 2;
-    this.mapCoordY = (this.cameras.main.height - layerHeight) / 2;
-
-    for (let i = 0; i < this.tilemap.layers.length; i++) {
-      const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet"], this.mapCoordX, this.mapCoordY);
-      if(i == 2){
-        this.interactablesLayer = layer;
-        // Create collisions for interactable objects
-        console.log(this.interactablesLayer.setTileIndexCallback(85, this.interact, this));
-      }
-      layer.setDepth(i);
-    }
-  }
 
   interact(){
     console.log("Hit interactable obj");
