@@ -37,15 +37,6 @@ export class GridPhysics {
         return this.speedPixelsPerSecond * deltaInSeconds;
     }
 
-    willCrossTileBorderThisUpdate(
-        tileSizePixelsWalked : number,
-        pixelsToWalkThisUpdate: number
-    ): boolean {
-        return (
-            tileSizePixelsWalked + pixelsToWalkThisUpdate >= (config.TILE_SIZE * this.scaleFactor)
-        );
-    }
-
     isBlockingDirection(sourceTilePos: Phaser.Math.Vector2, direction: Direction): boolean {
         return this.hasBlockingTile(this.tilePosInDirection(sourceTilePos, direction));
     }

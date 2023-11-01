@@ -5,6 +5,10 @@ import { Player } from "../Classes/Player";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
 
+const INTERACTABLES_LAYER = 2;
+const CHEST_SPRITE_INDEX = 85;
+const PLAYER_SPRITE_INDEX = 101;
+
 export default class LevelPlayer extends Phaser.Scene {
   private mapCoordX: number;
   private mapCoordY: number;
@@ -67,10 +71,10 @@ export default class LevelPlayer extends Phaser.Scene {
     for (let i = 0; i < this.tilemap.layers.length; i++) {
       const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet"], this.mapCoordX, this.mapCoordY);
       layer.scale = this.scaleFactor;
-      if(i == 2){
+      if(i === INTERACTABLES_LAYER){
         this.interactablesLayer = layer;
         // Create collisions for interactable objects
-        console.log(this.interactablesLayer.setTileIndexCallback(85, this.interact, this));
+        console.log(this.interactablesLayer.setTileIndexCallback(CHEST_SPRITE_INDEX, this.interact, this));
       }
       layer.setDepth(i);
     }
@@ -79,7 +83,7 @@ export default class LevelPlayer extends Phaser.Scene {
   createPlayers(){
     this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor);
     // Create sprites
-    const sprites = this.tilemap.createFromTiles(101, null, { key: "playerSprite", frame: "down/0.png" }, this, undefined, "Players");
+    const sprites = this.tilemap.createFromTiles(PLAYER_SPRITE_INDEX, null, { key: "playerSprite", frame: "down/0.png" }, this, undefined, "Players");
 
     let i = 0;
     // Destroy each tile and position sprites correctly
@@ -140,11 +144,11 @@ export default class LevelPlayer extends Phaser.Scene {
     console.log("Hit interactable obj");
   }
 
-  public update(_time: number, delta: number) {
-    for (let p in this.players) {
-      this.players[p].update(delta);
-    }
-  }
+  // public update(_time: number, delta: number) {
+  //   for (let p in this.players) {
+  //     this.players[p].update(delta);
+  //   }
+  // }
 
   zoom(): void {
     this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {

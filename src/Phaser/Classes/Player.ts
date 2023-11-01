@@ -4,50 +4,30 @@ import { GridPhysics } from "./GridPhysics";
 
 export class Player {
     private movementDirection: Direction = Direction.NONE;
-    private lastMovementIntent = Direction.NONE;
-    private tileSizePixelsWalked: number = 0;
+    private steps: number = 0;
 
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
-        private gridPhysics : GridPhysics,
+        private gridPhysics: GridPhysics,
         private tilePos: Phaser.Math.Vector2,
         private scaleFactor: number
     ) {
         this.addEventListener();
     }
 
-    private addEventListener(){
-        this.sprite.scene.events.on("runCode", (steps: number, direction : Direction) => {
+    private addEventListener() {
+        this.sprite.scene.events.on("runCode", (steps: number, direction: Direction) => {
             console.log("received move");
-            if(steps == 0)
-                return;
-            
+
+            this.steps = steps;
             this.movePlayer(direction);
         });
     }
 
-    private isMoving(): boolean {
-        return this.movementDirection != Direction.NONE;
-    }
-
     private startMoving(direction: Direction): void {
-        this.startAnimation(direction);
         this.movementDirection = direction;
-        this.updatePlayerTilePos();
-    }
-
-    private updatePlayerPosition(delta: number) {
-        const pixelsToWalkThisUpdate = this.gridPhysics.getPixelsToWalkThisUpdate(delta);
-
-        if (!this.gridPhysics.willCrossTileBorderThisUpdate(this.tileSizePixelsWalked ,pixelsToWalkThisUpdate)) {
-            this.movePlayerSprite(pixelsToWalkThisUpdate);
-        } else if (this.shouldContinueMoving()) {
-            this.movePlayerSprite(pixelsToWalkThisUpdate);
-            this.updatePlayerTilePos();
-        } else {
-            this.movePlayerSprite(config.TILE_SIZE * this.scaleFactor - this.tileSizePixelsWalked);
-            this.stopMoving();
-        }
+        this.startAnimation(direction);
+        this.movePlayerSprite();
     }
 
     private updatePlayerTilePos() {
@@ -55,25 +35,25 @@ export class Player {
         this.setTilePos(this.getTilePos().add(movementVector));
     }
 
-    private movePlayerSprite(pixelsToMove: number) {
+    private movePlayerSprite() {
+        const pixelsToMove = config.TILE_SIZE * this.scaleFactor;
         const movementDistance = this.gridPhysics.getMovementDistance(this.movementDirection, pixelsToMove);
         const newPlayerPos = this.getPosition().add(movementDistance);
-        this.setPosition(newPlayerPos);
+        this.updatePlayerTilePos();
 
-        this.tileSizePixelsWalked += pixelsToMove;
-        this.tileSizePixelsWalked %= (config.TILE_SIZE * this.scaleFactor);
+        this.sprite.scene.tweens.add({
+            targets: this.sprite,
+            x: newPlayerPos.x,
+            y: newPlayerPos.y,
+            duration: 1000,
+            ease: "Sine.inOut",
+            onComplete: (--this.steps > 0) ? this.movePlayer.bind(this, this.movementDirection) : this.stopMoving.bind(this),
+        })
     }
 
     private stopMoving(): void {
-        this.stopAnimation(this.movementDirection);
+        this.stopAnimation();
         this.movementDirection = Direction.NONE;
-    }
-
-    private shouldContinueMoving(): boolean {
-        return (
-            this.movementDirection == this.lastMovementIntent &&
-            !this.gridPhysics.isBlockingDirection(this.getTilePos() ,this.lastMovementIntent)
-        );
     }
 
     getPosition(): Phaser.Math.Vector2 {
@@ -84,16 +64,18 @@ export class Player {
         this.sprite.setPosition(position.x, position.y);
     }
 
-    stopAnimation(direction: Direction) {
-        const animationManager = this.sprite.anims.animationManager;
-        const standingFrame = animationManager.get(direction).frames[1].frame.name;
+    stopAnimation() {
         this.sprite.anims.stop();
+
+        // Set new idle frame
+        const animationManager = this.sprite.anims.animationManager;
+        const standingFrame = animationManager.get(Direction.DOWN).frames[0].frame.name;
         this.sprite.setFrame(standingFrame);
     }
 
     startAnimation(direction: Direction) {
+        console.log(`Start animation in ${direction}`);
         this.sprite.anims.play(direction);
-        this.movementDirection = direction;
     }
 
     getTilePos(): Phaser.Math.Vector2 {
@@ -104,25 +86,41 @@ export class Player {
         this.tilePos = tilePosition.clone();
     }
 
+    bounceAnimation(direction){
+        const pixelsToMove = config.TILE_SIZE / 2 * this.scaleFactor;
+        const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
+        const newPlayerPos = this.getPosition().add(movementDistance);
+
+        this.sprite.scene.tweens.add({
+            targets: this.sprite,
+            x: newPlayerPos.x,
+            y: newPlayerPos.y,
+            duration: 1000,
+            ease: "Sine.inOut",
+            yoyo: true,
+            onComplete: this.stopAnimation.bind(this)
+        })
+    }
+
     movePlayer(direction: Direction): void {
-        this.lastMovementIntent = direction;
-        if (this.isMoving()){
-            console.log("already moving");
+        console.log(`Moving ${this.steps} in ${direction}`)
+        if (this.steps == 0)
             return;
-        }
+
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
             console.log("blocked");
-            this.stopAnimation(direction);
+            this.startAnimation(direction);
+            this.bounceAnimation(direction);
         } else {
             console.log("start moving");
             this.startMoving(direction);
         }
     }
 
-    update(delta: number) {
-        if (this.isMoving()) {
-            this.updatePlayerPosition(delta);
-        }
-        this.lastMovementIntent = Direction.NONE;
-    }
+    // update(delta: number) {
+    //     if (this.isMoving()) {
+    //         this.updatePlayerPosition(delta);
+    //     }
+    //     this.lastMovementIntent = Direction.NONE;
+    // }
 }
