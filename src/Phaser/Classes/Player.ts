@@ -5,7 +5,7 @@ import { GridPhysics } from "./GridPhysics";
 export class Player {
     private movementDirection: Direction = Direction.NONE;
     private steps: number = 0;
-
+    private playerDir : Direction = Direction.DOWN; //por defecto la ranita mira "abajo"
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics: GridPhysics,
@@ -16,13 +16,53 @@ export class Player {
     }
 
     private addEventListener() {
-        this.sprite.scene.events.on("runCode", (steps: number, direction: Direction) => {
+        this.sprite.scene.events.on("moveOrder", (steps: number, direction: Direction) => {
             console.log("received move");
 
             this.steps = steps;
             this.movePlayer(direction);
         });
+        this.sprite.scene.events.on("rotateOrder", (times: number, direction: Direction) => {
+            console.log("received rotate order");
+
+            this.steps = times;
+            this.rotatePlayer(direction);
+        });
     }
+
+    private rotatePlayer(direction: Direction): void {
+        if (this.steps <= 0) { return; }
+
+        const animationManager = this.sprite.anims.animationManager;
+        const currentAnimation = animationManager.get(this.playerDir);
+        const currentFrameIndex = this.sprite.anims.currentFrame.index;
+        const currentFrame = currentAnimation.frames[currentFrameIndex].frame.name;
+        const nextDirection = this.getNextDirection(this.playerDir, direction);
+
+        this.playerDir = nextDirection;
+        this.sprite.anims.play(nextDirection);
+
+        const nextAnimation = animationManager.get(nextDirection);
+        //pending frame call
+        const nextFrameIndex = currentAnimation.frames.findIndex(frame => frame.frame.name === currentFrame);
+        const nextFrame = nextAnimation.frames[nextFrameIndex].frame.name;
+
+        this.sprite.anims.pause();
+        this.sprite.setFrame(nextFrame);
+
+        this.steps--;
+        this.sprite.scene.time.delayedCall(500, this.rotatePlayer.bind(this, direction));
+    }
+
+    private getNextDirection(currentDirection: Direction, targetDirection: Direction): Direction {
+        const currentIndex = Direction[currentDirection];
+        const targetIndex = Direction[targetDirection];
+
+        const diff = targetIndex - currentIndex;
+        const nextIndex = (diff + 4) % 4;
+        return Direction[nextIndex];
+    }
+
 
     private startMoving(direction: Direction): void {
         this.movementDirection = direction;

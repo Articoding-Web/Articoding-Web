@@ -21,8 +21,8 @@ export function defineAllBlocks() {
     //rotate block, action toolbox
     javascriptGenerator.forBlock['rotate'] = function (block, generator) {
         let dropdown_direction = block.getFieldValue('DIRECTION');
-        let times = block.getFieldValue('TIMES');
-        let code = 'rotate(' + dropdown_direction + ', ' + times + ');';
+        let times  = generator.statementToCode(block, 'TIMES');
+        let code = 'this.rotate('+ dropdown_direction + ',' + times + ');';
         return code;
     }
     //changeStatus block, changes the status of the specified object
