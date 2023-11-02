@@ -3,9 +3,10 @@ import config from "../config"
 import { GridPhysics } from "./GridPhysics";
 
 export class Player {
-    private movementDirection: Direction = Direction.NONE;
+    private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
+    private movementDirection: Direction = Direction.NONE;  // Always none except when moving
     private steps: number = 0;
-
+    private playerDir : number = 0; //por defecto la ranita mira "abajo" down/left/up/right
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics: GridPhysics,
@@ -16,12 +17,32 @@ export class Player {
     }
 
     private addEventListener() {
-        this.sprite.scene.events.on("runCode", (steps: number, direction: Direction) => {
+        this.sprite.scene.events.on("moveOrder", (steps: number, direction: Direction) => {
             console.log("received move");
 
             this.steps = steps;
             this.movePlayer(direction);
         });
+        this.sprite.scene.events.on("rotateOrder", (direction: Direction) => {
+            console.log(`received rotate order: in ${direction}`);
+
+            this.rotatePlayer(direction);
+        });
+    }
+
+    private rotatePlayer(direction: Direction): void {
+        console.log(`rotating ${this.steps}`);
+
+        if(direction === Direction.RIGHT){
+            this.playerDir++;
+            this.playerDir %= 4;
+        }
+        else{
+            this.playerDir += 3;
+            this.playerDir %= 4;
+        }
+
+        this.stopMoving();
     }
 
     private startMoving(direction: Direction): void {
@@ -69,7 +90,7 @@ export class Player {
 
         // Set new idle frame
         const animationManager = this.sprite.anims.animationManager;
-        const standingFrame = animationManager.get(Direction.DOWN).frames[0].frame.name;
+        const standingFrame = animationManager.get(this.facingDirections[this.playerDir]).frames[0].frame.name;
         this.sprite.setFrame(standingFrame);
     }
 
@@ -81,7 +102,7 @@ export class Player {
     getTilePos(): Phaser.Math.Vector2 {
         return this.tilePos.clone();
     }
-
+    
     setTilePos(tilePosition: Phaser.Math.Vector2): void {
         this.tilePos = tilePosition.clone();
     }

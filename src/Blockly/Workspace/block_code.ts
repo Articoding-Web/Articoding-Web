@@ -21,8 +21,10 @@ export function defineAllBlocks() {
     //rotate block, action toolbox
     javascriptGenerator.forBlock['rotate'] = function (block, generator) {
         let dropdown_direction = block.getFieldValue('DIRECTION');
-        let times = block.getFieldValue('TIMES');
-        let code = 'rotate(' + dropdown_direction + ', ' + times + ');';
+        if(dropdown_direction === 'CLOCKWISE') dropdown_direction = 'RIGHT';
+        else dropdown_direction = 'LEFT';
+        console.log(dropdown_direction);
+        let code = 'this.rotate("' + dropdown_direction + '");';
         return code;
     }
     //changeStatus block, changes the status of the specified object

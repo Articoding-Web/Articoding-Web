@@ -163,13 +163,28 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  runCode() {
+  runCode() { // solo para testear? 
     const code = globalThis.blocklyController.getCode();
     console.log(`runcode is gonna run: ${code}`);
     eval(code);
   }
 
   move(steps: number, direction: string) {
-    this.events.emit('runCode', steps, Direction[direction]);
+    this.events.emit('moveOrder', steps, Direction[direction]);
   }
+
+  rotate(direction: string) {
+    this.events.emit('rotateOrder', Direction[direction]);
+  }
+  //NO TOCAR (tal vez sea util)
+  // rotate(steps: number, direction: string) {
+  //   const rotation = direction === 'left' ? -1 : 1;
+  //   for (let i = 0; i < steps; i++) {
+  //     this.players.forEach(player => {
+  //       frog.rotate(rotation);
+  //       const animName = Direction[player.direction];
+  //       player.sprite.anims.play(animName, true);
+  //     });
+  //   }
+  // }
 }
