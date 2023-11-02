@@ -173,8 +173,8 @@ export default class LevelPlayer extends Phaser.Scene {
     this.events.emit('moveOrder', steps, Direction[direction]);
   }
 
-  rotate(times: number, direction: string) {
-    this.events.emit('rotateOrder', times, Direction[direction]);
+  rotate(direction: string) {
+    this.events.emit('rotateOrder', Direction[direction]);
   }
   //NO TOCAR (tal vez sea util)
   // rotate(steps: number, direction: string) {

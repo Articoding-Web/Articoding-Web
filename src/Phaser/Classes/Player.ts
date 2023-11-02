@@ -3,9 +3,10 @@ import config from "../config"
 import { GridPhysics } from "./GridPhysics";
 
 export class Player {
-    private movementDirection: Direction = Direction.NONE;
+    private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
+    private movementDirection: Direction = Direction.NONE;  // Always none except when moving
     private steps: number = 0;
-    private playerDir : Direction = Direction.DOWN; //por defecto la ranita mira "abajo"
+    private playerDir : number = 0; //por defecto la ranita mira "abajo" down/left/up/right
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics: GridPhysics,
@@ -22,47 +23,27 @@ export class Player {
             this.steps = steps;
             this.movePlayer(direction);
         });
-        this.sprite.scene.events.on("rotateOrder", (times: number, direction: Direction) => {
-            console.log("received rotate order");
+        this.sprite.scene.events.on("rotateOrder", (direction: Direction) => {
+            console.log(`received rotate order: in ${direction}`);
 
-            this.steps = times;
             this.rotatePlayer(direction);
         });
     }
 
     private rotatePlayer(direction: Direction): void {
-        if (this.steps <= 0) { return; }
+        console.log(`rotating ${this.steps}`);
 
-        const animationManager = this.sprite.anims.animationManager;
-        const currentAnimation = animationManager.get(this.playerDir);
-        const currentFrameIndex = this.sprite.anims.currentFrame.index;
-        const currentFrame = currentAnimation.frames[currentFrameIndex].frame.name;
-        const nextDirection = this.getNextDirection(this.playerDir, direction);
+        if(direction === Direction.RIGHT){
+            this.playerDir++;
+            this.playerDir %= 4;
+        }
+        else{
+            this.playerDir += 3;
+            this.playerDir %= 4;
+        }
 
-        this.playerDir = nextDirection;
-        this.sprite.anims.play(nextDirection);
-
-        const nextAnimation = animationManager.get(nextDirection);
-        //pending frame call
-        const nextFrameIndex = currentAnimation.frames.findIndex(frame => frame.frame.name === currentFrame);
-        const nextFrame = nextAnimation.frames[nextFrameIndex].frame.name;
-
-        this.sprite.anims.pause();
-        this.sprite.setFrame(nextFrame);
-
-        this.steps--;
-        this.sprite.scene.time.delayedCall(500, this.rotatePlayer.bind(this, direction));
+        this.stopMoving();
     }
-
-    private getNextDirection(currentDirection: Direction, targetDirection: Direction): Direction {
-        const currentIndex = Direction[currentDirection];
-        const targetIndex = Direction[targetDirection];
-
-        const diff = targetIndex - currentIndex;
-        const nextIndex = (diff + 4) % 4;
-        return Direction[nextIndex];
-    }
-
 
     private startMoving(direction: Direction): void {
         this.movementDirection = direction;
@@ -109,7 +90,7 @@ export class Player {
 
         // Set new idle frame
         const animationManager = this.sprite.anims.animationManager;
-        const standingFrame = animationManager.get(Direction.DOWN).frames[0].frame.name;
+        const standingFrame = animationManager.get(this.facingDirections[this.playerDir]).frames[0].frame.name;
         this.sprite.setFrame(standingFrame);
     }
 
@@ -121,7 +102,7 @@ export class Player {
     getTilePos(): Phaser.Math.Vector2 {
         return this.tilePos.clone();
     }
-
+    
     setTilePos(tilePosition: Phaser.Math.Vector2): void {
         this.tilePos = tilePosition.clone();
     }
