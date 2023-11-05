@@ -31,8 +31,6 @@ export class Player {
     }
 
     private rotatePlayer(direction: Direction): void {
-        console.log(`rotating ${this.steps}`);
-
         if(direction === Direction.RIGHT){
             this.playerDir++;
             this.playerDir %= 4;
@@ -95,7 +93,6 @@ export class Player {
     }
 
     startAnimation(direction: Direction) {
-        console.log(`Start animation in ${direction}`);
         this.sprite.anims.play(direction);
     }
 
@@ -124,16 +121,13 @@ export class Player {
     }
 
     movePlayer(direction: Direction): void {
-        console.log(`Moving ${this.steps} in ${direction}`)
         if (this.steps == 0)
             return;
 
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
-            console.log("blocked");
             this.startAnimation(direction);
             this.bounceAnimation(direction);
         } else {
-            console.log("start moving");
             this.startMoving(direction);
         }
     }

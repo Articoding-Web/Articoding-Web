@@ -7,6 +7,7 @@ import { Direction } from "../types/Direction";
 
 const INTERACTABLES_LAYER = 2;
 const CHEST_SPRITE_INDEX = 85;
+const SPIKES_SPRITE_INDEX = 113;
 const PLAYER_SPRITE_INDEX = 101;
 
 export default class LevelPlayer extends Phaser.Scene {
@@ -15,6 +16,7 @@ export default class LevelPlayer extends Phaser.Scene {
   private scaleFactor: number;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private players: Player[] = [];
+  private traps: Phaser.GameObjects.Sprite[] = [];
   private gridPhysics: GridPhysics;
   private interactablesLayer: Phaser.Tilemaps.TilemapLayer;
 
@@ -26,7 +28,6 @@ export default class LevelPlayer extends Phaser.Scene {
   init() { }
 
   preload() {
-    console.log("Preload");
     this.load.image("tiles", "assets/Dungeon_Tileset.png");
     this.load.tilemapTiledJSON("4x4map", "assets/4x4_map.json");
 
@@ -37,19 +38,15 @@ export default class LevelPlayer extends Phaser.Scene {
       "assets/sprites/"
     );
 
-    // Load chest
+    // Load spikes
     this.load.multiatlas(
-      "BigTreasureChest",
-      "assets/sprites/BigTreasureChest.json",
+      "spikes",
+      "assets/sprites/spikes.json",
       "assets/sprites/"
     );
-
-    // Load tile
-    this.load.image("tile", "assets/tiles/tile.png");
   }
 
   create() {
-    console.log("Create");
     this.zoom();
     this.createTileMap();
     this.createPlayers();
@@ -59,6 +56,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.tilemap = this.make.tilemap({ key: "4x4map" });
     this.tilemap.addTilesetImage("Dungeon_Tileset", "tiles");
     this.tilemap.addTilesetImage("FrogSpriteSheet", "playerSprite");
+    this.tilemap.addTilesetImage("spikes", "spikes");
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
     const layerHeight = this.tilemap.height * config.TILE_SIZE;
@@ -69,18 +67,62 @@ export default class LevelPlayer extends Phaser.Scene {
     this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
     for (let i = 0; i < this.tilemap.layers.length; i++) {
-      const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet"], this.mapCoordX, this.mapCoordY);
+      const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet", "spikes"], this.mapCoordX, this.mapCoordY);
       layer.scale = this.scaleFactor;
-      if(i === INTERACTABLES_LAYER){
+      if (i === INTERACTABLES_LAYER) {
         this.interactablesLayer = layer;
         // Create collisions for interactable objects
-        console.log(this.interactablesLayer.setTileIndexCallback(CHEST_SPRITE_INDEX, this.interact, this));
+        // Chests
+        this.interactablesLayer.setTileIndexCallback(CHEST_SPRITE_INDEX, this.chestCollider, this);
+
+        // TRAPS
+        // Spikes
+        this.createSpikes();
       }
       layer.setDepth(i);
     }
   }
 
-  createPlayers(){
+  createSpikes() {
+    this.createSpikeAnimation();
+    const spikeSprites = this.tilemap.createFromTiles(SPIKES_SPRITE_INDEX, null, { key: "spikes", frame: "0.png" }, this, undefined, this.interactablesLayer);
+
+    let i = 0;
+    // Scale and position sprites correctly
+    this.tilemap.forEachTile(tile => {
+      if (tile.index === SPIKES_SPRITE_INDEX) {
+        const layer = tile.tilemapLayer;
+        const sprite = spikeSprites[i];
+        sprite.setDepth(layer.depth);
+
+        this.scaleSprite(sprite, tile.x, tile.y);
+
+        this.physics.add.existing(sprite);
+
+        // Start animation
+        sprite.anims.startAnimation("spikes");
+        layer.removeTileAt(tile.x, tile.y);
+        this.traps.push(sprite);
+        i++;
+      }
+    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, this.interactablesLayer);
+  }
+
+  createSpikeAnimation() {
+    this.anims.create({
+      key: "spikes",
+      frames: this.anims.generateFrameNames("spikes", {
+        start: 0,
+        end: 3,
+        suffix: '.png',
+      }),
+      frameRate: 2,
+      repeat: -1,
+      yoyo: true,
+    });
+  }
+
+  createPlayers() {
     this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor);
     // Create sprites
     const sprites = this.tilemap.createFromTiles(PLAYER_SPRITE_INDEX, null, { key: "playerSprite", frame: "down/0.png" }, this, undefined, "Players");
@@ -91,21 +133,17 @@ export default class LevelPlayer extends Phaser.Scene {
       const layer = tile.tilemapLayer;
       const sprite = sprites[i];
       sprite.setDepth(layer.depth);
-      const offsetX = config.TILE_SIZE / 2 * this.scaleFactor  + this.mapCoordX;
-      const offsetY = config.TILE_SIZE * this.scaleFactor  + this.mapCoordY;
 
-      sprite.setOrigin(0.5, 1);
-      sprite.setPosition(
-        tile.x * config.TILE_SIZE * this.scaleFactor + offsetX,
-        tile.y * config.TILE_SIZE * this.scaleFactor + offsetY
-      );
-      sprite.scale = this.scaleFactor;
+      this.scaleSprite(sprite, tile.x, tile.y);
 
       this.physics.add.existing(sprite);
       this.physics.add.overlap(sprite, this.interactablesLayer);
 
+      this.physics.add.collider(sprite, this.traps, this.trapCollider);
+
       // Create player
       this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y), this.scaleFactor));
+      
       layer.removeTileAt(tile.x, tile.y);
 
       i++;
@@ -134,21 +172,31 @@ export default class LevelPlayer extends Phaser.Scene {
         prefix: `${name}/`,
         suffix: '.png',
       }),
-      frameRate: 10,
+      frameRate: 8,
       repeat: -1,
       yoyo: true,
     });
   };
 
-  interact(){
+  trapCollider(player, trap){
+    console.log(`Player ${player} collided with trap ${trap}`);
+  }
+
+  chestCollider() {
     console.log("Hit interactable obj");
   }
 
-  // public update(_time: number, delta: number) {
-  //   for (let p in this.players) {
-  //     this.players[p].update(delta);
-  //   }
-  // }
+  scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
+    const offsetX = config.TILE_SIZE / 2 * this.scaleFactor + this.mapCoordX;
+    const offsetY = config.TILE_SIZE * this.scaleFactor + this.mapCoordY;
+
+    sprite.setOrigin(0.5, 1);
+    sprite.setPosition(
+      gridXPosition * config.TILE_SIZE * this.scaleFactor + offsetX,
+      gridYPosition * config.TILE_SIZE * this.scaleFactor + offsetY
+    );
+    sprite.scale = this.scaleFactor;
+  }
 
   zoom(): void {
     this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {

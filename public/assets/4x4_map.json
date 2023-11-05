@@ -39,7 +39,7 @@
         {
          "data":[0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 113, 0, 0,
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 85, 0,
             0, 0, 0, 0, 0, 0],
@@ -1017,6 +1017,19 @@
          "name":"FrogSpriteSheet",
          "spacing":0,
          "tilecount":12,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":4,
+         "firstgid":113,
+         "image":"sprites\/spikes.png",
+         "imageheight":16,
+         "imagewidth":64,
+         "margin":0,
+         "name":"spikes",
+         "spacing":0,
+         "tilecount":4,
          "tileheight":16,
          "tilewidth":16
         }],
