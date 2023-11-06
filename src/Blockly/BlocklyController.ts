@@ -10,10 +10,18 @@ export default class BlocklyController {
   blocklyArea = globalThis.blocklyArea;
   blocklyDiv = globalThis.blocklyDiv;
   isVisible: boolean = false;
+  startBlock : Blockly.BlockSvg;
+  workspace: Blockly.WorkspaceSvg;
 
   constructor() {
-    globalThis.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
+    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
+    globalThis.workspace = this.workspace;
     Blockly.defineBlocksWithJsonArray(blocks);
+    this.startBlock = this.workspace.newBlock('start');
+    this.startBlock.initSvg();
+    this.startBlock.render();
+    this.workspace.centerOnBlock(this.startBlock.id);
+    this.startBlock.moveBy(10000, 100);
     block_code.defineAllBlocks();
   }
 
@@ -29,9 +37,20 @@ export default class BlocklyController {
     window.dispatchEvent(new Event("resize"));
   }
 
-  getCode() {
-    let code = javascriptGenerator.workspaceToCode(globalThis.workspace);
-    console.log("code being executed from blocklyController with eval: ", code);
+  fetchCode() {
+    let nextBlock = this.startBlock.getNextBlock();
+    let code = [];
+ 
+     while(nextBlock !== null){
+       console.log("the next blocks is: ", nextBlock);
+       const blockCode = javascriptGenerator.blockToCode(nextBlock, true);
+       console.log(`Generated block code: ${blockCode}`);
+ 
+       code.push(blockCode);
+ 
+       nextBlock = nextBlock.getNextBlock();
+     }
+   console.log("the code is: ", code);
     return code;
   }
 }

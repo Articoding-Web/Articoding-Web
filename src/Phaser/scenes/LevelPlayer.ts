@@ -212,10 +212,29 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   runCode() { // solo para testear? 
-    const code = globalThis.blocklyController.getCode();
-    console.log(`runcode is gonna run: ${code}`);
-    eval(code);
+    const codeInstructions = globalThis.blocklyController.fetchCode();
+    for(let instruction in codeInstructions){
+      eval(codeInstructions[instruction]);
+    }
   }
+  //IDEA PARA EVENTQUEUE (PENDIENTE DE IMPLEMENTAR)
+  // private eventQueue: any[] = [];
+
+  // runCode() {
+  //   const codeInstructions = globalThis.blocklyController.fetchCode();
+  //   for(let instruction in codeInstructions){
+  //     this.eventQueue.push(codeInstructions[instruction]);
+  //   }
+  // }
+  // emitNextEvent() {
+  //   const nextEvent = this.eventQueue.shift();
+  //   if (nextEvent) {
+  //     eval(nextEvent);
+  //     this.emitNextEvent();
+  //   }
+  // }
+
+
 
   move(steps: number, direction: string) {
     this.events.emit('moveOrder', steps, Direction[direction]);
