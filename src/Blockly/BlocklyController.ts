@@ -14,8 +14,8 @@ export default class BlocklyController {
   workspace: Blockly.WorkspaceSvg;
 
   constructor(removeBlocks : string[],removeCategories: string[]) {
-    
-    this.loadToolbox(removeBlocks,removeCategories);
+    this.workspace = Blockly.inject(this.blocklyDiv,{toolbox});
+   // this.loadToolbox(removeBlocks,removeCategories);
     globalThis.workspace = this.workspace;
     Blockly.defineBlocksWithJsonArray(blocks);
     this.startBlock = this.workspace.newBlock('start');
@@ -27,22 +27,23 @@ export default class BlocklyController {
   }
   //vamos a especificar que bloques se pueden usar en el workspace
   loadToolbox(removedBlocks: string[], removedCategories: string[]) {
-    if (removedBlocks === undefined || removedCategories === undefined) {
-      return; //esto no va a hacer falta.
-    }
-    let toolboxClone = JSON.parse(JSON.stringify(toolbox));
+    // if (removedBlocks === undefined || removedCategories === undefined) {
+    //   return; //esto no va a hacer falta.
+    // }
+    let toolboxClone = toolbox;
 
-    toolboxClone.contents = toolboxClone.contents.filter(category => {
-        if (removedCategories.indexOf(category.name) !== -1) { return false;}
-        category.contents = category.contents.filter(block => {
-            if (removedBlocks.indexOf(block.type) !== -1) {return false;}
-            return true;
-        });
-        if (category.contents.length > 0) {return true;}
-        return false;
-    });
+    if (removedBlocks.length > 0) {
+      toolboxClone.contents.forEach(category => {
+          category.contents = category.contents.filter(block => removedBlocks.indexOf(block.type) === -1);
+      });
+  }
+  
+  if (removedCategories.length > 0) {
+      toolboxClone.contents = toolboxClone.contents.filter(category => 
+          removedCategories.indexOf(category.contents[0].type) === -1 && category.contents.length > 0);
+  }
     //cargamos un toolbox especifico
-    this.workspace = Blockly.inject(this.blocklyDiv,toolboxClone);
+    //this.workspace = Blockly.inject(this.blocklyDiv,toolboxClone);
 }
   showWorkspace() {
     globalThis.blocklyArea.classList.remove("d-none");
