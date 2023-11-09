@@ -13,14 +13,14 @@ let blocklyToggler = document.getElementById(
 
 window.addEventListener("load", (event) => {
   phaserController = new PhaserController();
-  blocklyController = new BlocklyController([],[]);
+  blocklyController = new BlocklyController(["Start"],["rotate","changeStatus","text"]);
   
   globalThis.phaserController = phaserController;
   globalThis.blocklyController = blocklyController;
 
   addNavbarListeners();
-
   blocklyToggler.addEventListener("click", (event) => toggleBlockly());
+  
 });
 
 function toggleBlockly() {
