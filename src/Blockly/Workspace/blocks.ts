@@ -42,26 +42,21 @@ export default [
     //block [ACTION = YELLOW] to rotate, asks user to choose left or right, and how many times to rotate
     {
         "type": "rotate",
-        "message0": "rotate %1 %2 times",
+        "message0": "rotate %1",
         "args0": [
             {
                 "type": "field_dropdown",
                 "name": "DIRECTION",
                 "options": [
                     [
-                        "left",
-                        "LEFT"
+                        "anti-clockwise",
+                        "ANTI-CLOCKWISE"
                     ],
                     [
-                        "right",
-                        "RIGHT"
+                        "clockwise",
+                        "CLOCKWISE"
                     ]
                 ]
-            },
-            {
-                "type": "input_value",
-                "name": "TIMES",
-                "check": "Number"
             }
         ],
         "previousStatement": null,
