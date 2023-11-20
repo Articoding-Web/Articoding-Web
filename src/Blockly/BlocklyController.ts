@@ -94,9 +94,7 @@ export default class BlocklyController {
     let code = [];
 
     while (nextBlock !== null) {
-      console.log("the next blocks is: ", nextBlock);
       const blockCode = javascriptGenerator.blockToCode(nextBlock, true);
-      console.log(`Generated block code: ${blockCode}`);
 
       code.push(blockCode);
 

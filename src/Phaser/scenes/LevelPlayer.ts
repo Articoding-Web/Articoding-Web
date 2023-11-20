@@ -13,13 +13,15 @@ const PLAYER_SPRITE_INDEX = 101;
 export default class LevelPlayer extends Phaser.Scene {
   private mapCoordX: number;
   private mapCoordY: number;
+  private instructionQueue: string[] = [];
   private scaleFactor: number;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private players: Player[] = [];
   private traps: Phaser.GameObjects.Sprite[] = [];
   private gridPhysics: GridPhysics;
   private interactablesLayer: Phaser.Tilemaps.TilemapLayer;
-
+  private _cd = 0;//TODO reemplazar
+  private  _movementAnimationDuration = 1150;
   constructor() {
     super("LevelPlayer");
   }
@@ -211,32 +213,28 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  runCode() { // solo para testear? 
-    const codeInstructions = globalThis.blocklyController.fetchCode();
-    for(let instruction in codeInstructions){
-      eval(codeInstructions[instruction]);
+
+
+  runCode() {
+    let codeInstructions = globalThis.blocklyController.fetchCode();
+    for (let instruction in codeInstructions) {
+      this.instructionQueue.push(codeInstructions[instruction]);
+    }
+    this.processInstructionQueue();
+  }
+
+  processInstructionQueue() {
+    if (this.instructionQueue.length > 0) {
+      let instruction = this.instructionQueue.shift();
+      eval(instruction);
+      setTimeout(() => {
+        this.processInstructionQueue();
+      },this._cd);
     }
   }
-  //IDEA PARA EVENTQUEUE (PENDIENTE DE IMPLEMENTAR)
-  // private eventQueue: any[] = [];
-
-  // runCode() {
-  //   const codeInstructions = globalThis.blocklyController.fetchCode();
-  //   for(let instruction in codeInstructions){
-  //     this.eventQueue.push(codeInstructions[instruction]);
-  //   }
-  // }
-  // emitNextEvent() {
-  //   const nextEvent = this.eventQueue.shift();
-  //   if (nextEvent) {
-  //     eval(nextEvent);
-  //     this.emitNextEvent();
-  //   }
-  // }
-
-
-
   move(steps: number, direction: string) {
+    this._cd = steps * this._movementAnimationDuration;
+    
     this.events.emit('moveOrder', steps, Direction[direction]);
   }
 

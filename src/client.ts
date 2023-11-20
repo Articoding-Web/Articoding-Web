@@ -13,7 +13,7 @@ let blocklyToggler = document.getElementById(
 
 window.addEventListener("load", (event) => {
   phaserController = new PhaserController();
-  blocklyController = new BlocklyController(["Start"],["rotate","changeStatus","text"]);
+  blocklyController = new BlocklyController(["Start"],[]);
   
   globalThis.phaserController = phaserController;
   globalThis.blocklyController = blocklyController;

@@ -19,7 +19,6 @@ export class Player {
     private addEventListener() {
         this.sprite.scene.events.on("moveOrder", (steps: number, direction: Direction) => {
             console.log("received move");
-
             this.steps = steps;
             this.movePlayer(direction);
         });
@@ -69,7 +68,6 @@ export class Player {
             onComplete: (--this.steps > 0) ? this.movePlayer.bind(this, this.movementDirection) : this.stopMoving.bind(this),
         })
     }
-
     private stopMoving(): void {
         this.stopAnimation();
         this.movementDirection = Direction.NONE;
