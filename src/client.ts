@@ -1,6 +1,9 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
 
+// Temp
+import level from './baseLevel.json';
+
 globalThis.blocklyArea = document.getElementById("blocklyArea") as HTMLElement;
 globalThis.blocklyDiv = document.getElementById("blocklyDiv") as HTMLDivElement;
 globalThis.phaserDiv = document.getElementById("phaserDiv") as HTMLDivElement;
@@ -12,15 +15,8 @@ let blocklyToggler = document.getElementById(
 ) as HTMLButtonElement;
 
 window.addEventListener("load", (event) => {
-  phaserController = new PhaserController();
-  blocklyController = new BlocklyController(["Start"],["rotate","changeStatus","text"]);
-  
-  globalThis.phaserController = phaserController;
-  globalThis.blocklyController = blocklyController;
-
   addNavbarListeners();
   blocklyToggler.addEventListener("click", (event) => toggleBlockly());
-  
 });
 
 function toggleBlockly() {
@@ -41,6 +37,13 @@ function addNavbarListeners() {
 }
 
 function playLevel() {
+  const toolbox = level.blockly.toolbox;
+  phaserController = new PhaserController();
+  blocklyController = new BlocklyController(toolbox);
+
+  globalThis.phaserController = phaserController;
+  globalThis.blocklyController = blocklyController;
+
   blocklyController.showWorkspace();
   blocklyToggler.classList.remove("d-none");
   phaserController.reduceSize();

@@ -28,6 +28,7 @@ export default class LevelPlayer extends Phaser.Scene {
   init() { }
 
   preload() {
+    
     this.load.image("tiles", "assets/Dungeon_Tileset.png");
     this.load.tilemapTiledJSON("4x4map", "assets/4x4_map.json");
 
