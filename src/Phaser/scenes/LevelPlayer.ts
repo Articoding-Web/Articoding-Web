@@ -11,6 +11,7 @@ const SPIKES_SPRITE_INDEX = 113;
 const PLAYER_SPRITE_INDEX = 101;
 
 export default class LevelPlayer extends Phaser.Scene {
+
   private mapCoordX: number;
   private mapCoordY: number;
   private instructionQueue: string[] = [];
@@ -21,7 +22,6 @@ export default class LevelPlayer extends Phaser.Scene {
   private gridPhysics: GridPhysics;
   private interactablesLayer: Phaser.Tilemaps.TilemapLayer;
   private _cd = 0;//TODO reemplazar
-  private  _movementAnimationDuration = 1150;
   constructor() {
     super("LevelPlayer");
   }
@@ -183,8 +183,9 @@ export default class LevelPlayer extends Phaser.Scene {
   trapCollider(player, trap){
     console.log(`Player ${player} collided with trap ${trap}`);
   }
-
+  private _ChestAcquired = false;
   chestCollider() {
+    this._ChestAcquired = true;
     console.log("Hit interactable obj");
   }
 
@@ -227,13 +228,24 @@ export default class LevelPlayer extends Phaser.Scene {
     if (this.instructionQueue.length > 0) {
       let instruction = this.instructionQueue.shift();
       eval(instruction);
+
       setTimeout(() => {
         this.processInstructionQueue();
       },this._cd);
     }
+    else{
+      if(this._ChestAcquired){
+        alert("Level completed! Good job!");
+        globalThis.phaserController.startScene("LevelPlayer");
+      }else{
+        alert("Level not completed! Try again.");
+        globalThis.phaserController.startScene("LevelPlayer");
+      }
+    
+    }
   }
   move(steps: number, direction: string) {
-    this._cd = steps * this._movementAnimationDuration;
+    this._cd = steps * (config.MOVEMENT_ANIMDURATION + 150);
     
     this.events.emit('moveOrder', steps, Direction[direction]);
   }

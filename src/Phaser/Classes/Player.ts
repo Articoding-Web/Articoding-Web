@@ -63,7 +63,7 @@ export class Player {
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: 1000,
+            duration: config.MOVEMENT_ANIMDURATION,
             ease: "Sine.inOut",
             onComplete: (--this.steps > 0) ? this.movePlayer.bind(this, this.movementDirection) : this.stopMoving.bind(this),
         })
@@ -111,7 +111,7 @@ export class Player {
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: 1000,
+            duration: config.MOVEMENT_ANIMDURATION,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopAnimation.bind(this)
