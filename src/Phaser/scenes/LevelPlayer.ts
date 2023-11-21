@@ -10,7 +10,14 @@ const CHEST_SPRITE_INDEX = 85;
 const SPIKES_SPRITE_INDEX = 113;
 const PLAYER_SPRITE_INDEX = 101;
 
+const MULTIATLAS_NAMES = ["background", "player", "trap", "door"];
+
 export default class LevelPlayer extends Phaser.Scene {
+  private theme: String;
+  private height: number;
+  private width: number;
+  private objetsJson: JSON;
+
   private mapCoordX: number;
   private mapCoordY: number;
   private scaleFactor: number;
@@ -25,39 +32,48 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   // TODO pasar la información del nivel
-  init() { }
+  init(...params) {
+    const levelJson = params[0];
+    this.theme = levelJson.theme;
+    this.height = levelJson.height;
+    this.width = levelJson.width;
+    this.objetsJson = levelJson.objects;
+  }
 
   preload() {
-    
-    this.load.image("tiles", "assets/Dungeon_Tileset.png");
-    this.load.tilemapTiledJSON("4x4map", "assets/4x4_map.json");
+    this.loadAssets();
+  }
 
-    // Load frog
-    this.load.multiatlas(
-      "playerSprite",
-      "assets/sprites/FrogSpriteSheet.json",
-      "assets/sprites/"
-    );
+  loadAssets(){
+    const themePath = `assets/sprites/${this.theme}`;
 
-    // Load spikes
-    this.load.multiatlas(
-      "spikes",
-      "assets/sprites/spikes.json",
-      "assets/sprites/"
-    );
+    // Load multiatlases
+    for(let x in MULTIATLAS_NAMES){
+      let assetKey : string = MULTIATLAS_NAMES[x];
+      this.load.multiatlas(
+        assetKey,
+        `${themePath}/${assetKey}.json`,
+        themePath
+      );
+    }
+
+    // Other assets
+
+    // wall / blockable
+    this.load.image("wall", `${themePath}/wall.png`);
+    // chest / objective
+    this.load.image("chest", `${themePath}/chest.png`);
   }
 
   create() {
-    this.zoom();
+    // this.zoom();
     this.createTileMap();
-    this.createPlayers();
+    // this.createPlayers();
   }
 
   createTileMap() {
-    this.tilemap = this.make.tilemap({ key: "4x4map" });
-    this.tilemap.addTilesetImage("Dungeon_Tileset", "tiles");
-    this.tilemap.addTilesetImage("FrogSpriteSheet", "playerSprite");
-    this.tilemap.addTilesetImage("spikes", "spikes");
+    this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height});
+    this.tilemap.addTilesetImage("background");
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
     const layerHeight = this.tilemap.height * config.TILE_SIZE;
@@ -67,52 +83,47 @@ export default class LevelPlayer extends Phaser.Scene {
     this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
     this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
-    for (let i = 0; i < this.tilemap.layers.length; i++) {
-      const layer = this.tilemap.createLayer(i, ["Dungeon_Tileset", "FrogSpriteSheet", "spikes"], this.mapCoordX, this.mapCoordY);
-      layer.scale = this.scaleFactor;
-      if (i === INTERACTABLES_LAYER) {
-        this.interactablesLayer = layer;
-        // Create collisions for interactable objects
-        // Chests
-        this.interactablesLayer.setTileIndexCallback(CHEST_SPRITE_INDEX, this.chestCollider, this);
+    // {data: [], tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, }
+    const bgLayer = this.tilemap.createBlankLayer("background", this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
+    bgLayer.scale = this.scaleFactor;
 
-        // TRAPS
-        // Spikes
-        this.createSpikes();
-      }
-      layer.setDepth(i);
-    }
+    // Outer ring
+    this.tilemap.putTileAt(0, 0, 0);  // Top-Left corner
+    this.tilemap.randomize(1, 0, this.width - 2, 1, [1, 2, 3]);   // Top between corners
+    this.tilemap.putTileAt(4, this.width - 1, 0); // Top-Right corner
+
+    this.tilemap.randomize(0, 1, 1, this.height - 2, [5, 10, 15]);  // Left border
+    this.tilemap.randomize(this.width - 1, 1, 1, this.height - 2, [9, 14, 19]); // Right border
+
+    this.tilemap.putTileAt(20, 0, this.height - 1); // Bottom-Left corner
+    this.tilemap.randomize(1, this.height - 1, this.width - 2, 1, [21, 22, 23]); // Bottom between corners
+    this.tilemap.putTileAt(24, this.width - 1, this.height - 1); // Bottom-Right corner
+
+    // Inner ring
+    this.tilemap.putTileAt(6, 1, 1);  // Top-Left corner
+    this.tilemap.fill(7, 2, 1, this.width - 3, 1);   // Top between corners
+    this.tilemap.putTileAt(8, this.width - 2, 1); // Top-Right corner
+
+    this.tilemap.fill(11, 1, 2, 1, this.height - 3);  // Left border
+    this.tilemap.fill(13, this.width - 2, 2, 1, this.height - 3); // Right border
+
+    this.tilemap.putTileAt(16, 1, this.height - 2); // Bottom-Left corner
+    this.tilemap.fill(17, 2, this.height - 2, this.width - 3, 1); // Bottom between corners
+    this.tilemap.putTileAt(18, this.width - 2, this.height - 2); // Bottom-Right corner
+
+    // Inside
+    this.tilemap.fill(12, 2, 2, (this.width - 3) / 2, (this.height - 3) / 2);
   }
 
-  createSpikes() {
-    this.createSpikeAnimation();
-    const spikeSprites = this.tilemap.createFromTiles(SPIKES_SPRITE_INDEX, null, { key: "spikes", frame: "0.png" }, this, undefined, this.interactablesLayer);
-
-    let i = 0;
-    // Scale and position sprites correctly
-    this.tilemap.forEachTile(tile => {
-      if (tile.index === SPIKES_SPRITE_INDEX) {
-        const layer = tile.tilemapLayer;
-        const sprite = spikeSprites[i];
-        sprite.setDepth(layer.depth);
-
-        this.scaleSprite(sprite, tile.x, tile.y);
-
-        this.physics.add.existing(sprite);
-
-        // Start animation
-        sprite.anims.startAnimation("spikes");
-        layer.removeTileAt(tile.x, tile.y);
-        this.traps.push(sprite);
-        i++;
-      }
-    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, this.interactablesLayer);
+  createTraps() {
+    this.createTrapAnimation();
+    
   }
 
-  createSpikeAnimation() {
+  createTrapAnimation() {
     this.anims.create({
-      key: "spikes",
-      frames: this.anims.generateFrameNames("spikes", {
+      key: "trap",
+      frames: this.anims.generateFrameNames("trap", {
         start: 0,
         end: 3,
         suffix: '.png',
@@ -144,7 +155,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
       // Create player
       this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y), this.scaleFactor));
-      
+
       layer.removeTileAt(tile.x, tile.y);
 
       i++;
@@ -179,7 +190,7 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   };
 
-  trapCollider(player, trap){
+  trapCollider(player, trap) {
     console.log(`Player ${player} collided with trap ${trap}`);
   }
 
@@ -214,7 +225,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
   runCode() { // solo para testear? 
     const codeInstructions = globalThis.blocklyController.fetchCode();
-    for(let instruction in codeInstructions){
+    for (let instruction in codeInstructions) {
       eval(codeInstructions[instruction]);
     }
   }

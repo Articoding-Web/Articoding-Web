@@ -21,6 +21,10 @@ export default class BlocklyController {
     // To-Do: Crear bloques en workspace
   }
 
+  destroy(){
+    this.workspace.dispose();
+  }
+
   // constructor(removeBlocks: string[], removeCategories: string[]) {
   //   //this.workspace = Blockly.inject(this.blocklyDiv,{toolbox});
   //   let updatedToolbox = this.loadToolBox(removeBlocks, removeCategories);
