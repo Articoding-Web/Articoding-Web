@@ -185,7 +185,9 @@ export default class LevelPlayer extends Phaser.Scene {
   }
   private _ChestAcquired = false;
   chestCollider() {
-    this._ChestAcquired = true;
+    if(this.instructionQueue.length === 0 && this._cd === 0){
+      this._ChestAcquired = true;
+    }
     console.log("Hit interactable obj");
   }
 
@@ -234,6 +236,9 @@ export default class LevelPlayer extends Phaser.Scene {
       },this._cd);
     }
     else{
+      this._cd = 0;
+      setTimeout(() => {
+
       if(this._ChestAcquired){
         alert("Level completed! Good job!");
         globalThis.phaserController.startScene("LevelPlayer");
@@ -241,6 +246,7 @@ export default class LevelPlayer extends Phaser.Scene {
         alert("Level not completed! Try again.");
         globalThis.phaserController.startScene("LevelPlayer");
       }
+    },500);
     
     }
   }
