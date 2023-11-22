@@ -7,16 +7,17 @@ export class Player {
     private movementDirection: Direction = Direction.NONE;  // Always none except when moving
     private steps: number = 0;
     private playerDir : number = 0; //por defecto la ranita mira "abajo" down/left/up/right
+
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics: GridPhysics,
         private tilePos: Phaser.Math.Vector2,
         private scaleFactor: number
     ) {
-        this.addEventListener();
+        this.addEventListeners();
     }
 
-    private addEventListener() {
+    private addEventListeners() {
         this.sprite.scene.events.on("moveOrder", (steps: number, direction: Direction) => {
             console.log("received move");
 

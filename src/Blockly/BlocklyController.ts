@@ -16,9 +16,15 @@ export default class BlocklyController {
   constructor(toolbox: string | ToolboxDefinition | Element, workspaceBlocks?: any) {
     this.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
     Blockly.defineBlocksWithJsonArray(blocks);
-    block_code.defineAllBlocks();
 
-    // To-Do: Crear bloques en workspace
+    this.startBlock = this.workspace.newBlock('start');
+    this.startBlock.initSvg();
+    this.startBlock.render();
+
+    // TODO: Crear workspaceBlocks
+
+    
+    block_code.defineAllBlocks();
   }
 
   destroy(){

@@ -5,18 +5,11 @@ import { Player } from "../Classes/Player";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
 
-const INTERACTABLES_LAYER = 2;
-const CHEST_SPRITE_INDEX = 85;
-const SPIKES_SPRITE_INDEX = 113;
-const PLAYER_SPRITE_INDEX = 101;
-
-const MULTIATLAS_NAMES = ["background", "player", "trap", "door"];
-
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
   private height: number;
   private width: number;
-  private objetsJson: JSON;
+  private layersJson: JSON;
 
   private mapCoordX: number;
   private mapCoordY: number;
@@ -37,7 +30,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.theme = levelJson.theme;
     this.height = levelJson.height;
     this.width = levelJson.width;
-    this.objetsJson = levelJson.objects;
+    this.layersJson = levelJson.layers;
   }
 
   preload() {
@@ -47,33 +40,29 @@ export default class LevelPlayer extends Phaser.Scene {
   loadAssets(){
     const themePath = `assets/sprites/${this.theme}`;
 
-    // Load multiatlases
-    for(let x in MULTIATLAS_NAMES){
-      let assetKey : string = MULTIATLAS_NAMES[x];
-      this.load.multiatlas(
-        assetKey,
-        `${themePath}/${assetKey}.json`,
-        themePath
-      );
+    for(let x in this.layersJson){
+      const layer = this.layersJson[x];
+      const assetKey = layer.spriteSheet;
+      if(layer.spriteSheetType === "multi"){
+        this.load.multiatlas(
+          assetKey,
+          `${themePath}/${assetKey}.json`,
+          themePath
+        );
+      } else {
+        this.load.image(assetKey, `${themePath}/${assetKey}.png`)
+      }
     }
-
-    // Other assets
-
-    // wall / blockable
-    this.load.image("wall", `${themePath}/wall.png`);
-    // chest / objective
-    this.load.image("chest", `${themePath}/chest.png`);
   }
 
   create() {
     // this.zoom();
     this.createTileMap();
-    // this.createPlayers();
+    this.createPlayers();
   }
 
   createTileMap() {
     this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height});
-    this.tilemap.addTilesetImage("background");
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
     const layerHeight = this.tilemap.height * config.TILE_SIZE;
@@ -83,41 +72,22 @@ export default class LevelPlayer extends Phaser.Scene {
     this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
     this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
-    // {data: [], tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, }
-    const bgLayer = this.tilemap.createBlankLayer("background", this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
-    bgLayer.scale = this.scaleFactor;
+    for(let x in this.layersJson){
+      const layerJSon = this.layersJson[x];
+      this.tilemap.addTilesetImage(layerJSon.spriteSheet);
+      const layer = this.tilemap.createBlankLayer(layerJSon.spriteSheet, this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
+      layer.scale = this.scaleFactor;
 
-    // Outer ring
-    this.tilemap.putTileAt(0, 0, 0);  // Top-Left corner
-    this.tilemap.randomize(1, 0, this.width - 2, 1, [1, 2, 3]);   // Top between corners
-    this.tilemap.putTileAt(4, this.width - 1, 0); // Top-Right corner
-
-    this.tilemap.randomize(0, 1, 1, this.height - 2, [5, 10, 15]);  // Left border
-    this.tilemap.randomize(this.width - 1, 1, 1, this.height - 2, [9, 14, 19]); // Right border
-
-    this.tilemap.putTileAt(20, 0, this.height - 1); // Bottom-Left corner
-    this.tilemap.randomize(1, this.height - 1, this.width - 2, 1, [21, 22, 23]); // Bottom between corners
-    this.tilemap.putTileAt(24, this.width - 1, this.height - 1); // Bottom-Right corner
-
-    // Inner ring
-    this.tilemap.putTileAt(6, 1, 1);  // Top-Left corner
-    this.tilemap.fill(7, 2, 1, this.width - 3, 1);   // Top between corners
-    this.tilemap.putTileAt(8, this.width - 2, 1); // Top-Right corner
-
-    this.tilemap.fill(11, 1, 2, 1, this.height - 3);  // Left border
-    this.tilemap.fill(13, this.width - 2, 2, 1, this.height - 3); // Right border
-
-    this.tilemap.putTileAt(16, 1, this.height - 2); // Bottom-Left corner
-    this.tilemap.fill(17, 2, this.height - 2, this.width - 3, 1); // Bottom between corners
-    this.tilemap.putTileAt(18, this.width - 2, this.height - 2); // Bottom-Right corner
-
-    // Inside
-    this.tilemap.fill(12, 2, 2, (this.width - 3) / 2, (this.height - 3) / 2);
+      for(let y in layerJSon.objects){
+        const obj = layerJSon.objects[y];
+        const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
+        tile.properties = obj.properties;
+      }
+    }
   }
 
   createTraps() {
     this.createTrapAnimation();
-    
   }
 
   createTrapAnimation() {
@@ -137,7 +107,7 @@ export default class LevelPlayer extends Phaser.Scene {
   createPlayers() {
     this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor);
     // Create sprites
-    const sprites = this.tilemap.createFromTiles(PLAYER_SPRITE_INDEX, null, { key: "playerSprite", frame: "down/0.png" }, this, undefined, "Players");
+    const sprites = this.tilemap.createFromTiles(0, null, { key: "player", frame: "down/0.png" }, this, undefined, "player");
 
     let i = 0;
     // Destroy each tile and position sprites correctly
@@ -159,7 +129,7 @@ export default class LevelPlayer extends Phaser.Scene {
       layer.removeTileAt(tile.x, tile.y);
 
       i++;
-    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, "Players");
+    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, "player");
 
     this.cameras.main.roundPixels = true;
 
@@ -178,7 +148,7 @@ export default class LevelPlayer extends Phaser.Scene {
   ) {
     this.anims.create({
       key: name,
-      frames: this.anims.generateFrameNames("playerSprite", {
+      frames: this.anims.generateFrameNames("player", {
         start: 0,
         end: 3,
         prefix: `${name}/`,
