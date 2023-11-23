@@ -23,7 +23,7 @@ export default class BlocklyController {
 
     // TODO: Crear workspaceBlocks
 
-    
+
     block_code.defineAllBlocks();
   }
 

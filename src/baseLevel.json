@@ -74,7 +74,10 @@
                     {
                         "x": 4,
                         "y": 1,
-                        "spriteIndex": "9"
+                        "spriteIndex": "9",
+                        "properties": {
+                            "collides": true
+                        }
                     },
                     {
                         "x": 0,
@@ -149,17 +152,26 @@
                     {
                         "x": 1,
                         "y": 4,
-                        "spriteIndex": "21"
+                        "spriteIndex": "21",
+                        "properties": {
+                            "collides": true
+                        }
                     },
                     {
                         "x": 2,
                         "y": 4,
-                        "spriteIndex": "22"
+                        "spriteIndex": "22",
+                        "properties": {
+                            "collides": true
+                        }
                     },
                     {
                         "x": 3,
                         "y": 4,
-                        "spriteIndex": "23"
+                        "spriteIndex": "23",
+                        "properties": {
+                            "collides": true
+                        }
                     },
                     {
                         "x": 4,
@@ -169,7 +181,8 @@
                             "collides": true
                         }
                     }
-                ]
+                ],
+                "depth": 0
             },
             {
                 "spriteSheet": "player",
@@ -183,7 +196,30 @@
                         "x": 2,
                         "y": 3
                     }
-                ]
+                ],
+                "depth": 2
+            },
+            {
+                "spriteSheet": "trap",
+                "spriteSheetType": "multi",
+                "objects": [
+                    {
+                        "x": 3,
+                        "y": 1
+                    }
+                ],
+                "depth": 1
+            },
+            {
+                "spriteSheet": "chest",
+                "spriteSheetType": "img",
+                "objects": [
+                    {
+                        "x": 3,
+                        "y": 3
+                    }
+                ],
+                "depth": 1
             }
         ]
     },

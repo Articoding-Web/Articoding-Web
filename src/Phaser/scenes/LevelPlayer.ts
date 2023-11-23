@@ -18,7 +18,6 @@ export default class LevelPlayer extends Phaser.Scene {
   private players: Player[] = [];
   private traps: Phaser.GameObjects.Sprite[] = [];
   private gridPhysics: GridPhysics;
-  private interactablesLayer: Phaser.Tilemaps.TilemapLayer;
 
   constructor() {
     super("LevelPlayer");
@@ -37,13 +36,13 @@ export default class LevelPlayer extends Phaser.Scene {
     this.loadAssets();
   }
 
-  loadAssets(){
+  loadAssets() {
     const themePath = `assets/sprites/${this.theme}`;
 
-    for(let x in this.layersJson){
+    for (let x in this.layersJson) {
       const layer = this.layersJson[x];
       const assetKey = layer.spriteSheet;
-      if(layer.spriteSheetType === "multi"){
+      if (layer.spriteSheetType === "multi") {
         this.load.multiatlas(
           assetKey,
           `${themePath}/${assetKey}.json`,
@@ -59,10 +58,11 @@ export default class LevelPlayer extends Phaser.Scene {
     // this.zoom();
     this.createTileMap();
     this.createPlayers();
+    this.createTraps();
   }
 
   createTileMap() {
-    this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height});
+    this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height });
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
     const layerHeight = this.tilemap.height * config.TILE_SIZE;
@@ -72,22 +72,47 @@ export default class LevelPlayer extends Phaser.Scene {
     this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
     this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
-    for(let x in this.layersJson){
+    for (let x in this.layersJson) {
       const layerJSon = this.layersJson[x];
       this.tilemap.addTilesetImage(layerJSon.spriteSheet);
       const layer = this.tilemap.createBlankLayer(layerJSon.spriteSheet, this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
       layer.scale = this.scaleFactor;
+      layer.depth = layerJSon.depth || layer.depth;
 
-      for(let y in layerJSon.objects){
+      for (let y in layerJSon.objects) {
         const obj = layerJSon.objects[y];
         const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
         tile.properties = obj.properties;
+        if (layerJSon.spriteSheet === "trap") {
+          tile.setCollisionCallback(this.trapCollider, this);
+        } else if (layerJSon.spriteSheet === "chest") {
+          tile.setCollisionCallback(this.chestCollider, this);
+        }
       }
     }
   }
 
   createTraps() {
     this.createTrapAnimation();
+    const trapSprites = this.tilemap.createFromTiles(0, null, { key: "trap", frame: "0.png" }, this, undefined, "trap");
+
+    let i = 0;
+    // Scale and position sprites correctly
+    this.tilemap.forEachTile(tile => {
+      const layer = tile.tilemapLayer;
+      const sprite = trapSprites[i];
+      sprite.setDepth(layer.depth);
+
+      this.scaleSprite(sprite, tile.x, tile.y);
+
+      this.physics.add.existing(sprite);
+
+      // Start animation
+      sprite.anims.startAnimation("trap");
+      layer.removeTileAt(tile.x, tile.y);
+      this.traps.push(sprite);
+      i++;
+    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, "trap");
   }
 
   createTrapAnimation() {
@@ -117,11 +142,8 @@ export default class LevelPlayer extends Phaser.Scene {
       sprite.setDepth(layer.depth);
 
       this.scaleSprite(sprite, tile.x, tile.y);
-
       this.physics.add.existing(sprite);
-      this.physics.add.overlap(sprite, this.interactablesLayer);
-
-      this.physics.add.collider(sprite, this.traps, this.trapCollider);
+      // this.physics.add.overlap(sprite, this.interactablesLayer);
 
       // Create player
       this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y), this.scaleFactor));

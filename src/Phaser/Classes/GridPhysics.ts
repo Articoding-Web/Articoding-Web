@@ -52,7 +52,7 @@ export class GridPhysics {
         }
         return this.tileMap.layers.some((layer) => {
             const tile = this.tileMap.getTileAt(pos.x, pos.y, false, layer.name);
-            return tile && tile.properties.collides;
+            return tile && tile.properties && tile.properties.collides;
         });
     }
 
