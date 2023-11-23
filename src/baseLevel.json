@@ -272,8 +272,9 @@
                 }
             ]
         },
-        "workspace": {
-
-        }
+        "workspaceBlocks": [
+            "movement",
+            "numberSpecial"
+        ]
     }
 }

@@ -22,7 +22,11 @@ export default class BlocklyController {
     this.startBlock.render();
 
     // TODO: Crear workspaceBlocks
-
+    for(let x in workspaceBlocks){
+      const block = this.workspace.newBlock(workspaceBlocks[x]);
+      block.initSvg();
+      block.render();
+    }
     
     block_code.defineAllBlocks();
   }
