@@ -4,7 +4,7 @@ import config from "../config";
 import { Player } from "../Classes/Player";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
-
+import {appendModal} from "../../../public/utils.js";
 const INTERACTABLES_LAYER = 2;
 const CHEST_SPRITE_INDEX = 85;
 const SPIKES_SPRITE_INDEX = 113;
@@ -238,13 +238,17 @@ export default class LevelPlayer extends Phaser.Scene {
     else{
       this._cd = 0;
       setTimeout(() => {
-
       if(this._ChestAcquired){
-        alert("Level completed! Good job!");
-        globalThis.phaserController.startScene("LevelPlayer");
+
+        appendModal("¡Buen trabajo! nivel completado",3,1);
+        setTimeout(()=>{
+          globalThis.phaserController.startScene("LevelPlayer");
+        },1500);
       }else{
-        alert("Level not completed! Try again.");
-        globalThis.phaserController.startScene("LevelPlayer");
+        appendModal("Nivel no completado...",0,0);
+        setTimeout(()=>{
+          globalThis.phaserController.startScene("LevelPlayer");
+        },1500);
       }
     },500);
     
