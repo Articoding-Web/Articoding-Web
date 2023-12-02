@@ -5,6 +5,9 @@ const PhaserConfig: Phaser.Types.Core.GameConfig = {
   parent: "phaserDiv",
   physics: {
     default: 'arcade',
+    arcade: {
+      debug: true
+    }
   },
   canvas: <HTMLCanvasElement>document.getElementById("phaserCanvas"),
   scale: {

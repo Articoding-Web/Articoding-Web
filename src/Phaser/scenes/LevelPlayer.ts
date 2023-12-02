@@ -9,7 +9,9 @@ export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
   private height: number;
   private width: number;
-  private layersJson: JSON;
+  private backgroundLayerJson: any;
+  private playersLayerJson: any;
+  private objectsLayerJson: any;
 
   private mapCoordX: number;
   private mapCoordY: number;
@@ -29,39 +31,48 @@ export default class LevelPlayer extends Phaser.Scene {
     this.theme = levelJson.theme;
     this.height = levelJson.height;
     this.width = levelJson.width;
-    this.layersJson = levelJson.layers;
+    this.backgroundLayerJson = levelJson.layers.background;
+    this.playersLayerJson = levelJson.layers.players;
+    this.objectsLayerJson = levelJson.layers.objects;
   }
 
   preload() {
-    this.loadAssets();
+    // Load background assets
+    this.loadAssetFromLayer(this.backgroundLayerJson);
+
+    // Load player assets
+    this.loadAssetFromLayer(this.playersLayerJson);
+
+    // Load objects assets
+    for(let x in this.objectsLayerJson){
+      let objJson = this.objectsLayerJson[x];
+      this.loadAssetFromLayer(objJson);
+    }
   }
 
-  loadAssets() {
+  loadAssetFromLayer(layerJson: any) {
     const themePath = `assets/sprites/${this.theme}`;
 
-    for (let x in this.layersJson) {
-      const layer = this.layersJson[x];
-      const assetKey = layer.spriteSheet;
-      if (layer.spriteSheetType === "multi") {
-        this.load.multiatlas(
-          assetKey,
-          `${themePath}/${assetKey}.json`,
-          themePath
-        );
-      } else {
-        this.load.image(assetKey, `${themePath}/${assetKey}.png`)
-      }
+    const assetKey = layerJson.spriteSheet;
+    if (layerJson.spriteSheetType === "multi") {
+      this.load.multiatlas(
+        assetKey,
+        `${themePath}/${assetKey}.json`,
+        themePath
+      );
+    } else {
+      this.load.image(assetKey, `${themePath}/${assetKey}.png`)
     }
   }
 
   create() {
     // this.zoom();
-    this.createTileMap();
+    this.createBackground();
     this.createPlayers();
-    this.createTraps();
+    this.createObjects();
   }
 
-  createTileMap() {
+  createBackground() {
     this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height });
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
@@ -72,86 +83,34 @@ export default class LevelPlayer extends Phaser.Scene {
     this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
     this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
-    for (let x in this.layersJson) {
-      const layerJSon = this.layersJson[x];
-      this.tilemap.addTilesetImage(layerJSon.spriteSheet);
-      const layer = this.tilemap.createBlankLayer(layerJSon.spriteSheet, this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
-      layer.scale = this.scaleFactor;
-      layer.depth = layerJSon.depth || layer.depth;
+    this.tilemap.addTilesetImage(this.backgroundLayerJson.spriteSheet);
+    const layer = this.tilemap.createBlankLayer(this.backgroundLayerJson.spriteSheet, this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
+    layer.scale = this.scaleFactor;
+    layer.depth = this.backgroundLayerJson.depth || layer.depth;
 
-      for (let y in layerJSon.objects) {
-        const obj = layerJSon.objects[y];
-        const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
-        tile.properties = obj.properties;
-        if (layerJSon.spriteSheet === "trap") {
-          tile.setCollisionCallback(this.trapCollider, this);
-        } else if (layerJSon.spriteSheet === "chest") {
-          tile.setCollisionCallback(this.chestCollider, this);
-        }
-      }
+    for (let y in this.backgroundLayerJson.objects) {
+      const obj = this.backgroundLayerJson.objects[y];
+      const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
+      tile.properties = obj.properties;
     }
-  }
-
-  createTraps() {
-    this.createTrapAnimation();
-    const trapSprites = this.tilemap.createFromTiles(0, null, { key: "trap", frame: "0.png" }, this, undefined, "trap");
-
-    let i = 0;
-    // Scale and position sprites correctly
-    this.tilemap.forEachTile(tile => {
-      const layer = tile.tilemapLayer;
-      const sprite = trapSprites[i];
-      sprite.setDepth(layer.depth);
-
-      this.scaleSprite(sprite, tile.x, tile.y);
-
-      this.physics.add.existing(sprite);
-
-      // Start animation
-      sprite.anims.startAnimation("trap");
-      layer.removeTileAt(tile.x, tile.y);
-      this.traps.push(sprite);
-      i++;
-    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, "trap");
-  }
-
-  createTrapAnimation() {
-    this.anims.create({
-      key: "trap",
-      frames: this.anims.generateFrameNames("trap", {
-        start: 0,
-        end: 3,
-        suffix: '.png',
-      }),
-      frameRate: 2,
-      repeat: -1,
-      yoyo: true,
-    });
   }
 
   createPlayers() {
     this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor);
+    
     // Create sprites
-    const sprites = this.tilemap.createFromTiles(0, null, { key: "player", frame: "down/0.png" }, this, undefined, "player");
+    for(let x in this.playersLayerJson.objects){
+      const player = this.playersLayerJson.objects[x];
+      
+      // Create and scale sprite
+      const sprite = this.add.sprite(player.x, player.y, this.playersLayerJson.spriteSheet);
+      this.scaleSprite(sprite, player.x, player.y);
+      sprite.setDepth(this.playersLayerJson.depth);
 
-    let i = 0;
-    // Destroy each tile and position sprites correctly
-    this.tilemap.forEachTile(tile => {
-      const layer = tile.tilemapLayer;
-      const sprite = sprites[i];
-      sprite.setDepth(layer.depth);
-
-      this.scaleSprite(sprite, tile.x, tile.y);
+      // Add physics and create player object
       this.physics.add.existing(sprite);
-      // this.physics.add.overlap(sprite, this.interactablesLayer);
-
-      // Create player
-      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(tile.x, tile.y), this.scaleFactor));
-
-      layer.removeTileAt(tile.x, tile.y);
-
-      i++;
-    }, undefined, 1, 1, undefined, undefined, { isNotEmpty: true }, "player");
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(player.x, player.y), this.scaleFactor));
+    }
 
     this.cameras.main.roundPixels = true;
 
@@ -182,8 +141,25 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   };
 
-  trapCollider(player, trap) {
-    console.log(`Player ${player} collided with trap ${trap}`);
+  createObjects() {
+    console.log(this.objectsLayerJson);
+    for(let x in this.objectsLayerJson){
+      const objectJson = this.objectsLayerJson[x];
+      const objects = objectJson.objects;
+      for(let y in objects){
+        const obj = objects[y];
+        
+        // Create and scale sprite
+        const sprite = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
+        this.scaleSprite(sprite, obj.x, obj.y);
+        sprite.setDepth(objectJson.depth);
+
+        // Add physics and create player object
+        this.physics.add.existing(sprite);
+
+        // TODO: add collider
+      }
+    }
   }
 
   chestCollider() {
@@ -237,8 +213,6 @@ export default class LevelPlayer extends Phaser.Scene {
   //     this.emitNextEvent();
   //   }
   // }
-
-
 
   move(steps: number, direction: string) {
     this.events.emit('moveOrder', steps, Direction[direction]);

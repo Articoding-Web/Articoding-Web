@@ -3,8 +3,8 @@
         "width": 6,
         "height": 6,
         "theme": "default",
-        "layers" : [
-            {
+        "layers" : {
+            "background" : {
                 "spriteSheet": "background",
                 "spriteSheetType": "multi",
                 "objects": [
@@ -184,7 +184,7 @@
                 ],
                 "depth": 0
             },
-            {
+            "players" : {
                 "spriteSheet": "player",
                 "spriteSheetType": "multi",
                 "objects": [
@@ -199,29 +199,31 @@
                 ],
                 "depth": 2
             },
-            {
-                "spriteSheet": "trap",
-                "spriteSheetType": "multi",
-                "objects": [
-                    {
-                        "x": 3,
-                        "y": 1
-                    }
-                ],
-                "depth": 1
-            },
-            {
-                "spriteSheet": "chest",
-                "spriteSheetType": "img",
-                "objects": [
-                    {
-                        "x": 3,
-                        "y": 3
-                    }
-                ],
-                "depth": 1
-            }
-        ]
+            "objects" : [
+                {
+                    "spriteSheet": "trap",
+                    "spriteSheetType": "multi",
+                    "objects": [
+                        {
+                            "x": 3,
+                            "y": 1
+                        }
+                    ],
+                    "depth": 1
+                },
+                {
+                    "spriteSheet": "chest",
+                    "spriteSheetType": "img",
+                    "objects": [
+                        {
+                            "x": 3,
+                            "y": 3
+                        }
+                    ],
+                    "depth": 1
+                }
+            ]
+        }
     },
     "blockly": {
         "toolbox": {
