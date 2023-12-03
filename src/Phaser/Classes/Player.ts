@@ -1,12 +1,14 @@
 import { Direction } from "../types/Direction";
 import config from "../config"
 import { GridPhysics } from "./GridPhysics";
+import ChestObject from "./ChestObject";
 
 export class Player {
     private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
     private movementDirection: Direction = Direction.NONE;  // Always none except when moving
     private steps: number = 0;
     private playerDir : number = 0; //por defecto la ranita mira "abajo" down/left/up/right
+    private collidingWith: ChestObject = undefined; // TODO: cambiar esto por obj. general / interfaz
 
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
@@ -129,8 +131,19 @@ export class Player {
             this.startAnimation(direction);
             this.bounceAnimation(direction);
         } else {
+            this.setCollidingObject(undefined);
             this.startMoving(direction);
+            this.gridPhysics.collide(this);
         }
+        
+    }
+
+    setCollidingObject(obj: ChestObject) { 
+        this.collidingWith = obj;
+    }
+
+    getCollidingObject() : ChestObject {
+        return this.collidingWith;
     }
 
     // update(delta: number) {

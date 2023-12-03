@@ -2,6 +2,8 @@ import * as Phaser from "phaser";
 
 import { Direction } from "../types/Direction";
 import config from "../config"
+import ChestObject from "./ChestObject";
+import { Player } from "./Player";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -19,6 +21,7 @@ export class GridPhysics {
     constructor(
         private tileMap: Phaser.Tilemaps.Tilemap,
         private scaleFactor: number,
+        private objects: ChestObject[]    // TODO: cambiar ChestObject por tipo generico
     ) {
         this.speedPixelsPerSecond = config.TILE_SIZE * this.scaleFactor;
     }
@@ -60,5 +63,17 @@ export class GridPhysics {
         return !this.tileMap.layers.some((layer) =>
             this.tileMap.hasTileAt(pos.x, pos.y, layer.name)
         );
+    }
+
+    collide(player: Player): void {
+        // get obj in position
+        const pos = player.getTilePos();
+
+        this.objects.forEach((obj) => {
+            // If obj in same position, collide
+            if(obj.getPosition().equals(pos)){
+                obj.collide(player);
+            }
+        });
     }
 }

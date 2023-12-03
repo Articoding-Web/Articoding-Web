@@ -217,7 +217,8 @@
                     "objects": [
                         {
                             "x": 3,
-                            "y": 3
+                            "y": 3,
+                            "type": "chest"
                         }
                     ],
                     "depth": 1

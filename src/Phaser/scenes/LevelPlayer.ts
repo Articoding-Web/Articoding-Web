@@ -4,6 +4,7 @@ import config from "../config";
 import { Player } from "../Classes/Player";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
+import ChestObject from  "../Classes/ChestObject";
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -18,7 +19,8 @@ export default class LevelPlayer extends Phaser.Scene {
   private scaleFactor: number;
   private tilemap: Phaser.Tilemaps.Tilemap;
   private players: Player[] = [];
-  private traps: Phaser.GameObjects.Sprite[] = [];
+  private chests: ChestObject[] = [];
+  
   private gridPhysics: GridPhysics;
 
   constructor() {
@@ -67,9 +69,9 @@ export default class LevelPlayer extends Phaser.Scene {
 
   create() {
     // this.zoom();
-    this.createBackground();
-    this.createPlayers();
-    this.createObjects();
+    this.createBackground();  // create un tilemap
+    this.createPlayers(); // create sprites y obj jugadores
+    this.createObjects(); // create sprites obj, incl. cofres
   }
 
   createBackground() {
@@ -96,7 +98,7 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createPlayers() {
-    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor);
+    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor, this.chests);
     
     // Create sprites
     for(let x in this.playersLayerJson.objects){
@@ -148,22 +150,20 @@ export default class LevelPlayer extends Phaser.Scene {
       const objects = objectJson.objects;
       for(let y in objects){
         const obj = objects[y];
-        
-        // Create and scale sprite
-        const sprite = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
-        this.scaleSprite(sprite, obj.x, obj.y);
-        sprite.setDepth(objectJson.depth);
 
-        // Add physics and create player object
-        this.physics.add.existing(sprite);
-
-        // TODO: add collider
+        if(obj.type === "chest"){
+          const chest = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          this.scaleSprite(chest, obj.x, obj.y);
+          chest.setDepth(objectJson.depth);
+          this.chests.push(chest);
+        } else {
+          // Create and scale sprite
+          const sprite = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
+          this.scaleSprite(sprite, obj.x, obj.y);
+          sprite.setDepth(objectJson.depth);
+        }
       }
     }
-  }
-
-  chestCollider() {
-    console.log("Hit interactable obj");
   }
 
   scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
