@@ -31,6 +31,9 @@
                         <li class="nav-item">
                             <a id="communityBtn" class="nav-link" aria-current="page" href="#">Community</a>
                         </li>
+                        <li class="nav-item">
+                            <a id="loginBtn" class="nav-link" aria-current="page" >Login</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -99,5 +102,41 @@
         <script src="./js/bootstrap5.3.2.min.js"></script>
         <script src="./client.js"></script>
         <script src="./utils.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+              // Obtén una referencia al elemento del enlace
+              var loginLink = document.getElementById("loginBtn");
+            
+              // Agrega un event listener para el clic en el enlace
+              loginLink.addEventListener("click", function() {
+                // Realiza la solicitud Fetch al servidor
+                fetch("http://localhost:3000/login", {
+                  method: "GET", // Puedes ajustar el método según las necesidades de tu servidor
+                  headers: {
+                    "Content-Type": "application/json" // Ajusta los encabezados según las necesidades de tu servidor
+                    // Puedes agregar más encabezados si es necesario
+                  },
+                  // Puedes agregar un cuerpo a la solicitud si es necesario
+                  // body: JSON.stringify({ key: "value" })
+                })
+                .then(response => {
+                // Maneja la respuesta del servidor aquí
+                if (response.ok) {
+                    return response.text(); // Cambiado a response.text() ya que el servidor envía un simple texto "Recibido"
+                } else {
+                    throw new Error("Error en la solicitud");
+                }
+                })
+                .then(data => {
+                  // Manipula los datos de respuesta aquí
+                  console.log(data);
+                })
+                .catch(error => {
+                  // Maneja los errores aquí
+                  console.error("Error:", error);
+                });
+              });
+            });
+            </script>
     </body>
 </html>
