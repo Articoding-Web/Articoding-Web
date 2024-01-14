@@ -113,7 +113,7 @@ function appendRegisterModal() {
              };
 
             // Realiza la petición POST
-            fetch('/tu-endpoint-de-registro', {
+            fetch("http://localhost:3001/api/user/registro", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
