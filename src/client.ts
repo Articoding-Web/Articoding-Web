@@ -1,5 +1,10 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
+import LevelPlayer from "./Phaser/scenes/LevelPlayer";
+import LevelEditor from "./Phaser/scenes/LevelEditor";
+
+// Temp
+import level from './baseLevel.json';
 
 globalThis.blocklyArea = document.getElementById("blocklyArea") as HTMLElement;
 globalThis.blocklyDiv = document.getElementById("blocklyDiv") as HTMLDivElement;
@@ -12,24 +17,22 @@ let blocklyToggler = document.getElementById(
 ) as HTMLButtonElement;
 
 window.addEventListener("load", (event) => {
-  phaserController = new PhaserController();
-  blocklyController = new BlocklyController(["Start"],["rotate","changeStatus","text"]);
-  
-  globalThis.phaserController = phaserController;
-  globalThis.blocklyController = blocklyController;
-
   addNavbarListeners();
   blocklyToggler.addEventListener("click", (event) => toggleBlockly());
-  
 });
 
 function toggleBlockly() {
   if (blocklyController.isVisible) {
     blocklyController.hideWorkspace();
-    phaserController.increaseSize();
+    globalThis.phaserDiv.classList.add("w-100");
+    globalThis.phaserDiv.classList.add("mx-auto");
+    globalThis.phaserDiv.classList.remove("col-lg-8");
   } else {
     blocklyController.showWorkspace();
-    phaserController.reduceSize();
+    globalThis.phaserDiv.classList.remove("w-100");
+    globalThis.phaserDiv.classList.remove("mx-auto");
+    globalThis.phaserDiv.classList.add("col-lg-8");
+    globalThis.phaserDiv.classList.add("col-lg-8");
   }
 }
 
@@ -41,15 +44,24 @@ function addNavbarListeners() {
 }
 
 function playLevel() {
+  const toolbox = level.blockly.toolbox;
+  const workspaceBlocks = level.blockly.workspaceBlocks;
+  const levelJSON = level.phaser;
+  phaserController = new PhaserController("LevelPlayer", LevelPlayer, levelJSON);
+  blocklyController = new BlocklyController(toolbox, workspaceBlocks);
+
+  globalThis.phaserController = phaserController;
+  globalThis.blocklyController = blocklyController;
+
   blocklyController.showWorkspace();
   blocklyToggler.classList.remove("d-none");
-  phaserController.reduceSize();
-  phaserController.startScene("LevelPlayer");
 }
 
 function editLevel() {
-  blocklyController.hideWorkspace();
   blocklyToggler.classList.add("d-none");
-  phaserController.increaseSize();
-  phaserController.startScene("LevelEditor");
+
+  blocklyController.destroy();
+  phaserController.destroy();
+  phaserController = new PhaserController("LevelEditor", LevelEditor);
+  globalThis.phaserController = phaserController;
 }

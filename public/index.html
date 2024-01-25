@@ -38,15 +38,15 @@
 
         <div class="container-fluid h-100">
             <div class="row row-cols-1 row-cols-lg-2 h-100">
-                <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative">
+                <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative pe-0">
                     <div id="blocklyDiv" class="blocks"></div>
-                    <div class="position-absolute top-0 end-0">
+                    <div class="position-absolute top-0 end-0 me-3">
                         <button class="btn btn-primary" id="runCodeBtn">
                             Run Code
                         </button>
                     </div>
                 </div>
-                <div id="phaserDiv" class="col w-100 mx-auto mh-100 p-0 position-relative">
+                <div id="phaserDiv" class="col col-lg-8 mx-auto mh-100 p-0 position-relative">
                     <canvas id="phaserCanvas"></canvas>
                     
                     <!-- Toggle Blockly -->
@@ -95,7 +95,9 @@
             </div>
         </div>
 
+
         <script src="./js/bootstrap5.3.2.min.js"></script>
         <script src="./client.js"></script>
+        <script src="./utils.js"></script>
     </body>
 </html>

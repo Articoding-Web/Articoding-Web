@@ -1,25 +1,27 @@
 import { Direction } from "../types/Direction";
 import config from "../config"
 import { GridPhysics } from "./GridPhysics";
+import ChestObject from "./ChestObject";
 
 export class Player {
     private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
     private movementDirection: Direction = Direction.NONE;  // Always none except when moving
     private steps: number = 0;
     private playerDir : number = 0; //por defecto la ranita mira "abajo" down/left/up/right
+    private collidingWith: ChestObject = undefined; // TODO: cambiar esto por obj. general / interfaz
+
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
         private gridPhysics: GridPhysics,
         private tilePos: Phaser.Math.Vector2,
         private scaleFactor: number
     ) {
-        this.addEventListener();
+        this.addEventListeners();
     }
 
-    private addEventListener() {
+    private addEventListeners() {
         this.sprite.scene.events.on("moveOrder", (steps: number, direction: Direction) => {
             console.log("received move");
-
             this.steps = steps;
             this.movePlayer(direction);
         });
@@ -64,12 +66,11 @@ export class Player {
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: 1000,
+            duration: config.MOVEMENT_ANIMDURATION,
             ease: "Sine.inOut",
             onComplete: (--this.steps > 0) ? this.movePlayer.bind(this, this.movementDirection) : this.stopMoving.bind(this),
         })
     }
-
     private stopMoving(): void {
         this.stopAnimation();
         this.movementDirection = Direction.NONE;
@@ -113,7 +114,7 @@ export class Player {
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: 1000,
+            duration: config.MOVEMENT_ANIMDURATION,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopAnimation.bind(this)
@@ -128,8 +129,19 @@ export class Player {
             this.startAnimation(direction);
             this.bounceAnimation(direction);
         } else {
+            this.setCollidingObject(undefined);
             this.startMoving(direction);
+            this.gridPhysics.collide(this);
         }
+        
+    }
+
+    setCollidingObject(obj: ChestObject) { 
+        this.collidingWith = obj;
+    }
+
+    getCollidingObject() : ChestObject {
+        return this.collidingWith;
     }
 
     // update(delta: number) {
