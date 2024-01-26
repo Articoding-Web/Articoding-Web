@@ -3,6 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
+import json from '@rollup/plugin-json';
 
 export default [
     {
@@ -48,6 +49,8 @@ export default [
 
             //  We need to convert the CJS modules into a format Rollup can use:
             commonjs(),
+
+            json(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options
             typescript(),
