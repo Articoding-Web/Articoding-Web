@@ -1,15 +1,15 @@
 import * as Phaser from 'phaser'
+import ArticodingObject from './ArticodingObject';
+import LevelEditor from '../LevelEditor';
 
 export default class DropZoneTile extends Phaser.GameObjects.Zone {
     //owned sprite:
     private bgSprite: Phaser.GameObjects.Sprite;
     //owned object:
-    private objectSprite: Phaser.GameObjects.Sprite;
+    private objectSprite: ArticodingObject;
 
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number) {
         super(scene, x, y, width, height);
-
-        console.log(`Tile created at: ${x}, ${y}`);
 
         this.setRectangleDropZone(width, height);
 
@@ -37,8 +37,22 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
         return this.objectSprite;
     }
 
-    setObjectSprite(sprite: Phaser.GameObjects.Sprite) {
-        this.objectSprite = sprite;
+    setObjectSprite(sprite: ArticodingObject) {
+        if (this.objectSprite) {
+            // Replace current object sprite
+            console.log("Destroyed old sprite");
+            this.objectSprite.destroy();
+        }
+
+        // Create duplicate sprite
+        this.objectSprite = new ArticodingObject(
+            <LevelEditor>this.scene,
+            this.x,
+            this.y,
+            sprite.texture,
+            sprite.frame.name,
+            true
+        );
     }
 
     setBgSprite(sprite: Phaser.GameObjects.Sprite) {

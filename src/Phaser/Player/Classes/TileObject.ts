@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import ArticodingObject from "./ArticodingObject";
+import ArticodingObject from "../../Editor/Classes/ArticodingObject";
 
 export default class TileObject extends Phaser.GameObjects.Sprite {
   object: ArticodingObject | undefined = undefined;

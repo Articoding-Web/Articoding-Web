@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import EditorBoard from "./Classes/EditorBoard";
 import config from "../config";
+import ArticodingObject from "./Classes/ArticodingObject";
 
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
@@ -21,6 +22,9 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   preload(): void {
+    const themePath = `assets/sprites/default`;
+    this.load.image("chest", `${themePath}/chest.png`);
+
     // TODO: load level or default assets
 
   }
@@ -34,5 +38,15 @@ export default class LevelEditor extends Phaser.Scene {
     const mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
     this.board = new EditorBoard(this, mapCoordX, mapCoordY, NUM_ROWS, NUM_COLS);
+
+    // TESTING
+    const chest = new ArticodingObject(
+      this,
+      100,
+      100,
+      "chest",
+      0,
+      false
+    );
   }
 }

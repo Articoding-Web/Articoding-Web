@@ -1,5 +1,5 @@
 import TileObject from "./TileObject";
-import ArticodingObject from "./ArticodingObject";
+import ArticodingObject from "../../Editor/Classes/ArticodingObject";
 
 export default class Board {
   tiles: TileObject[];
