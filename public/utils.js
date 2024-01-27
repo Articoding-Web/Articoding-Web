@@ -1,4 +1,4 @@
-import bootstrap from 'bootstrap';
+// import bootstrap from 'bootstrap';
 
 export function appendModal(msg, stars, status) {
     let modalHtml = `

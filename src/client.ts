@@ -1,7 +1,7 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
-import LevelPlayer from "./Phaser/scenes/LevelPlayer";
-import LevelEditor from "./Phaser/scenes/LevelEditor";
+import LevelPlayer from "./Phaser/Player/LevelPlayer";
+import LevelEditor from "./Phaser/Editor/LevelEditor";
 
 // Temp
 import level from './baseLevel.json';
@@ -60,8 +60,8 @@ function playLevel() {
 function editLevel() {
   blocklyToggler.classList.add("d-none");
 
-  blocklyController.destroy();
-  phaserController.destroy();
+  blocklyController?.destroy();
+  phaserController?.destroy();
   phaserController = new PhaserController("LevelEditor", LevelEditor);
   globalThis.phaserController = phaserController;
 }

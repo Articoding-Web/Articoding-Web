@@ -46,58 +46,19 @@
                         </button>
                     </div>
                 </div>
-                <div id="phaserDiv" class="col col-lg-8 mx-auto mh-100 p-0 position-relative">
+                <div id="phaserDiv" class="col w-100 mh-100 p-0 position-relative">
                     <canvas id="phaserCanvas"></canvas>
                     
                     <!-- Toggle Blockly -->
                     <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0 d-none">
                         Toggle Blockly
                     </button>
-
-                    <!-- Resize grid -->
-                    <div id="gridResizeDialog" class="position-absolute top-0 end-0 d-none">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gridResizeModal">
-                            Resize Grid
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="gridResizeModal" tabindex="-1" aria-labelledby="gridResizeModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="gridResizeModalLabel">Level Editor</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row row-cols-2 g-2">
-                            <div class="col-4 text-end">
-                                Rows:
-                            </div>
-                            <div class="col-8 text-start">
-                                <input id="numRowsInput" name="numRowsInput" type="number" min="0" max="15">
-                            </div>
-                            <div class="col-4 text-end">
-                                Columns:
-                            </div>
-                            <div class="col-8 text-start">
-                                <input id="numColsInput" name="numColsInput" type="number" min="0" max="15">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button id="changeGridSize" type="button" class="btn btn-primary">Change Size</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
 
         <script src="./js/bootstrap5.3.2.min.js"></script>
         <script src="./client.js"></script>
-        <script src="./utils.js"></script>
+        <!-- <script src="./utils.js"></script> -->
     </body>
 </html>
