@@ -46,28 +46,44 @@ export default class EditorBoard {
     private createResizeButtons(): void {
         const rightCenterCoords = this.getRightCenter();
 
-        this.scene.add.sprite(rightCenterCoords.x, rightCenterCoords.y, "a");
+        const addColBtn = this.scene.add.sprite(rightCenterCoords.x + 50, rightCenterCoords.y - 50, "+");
+        const rmColBtn = this.scene.add.sprite(rightCenterCoords.x + 50, rightCenterCoords.y + 50, "-");
+        
+        addColBtn.setInteractive().on("pointerdown", () => this.addCol(this.numRows));
+    }
+
+    private getTopLeft(): Phaser.Math.Vector2 {
+        const tileOffset = config.TILE_SIZE / 2 * (<LevelEditor>this.scene).scaleFactor
+
+        return new Phaser.Math.Vector2(this.x - tileOffset, this.y - tileOffset);
     }
 
     private getTopRight(): Phaser.Math.Vector2 {
-        const xCoord = this.x + this.numCols * config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor;
-        return new Phaser.Math.Vector2(xCoord, this.y);
+        const tl = this.getTopLeft();
+        return new Phaser.Math.Vector2(tl.x + this.numCols * config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor, tl.y);
     }
 
-    // TODO: Revisar
     private getRightCenter(): Phaser.Math.Vector2 {
-        const xCoord = this.x + this.numCols * config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor;
-        const yCoord = this.y + this.numRows / 2 * config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor;
+        const tl = this.getTopLeft();
 
-        return new Phaser.Math.Vector2(xCoord, yCoord);
+        return new Phaser.Math.Vector2(tl.x + this.numCols * config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor, tl.y + this.numRows / 2 * config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor);
     }
 
-    addCol() {
-        this.numCols++;
-        for (let i = 0; i < this.numRows; i++) {
-            const tile = new DropZoneTile(this.scene, 0, 0, 0, 0); //TODO gestionar tamaño y posicion
+    addCol(numRows: number) {
+        console.log("adding col");
+
+        const tileOffset = config.TILE_SIZE / 2 * (<LevelEditor>this.scene).scaleFactor;
+        const scaledTileSize = config.TILE_SIZE * (<LevelEditor>this.scene).scaleFactor;
+        const topRight = this.getTopRight();
+
+        for (let i = 0; i < numRows; i++) {
+            console.log(`Adding tile at: ${topRight.x}, ${topRight.y + i * scaledTileSize}`);
+
+            const tile = new DropZoneTile(this.scene, topRight.x + tileOffset, topRight.y + tileOffset + i * scaledTileSize, scaledTileSize, scaledTileSize); //TODO gestionar tamaño y posicion
             this.dropZoneTiles.splice(i * this.numCols + this.numCols - 1, 0, tile);
         }
+
+        this.numCols++;
     }
 
     addRow() {
