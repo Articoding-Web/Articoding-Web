@@ -9,7 +9,6 @@ const NUM_COLS = 5;
 
 export default class LevelEditor extends Phaser.Scene {
   board: EditorBoard;
-  public scaleFactor: number;
   // selector: spriteSelector
   // leveldata
 
@@ -30,20 +29,14 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   create(): void {
-    const layerWidth = NUM_COLS * config.TILE_SIZE;
-    const layerHeight = NUM_ROWS * config.TILE_SIZE;
-
-    this.scaleFactor = Math.floor((this.cameras.main.height) / layerHeight / 2);
-    const mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
-    const mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
-
-    this.board = new EditorBoard(this, mapCoordX, mapCoordY, NUM_ROWS, NUM_COLS);
+    this.board = new EditorBoard(this, NUM_ROWS, NUM_COLS);
 
     // TESTING
     const chest = new ArticodingObject(
       this,
       100,
       100,
+      this.board.getScaleFactor(),
       "chest",
       0,
       false

@@ -13,6 +13,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     scene: LevelEditor,
     x: number,
     y: number,
+    scale: number,
     texture: string | Phaser.Textures.Texture,
     frame?: string | number | undefined,
     allowDestruction?: Boolean
@@ -23,7 +24,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     this.origY = y;
     this.allowDestruction = allowDestruction;
 
-    this.setScale((<LevelEditor>this.scene).scaleFactor);
+    this.setScale(scale);
 
     this.setInteractive();
     this.scene.input.setDraggable(this);
@@ -72,7 +73,18 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDrop(dropZone: DropZoneTile) {
     if (this.isOnDropZone) {
-      dropZone.setObjectSprite(this);
+      // Create duplicate
+      const newObj = new ArticodingObject(
+        <LevelEditor>this.scene,
+        dropZone.x,
+        dropZone.y,
+        this.scale,
+        this.texture,
+        this.frame.name,
+        true
+      );
+
+      dropZone.setObjectSprite(newObj);
 
       this.isOnDropZone = false;
     } else {
