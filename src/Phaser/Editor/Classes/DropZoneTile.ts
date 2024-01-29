@@ -45,14 +45,7 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
         }
 
         // Create duplicate sprite
-        this.objectSprite = new ArticodingObject(
-            <LevelEditor>this.scene,
-            this.x,
-            this.y,
-            sprite.texture,
-            sprite.frame.name,
-            true
-        );
+        this.objectSprite = sprite;
     }
 
     setBgSprite(sprite: Phaser.GameObjects.Sprite) {
