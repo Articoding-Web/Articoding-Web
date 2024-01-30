@@ -1,3 +1,23 @@
+const API_ENDPOINT = "https://localhost:3001/api";
+
+let categories = [];
+
+function getCategories() {
+  fetch(API_ENDPOINT + "/level/categories", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((categories) => {
+      this.categories = categories;
+    })
+    .catch((error) => {
+      console.error("Error al realizar la petición:", error);
+    });
+}
+
 document.addEventListener("click", (event) => {
   const { target } = event;
   if (!target.matches("navbar")) return;
@@ -10,7 +30,7 @@ const routes = {
     template: "index.html",
     title: "",
   },
-  "/categories": {
+  "level/categories": {
     template: "/templates/categories.html",
     title: "categories",
   },
@@ -26,8 +46,8 @@ const locationHandler = async () => {
   const location = window.location.pathname;
   if (location.length == 0) location = "/";
   const route = routes[location];
-  const html = await fetch(route.template).then((response) => response.text());
-  document.getElementById("content").innerHTML = html;
+  console.log(route);
+  const html = (document.getElementById("content").innerHTML = html);
 };
 
 window.onpopstate = locationHandler;

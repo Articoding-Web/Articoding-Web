@@ -13,7 +13,7 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div class="navbar bg-dark">
+                <div class="navbar bg-dark" id="a">
                     <div class="col col-1 offset-1">
                         <a href="/level/categories">
                             <i class="bi bi-house-door-fill h1" title="Home"></i>
@@ -48,10 +48,11 @@
             </div>
         </div>
         
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3">
+        <div class="row row-cols-4 row-cols-md-3 row-cols-lg-2 row-cols-xl-1">
             <div class="container below" id="categories"></div>
         </div>
 
+        <!--
         <div class="container-fluid h-100">
             <div class="row row-cols-1 row-cols-lg-2 h-100">
                 <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative pe-0">
@@ -65,12 +66,12 @@
                 <div id="phaserDiv" class="col col-lg-8 mx-auto mh-100 p-0 position-relative">
                     <canvas id="phaserCanvas"></canvas>
                     
-                    <!-- Toggle Blockly -->
+                    !-- Toggle Blockly --
                     <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0 d-none">
                         Toggle Blockly
                     </button>
 
-                    <!-- Resize grid -->
+                    !-- Resize grid --
                     <div id="gridResizeDialog" class="position-absolute top-0 end-0 d-none">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gridResizeModal">
                             Resize Grid
@@ -109,7 +110,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
 
         <script src="./js/bootstrap.min.js"></script>
         <script src="./client.js"></script>

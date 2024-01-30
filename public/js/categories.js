@@ -1,56 +1,55 @@
-function getCategories() {
-  console.log("Enviado");
-  fetch("http://localhost:3001/api/level/categories", {
+const API_ENDPOINT = "http://localhost:3001/api";
+
+let content = null;
+let categories = [];
+let levels = 3;
+
+const categoriesView = (categories) => {
+  let view = "";
+  for (const category of categories) view += categoryDiv(category);
+  return view;
+};
+
+const categoryDiv = (category) => {
+  let view = `
+  <div class="col">
+    <div class="card border-dark d-flex flex-column h-100">
+      <a href="/level/levelsByCategory/${category.id}">
+        <h5 class="card-header card-title text-dark">
+          ${category.name}
+        </h5>
+        <div class="card-body text-dark">
+          <h6 class="card-subtitle mb-2 text-muted">
+            <!-- TODO: Calcular el número de niveles de la categoría -->
+            Niveles: ${levels}
+          </h6>
+          ${category.description}
+        </div>
+      </a>
+    </div>
+  </div>
+  `;
+  return view;
+};
+
+const getCategories = async () => {
+  const response = fetch(API_ENDPOINT + "/level/categories", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Respuesta del servidor:", data);
-    })
-    .catch((error) => {
-      console.error("Error al realizar la petición:", error);
-    });
-}
+  });
+  return (await response).json();
+};
 
-document.addEventListener("DOMContentLoaded", function () {
-  let categories = document.getElementById("categories");
-  if (categories) {
-    categories.addEventListener("click", function () {
-      getCategories();
-    });
-  }
-});
+const initController = async () => {
+  content = document.getElementById("categories");
+  categories = await getCategories();
+  content.innerHTML = categoriesView(categories);
+};
 
-// Estoy hay que tocarlo, viene de backend
+const init = () => {
+  document.addEventListener("DOMContentLoaded", initController);
+};
 
-/*
-let view = "";
-categories.forEach((category) => {
-  view += this.categoryDiv(category);
-});
-
-categoryDiv = (category) => {
-    let view = `
-      <div class="col">
-        <div class="card border-dark d-flex flex-column h-100">
-          <a href="/level/levelsByCategory/${category.id}">
-            <h5 class="card-header card-title text-dark">
-              ${category.name}
-            </h5>
-            <div class="card-body text-dark">
-              <h6 class="card-subtitle mb-2 text-muted">
-                <!-- TODO: Calcular el número de niveles de la categoría -->
-                Niveles: ${this.#levels}
-              </h6>
-              ${category.description}
-            </div>
-          </a>
-        </div>
-      </div>
-    `;
-    return view;
-  };
-*/
+init();
