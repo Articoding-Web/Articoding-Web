@@ -1,15 +1,22 @@
 import * as Phaser from "phaser";
-import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-const PhaserConfig: Phaser.Types.Core.GameConfig = {
-  type: Phaser.CANVAS,
-  parent: "phaserDiv",
-  plugins: {
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+
+/*
+
+
+ plugins: {
     scene: [{
         key: 'rexUI',
-        plugin: UIPlugin,
+        plugin: RexUIPlugin,
         mapping: 'rexUI'
     }]
 },
+
+*/
+const PhaserConfig: Phaser.Types.Core.GameConfig = {
+  type: Phaser.CANVAS,
+  parent: "phaserDiv",
+
   physics: {
     default: 'arcade',
     arcade: {

@@ -6,11 +6,11 @@ export default class Selector {
     private scene: Phaser.Scene;
     private menu: any;
     private options: string[];
-    const Random = Phaser.Math.Between;
+    Random = Phaser.Math.Between;
     //TODO ajustar
-    const COLOR_PRIMARY = 0x4e342e;
-    const COLOR_LIGHT = 0x7b5e57;
-    const COLOR_DARK = 0x260e04;
+    COLOR_PRIMARY = 0x4e342e;
+    COLOR_LIGHT = 0x7b5e57;
+    COLOR_DARK = 0x260e04;
     private onSelect: (option: string) => void;
     private gridTable: any;
     constructor(scene: Phaser.Scene, options: string[], onSelect: (option: string) => void) {

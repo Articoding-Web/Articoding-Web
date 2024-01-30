@@ -141,6 +141,13 @@ export default class EditorBoard {
     private autoScale() {
         
     }
+    
+    getX(): number {
+        return this.x;
+    }
+    getY(): number {
+        return this.y;
+    }
 
     toJSON(): Record<any, any> {
         //TODO pasar nivel actual a JSON siguiendo diseño de Nico
