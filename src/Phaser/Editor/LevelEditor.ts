@@ -43,7 +43,11 @@ export default class LevelEditor extends Phaser.Scene {
     items.push(this.createButton("player"));
     items.push(this.createButton("trap"));
     items.push(this.createButton("wall"));
-    let menu = this.CreateMenu(this, items);
+    let menu = this.CreateMenu(this, items)
+    .add(this.createButton("chest"))
+    .add(this.createButton("player"))
+    .add(this.createButton("trap"))
+    .add(this.createButton("wall"));
     let sizer = this.rexUI.add.overlapSizer({
       anchor: {
         left: 'left',
@@ -51,6 +55,7 @@ export default class LevelEditor extends Phaser.Scene {
         width: '100%',
         height: '100%'
       }
+     
     })
     .add(menu, { align: 'left-center', expand: false })
       .layout();
@@ -139,6 +144,10 @@ export default class LevelEditor extends Phaser.Scene {
         bottom: 5,
       },
     });
+
+    // Make the button draggable
+    this.rexUI.add.drag(buttonLabel);
+
     return buttonLabel;
   }
 }
