@@ -4,7 +4,7 @@
 ## Concept
 The aim of CodeHop is to learn basic programming through puzzle solving. 
 
-## TODO: Platform
+## Platform
 The game is aimed to be played in a web platform, but due to the nature of the project, it can be played offline and on other devices.
 
 ## Game Structure
@@ -15,9 +15,28 @@ The game is divided into 2 sections, a level player and a level editor (level cr
 The level player is used to play either offical levels or community-created levels. The screen is divided into a programming zone, where the where the player interacts with the "code blocks", and the level "board", where the result of the code is animated once played.
 
 #### Players
-![Player Spritesheet](../public/assets/sprites/default/player.png)
 
-// TODO: complete
+Here is shown the player spritesheet, it will be used as the playable character in the game.
+
+![Player Spritesheet](../public/assets/sprites/default/player.png)
+#### Interactables
+
+Here is the background. All levels are constructed using a grid of these, either walls, floors, or a mixture of both.
+
+![background Spritesheet](../public/assets/sprites/default/background.png)
+
+Here is the chest. The objective of the game is to make each player character reach the chest with matching colors, without any of them losing in the process.
+
+![chest Spritesheet](../public/assets/sprites/default/chest.png)
+
+Here is the spike. If a player character touches a spike, it will die and the level will be lost.
+
+![spike Spritesheet](../public/assets/sprites/default/trap.png)
+
+Here is the skeleton. If a player character touches a skeleton, it will die and the level will be lost.
+
+![skeleton Spritesheet](../public/assets/sprites/default/skeleton.png)
+
 
 #### Actions
 The actions are marked as blocks, distributed in intuitive sections, which the player can then use to create chunks of code that
@@ -58,5 +77,4 @@ Users can save and publish the level to the community or specific users/groups o
 The graphics are implemented through Phaser's built-in arcade graphics engine, which allows for webGL rendering of most of our game assets.
 
 ## Data storage
-To store data we use a relation
-smbdr() metsys tnemeganam esabatad l
+To store data we use a relational database management system (rdbms) called MySQL. It accomplishes all our needs, even storing levels in a JSON format.
