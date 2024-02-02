@@ -13,8 +13,10 @@ export default class BlocklyController {
   startBlock: Blockly.BlockSvg;
   workspace: Blockly.WorkspaceSvg;
 
-  constructor(toolbox: string | ToolboxDefinition | Element, workspaceBlocks?: any) {
-    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
+  constructor(toolbox: string | ToolboxDefinition | Element, maxInstances?: {[blockType: string]: number}, workspaceBlocks?: any) {
+    console.log(`MaxInstances: ${maxInstances}`);
+
+    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox, maxInstances });
     Blockly.defineBlocksWithJsonArray(blocks);
 
     this.startBlock = this.workspace.newBlock('start');

@@ -316,6 +316,10 @@
                 }
             ]
         },
+        "maxInstances": {
+            "start": 1,
+            "numberSpecial": 5
+        },
         "workspaceBlocks": [
             "movement",
             "numberSpecial"
