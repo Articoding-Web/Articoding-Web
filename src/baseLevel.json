@@ -322,7 +322,8 @@
         },
         "workspaceBlocks": [
             "movement",
-            "numberSpecial"
+            "numberSpecial",
+            "textSpecial"
         ]
     }
 }
