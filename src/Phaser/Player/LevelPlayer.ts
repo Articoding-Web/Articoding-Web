@@ -70,13 +70,19 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   create() {
+    // Create a container for the level
+    const levelContainer = this.add.container(0, 0);
+
     // this.zoom();
-    this.createBackground();  // create un tilemap
-    this.createPlayers(); // create sprites y obj jugadores
-    this.createObjects(); // create sprites obj, incl. cofres
+    this.createBackground(levelContainer);  // create un tilemap
+    this.createPlayers(levelContainer); // create sprites y obj jugadores
+    this.createObjects(levelContainer); // create sprites obj, incl. cofres
+
+    // Add the level container to the scene
+    this.add.existing(levelContainer);
   }
 
-  createBackground() {
+  createBackground(levelContainer: Phaser.GameObjects.Container) {
     this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height });
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
@@ -97,9 +103,12 @@ export default class LevelPlayer extends Phaser.Scene {
       const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
       tile.properties = obj.properties;
     }
+
+    // Add the background layer to the level container
+    levelContainer.add(layer);
   }
 
-  createPlayers() {
+  createPlayers(levelContainer: Phaser.GameObjects.Container) {
     this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor, this.chests);
 
     // Create sprites
@@ -114,6 +123,9 @@ export default class LevelPlayer extends Phaser.Scene {
       // Add physics and create player object
       this.physics.add.existing(sprite);
       this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(player.x, player.y), this.scaleFactor));
+
+      // Add the player sprite to the level container
+      levelContainer.add(sprite);
     }
 
     this.cameras.main.roundPixels = true;
@@ -145,7 +157,7 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   };
 
-  createObjects() {
+  createObjects(levelContainer: Phaser.GameObjects.Container) {
     console.log(this.objectsLayerJson);
     for (let x in this.objectsLayerJson) {
       const objectJson = this.objectsLayerJson[x];
@@ -158,11 +170,17 @@ export default class LevelPlayer extends Phaser.Scene {
           this.scaleSprite(chest, obj.x, obj.y);
           chest.setDepth(objectJson.depth);
           this.chests.push(chest);
+
+          // Add the chest sprite to the level container
+          levelContainer.add(chest);
         } else {
           // Create and scale sprite
           const sprite = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(sprite, obj.x, obj.y);
           sprite.setDepth(objectJson.depth);
+
+          // Add the sprite to the level container
+          levelContainer.add(sprite);
         }
       }
     }
