@@ -10,51 +10,63 @@ The game is aimed to be played in a web platform, but due to the nature of the p
 ## Game Structure
 The game is divided into 2 sections, a level player and a level editor (level creator).
 
-
 ### Level Player
-The level player is used to play either offical levels or community-created levels. The screen is divided into a programming zone, where the where the player interacts with the "code blocks", and the level "board", where the result of the code is animated once played.
-
-#### Players
-
-Here is shown the player spritesheet, it will be used as the playable character in the game.
-
-![Player Spritesheet](../public/assets/sprites/default/player.png)
-#### Interactables
-
-Here is the background. All levels are constructed using a grid of these, either walls, floors, or a mixture of both.
-
-![background Spritesheet](../public/assets/sprites/default/background.png)
-
-Here is the chest. The objective of the game is to make each player character reach the chest with matching colors, without any of them losing in the process.
-
-![chest Spritesheet](../public/assets/sprites/default/chest.png)
-
-Here is the spike. If a player character touches a spike, it will die and the level will be lost.
-
-![spike Spritesheet](../public/assets/sprites/default/trap.png)
-
-Here is the skeleton. If a player character touches a skeleton, it will die and the level will be lost.
-
-![skeleton Spritesheet](../public/assets/sprites/default/skeleton.png)
-
-
-#### Actions
-The actions are marked as blocks, distributed in intuitive sections, which the player can then use to create chunks of code that
-the game will run to solve the puzzle presented. The player is only allowed to manipulate existing blocks and to execute them.
-
-##### Use code block
-The user can add a block from a sidebar to the workspace and connect it to a starting block. The blocks can be interconnected to represent more advanced programming conectps (e.g. loops, conditionals, etc...).
-
-##### Run code
-The user can run the code, which will play the result movement and animation in the board. If the objective is reached a message is shown 
-
+The level player is used to play either offical levels or community-created levels. The screen is divided into a programming zone, where the where the player interacts with the "code blocks", and the level "board", where the result of the code is animated once the code is executed.
 
 #### Objective
 The objective of the game is to make each player character reach the chest with matching colors, without any of them losing in the process.
 A player loss is caused when:
 1. There are no more instructions to run and any player hasn't reached their respective chest, or
-2. The player avatar died in an obstacle, such as spikes or skeletons, or
+2. Any player avatar has died, such as by touching spikes or skeletons, or
 3. A timeout is triggered (due to infinite loop or other conditions).
+
+#### Board Zone
+The board is based on a square grid of size 15 > x, y > 2.
+The playing area defined by the background may not be square.
+
+##### Objects
+
+|    Name    | Sprite                                                          |                                Description                               |
+|------------|:---------------------------------------------------------------:|--------------------------------------------------------------------------|
+| Background | ![Background](../public/assets/sprites/previews/background.png) | Wall tiles have colliders, other background tiles are purely decoration. |
+|   Player   | ![Player](../public/assets/sprites/previews/player.png)         | Character controlled by the user.                                        |
+|  Objective | ![Objective](../public/assets/sprites/previews/chest.png)       | If all player characters reach their respective chest, they win.         |
+|    Trap    | ![Trap](../public/assets/sprites/previews/trap.png)             | If a player touches a trap, they lose.                                   |
+|    Wall    | ![Wall](../public/assets/sprites/previews/wall.png)             | Collision object.                                                        |
+|    Enemy   | ![Enemy](../public/assets/sprites/previews/enemy.png)           | If a player touches an enemy, they lose. Enemies move in a pattern.      |
+
+#### Programming Zone
+The programming zone has a toolbox of available blocks and a workspace to place the blocks to be used. Some levels may not have all blocks available in the toolbox to limit difficulty or to practice a specific skill. To use a block the user can drag a block from the toolbox and drop it in the workspace.
+
+The workspace will always have a single, un-deletable "start" block. When the user selects "Run code", all blocks connected to the "start" block will be sequentially executed.
+
+<details>
+<summary>Available Blocks</summary>
+
+#### Actions
+|  Name  |                     Sprite                    |                                                 Description                                                |
+|--------|:---------------------------------------------:|:----------------------------------------------------------------------------------------------------------:|
+| Move   | ![Move](../public/assets/blocks/move.png)     | Moves the player character NUMBER blocks in DIRECTION, where NUMBER and DIRECTION are specified variables. |
+| Rotate | ![Rotate](../public/assets/blocks/rotate.png) | Rotates the player character clockwise or counter-clockwise once.                                          |
+
+#### Logic
+|        Name       |                                   Sprite                                  |                               Description                              |
+|-------------------|:-------------------------------------------------------------------------:|-----------------------------------------------------------------------|
+| Conditionals      | ![Conditionals Block](../public/assets/blocks/conditionals.png)           | If, else if, and else block. Allows for conditional execution of code. |
+| Equality          | ![Equality Block](../public/assets/blocks/equality.png)                   | Comparison block. Allows =, !=, <, <=, etc...                          |
+| Logical Operators | ![Logical Operators Block](../public/assets/blocks/logical_operators.png) | Allows for extended comparisons. Allows AND, OR.                       |
+| Negation          | ![Negation Block](../public/assets/blocks/negation.png)                   | Negates a boolean value.                                               |
+| Booleans          | ![Booleans Block](../public/assets/blocks/booleans.png)                   | True or False.                                                         |
+
+#### Functions
+|        Name        |                                        Sprite                                        |                                 Description                                 |
+|--------------------|:------------------------------------------------------------------------------------:|-----------------------------------------------------------------------------|
+| Function           | ![Function Block](../public/assets/blocks/function.png)                              | Creates a function that can be used repeatedly or from another code branch. |
+| Return Function    | ![Return Function Block](../public/assets/blocks/function_return.png)                | Creates a function that returns a value.                                    |
+| Conditional Return | ![Conditional Return Block](../public/assets/blocks/function_conditional_return.png) | Allows for conditional returns in functions.                                |
+
+</details>
+
 
 ### Level Editor
 The Level Editor allows users to create levels and upload them to the community once completed. The screen is divided into a sprite selector and an empty board. The sprite selector has 2 tabs, a background sprite selector and a game object selector.
