@@ -1,24 +1,15 @@
 const API_ENDPOINT = "http://localhost:3001/api";
 
 let content = null;
-let categories = [];
+let levels = [];
 
-const categoriesView = (categories) => {
+const levelsView = (categories) => {
   let view = "";
-  for (const category of categories) {
-    category.levels = 0;
-    getNumber(category.id).then(function (result) {
-      category.levels = result;
-      console.log(category.levels);
-      console.log(result);
-    });
-    console.log(category.levels);
-    view += categoryDiv(category);
-  }
+  for (const category of categories) view += levelDiv(category);
   return view;
 };
 
-const categoryDiv = (category) => {
+const levelDiv = (category) => {
   let view = `
   <div class="col">
     <div class="card border-dark d-flex flex-column h-100">
@@ -29,7 +20,7 @@ const categoryDiv = (category) => {
         <div class="card-body text-dark">
           <h6 class="card-subtitle mb-2 text-muted">
             <!-- TODO: Calcular el número de niveles de la categoría -->
-            Niveles: ${category.levels}
+            Niveles: ${levels}
           </h6>
           ${category.description}
         </div>
@@ -40,18 +31,8 @@ const categoryDiv = (category) => {
   return view;
 };
 
-const getCategories = async () => {
+const getLevelsByCategory = async () => {
   const response = fetch(API_ENDPOINT + "/level/categories", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return (await response).json();
-};
-
-const getNumber = async (category) => {
-  const response = fetch(API_ENDPOINT + "/level/countByCategory/" + category, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -62,8 +43,8 @@ const getNumber = async (category) => {
 
 const initController = async () => {
   content = document.getElementById("categories");
-  categories = await getCategories();
-  content.innerHTML = categoriesView(categories);
+  categories = await getLevelsByCategory();
+  content.innerHTML = levelsView(categories);
 };
 
 const init = () => {
