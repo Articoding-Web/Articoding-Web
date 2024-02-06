@@ -3,39 +3,56 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="./css/bootstrap5.3.2.min.css" rel="stylesheet">
+        <link href="./css/bootstrap.min.css" rel="stylesheet">
         <link href="./css/style.css" rel="stylesheet">
+        <link href="./images/logo.png" rel="shortcut icon">
+        <link rel="stylesheet" href= "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
         <title>Articoding</title>
     </head>
-    <body class="vh-100">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="./img/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
-                    Articoding
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a id="playBtn" class="nav-link" aria-current="page" href="#">Play</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="#">Guide</a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="buildBtn" class="nav-link" aria-current="page" href="#">Build</a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="communityBtn" class="nav-link" aria-current="page" href="#">Community</a>
-                        </li>
-                    </ul>
+    <body class="vh-100 bg-secondary">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="navbar bg-dark" id="a">
+                    <div class="col col-1 offset-1">
+                        <a href="/level/categories">
+                            <i class="bi bi-house-door-fill h1" title="Home"></i>
+                        </a>
+                    </div>
+                    <div class="col col-1 offset-2 text-center">
+                        <a href="#">
+                            <i class="bi bi-pencil-square h2" title="Editor"></i>
+                        </a>
+                    </div>
+                    <div class="col col-1 text-center">
+                        <a href="#">
+                            <i class="bi bi-book h2" title="Manual"></i>
+                        </a>
+                    </div>
+                    <div class="col col-1 text-center">
+                        <a href="/level/community">
+                            <i class="bi bi-people-fill h2" title="Community"></i>
+                        </a>
+                    </div>
+                    <div class="col col-1 text-center">
+                        <a href="#">
+                            <i class="bi bi-person-circle h2" title="Profile"></i>
+                        </a>
+                    </div>
+                    <div class="col col-1 offset-3">
+                        <a href="#">
+                            <i class="bi bi-gear h1" title="Configuration"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </nav>
+        </div>
+        
+        <div class="row row-cols-4 row-cols-md-3 row-cols-lg-2 row-cols-xl-1">
+            <div class="container below" id="categories"></div>
+        </div>
 
+        <!--
         <div class="container-fluid h-100">
             <div class="row row-cols-1 row-cols-lg-2 h-100">
                 <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative pe-0">
@@ -49,12 +66,12 @@
                 <div id="phaserDiv" class="col col-lg-8 mx-auto mh-100 p-0 position-relative">
                     <canvas id="phaserCanvas"></canvas>
                     
-                    <!-- Toggle Blockly -->
+                    !-- Toggle Blockly --
                     <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0 d-none">
                         Toggle Blockly
                     </button>
 
-                    <!-- Resize grid -->
+                    !-- Resize grid --
                     <div id="gridResizeDialog" class="position-absolute top-0 end-0 d-none">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gridResizeModal">
                             Resize Grid
@@ -93,11 +110,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
 
-
-        <script src="./js/bootstrap5.3.2.min.js"></script>
+        <script src="./js/bootstrap.min.js"></script>
         <script src="./client.js"></script>
-        <script src="./utils.js"></script>
+        <script type="module" src="./js/utils.js"></script>
+        <script type="module" src="./js/login.js"></script>
+        <script type="module" src="./js/categories.js"></script>
     </body>
 </html>

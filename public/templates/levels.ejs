@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include("fragments/header") %>
+    </head>
+    <body class="bg-secondary">
+        <%- include("fragments/navbar") %>
+        <div class="container-fluid below">
+            <% levels.forEach((level) => { %>
+                <div class="row">
+                    <div class="card border-dark">
+                        <div class="card-header">
+                            <%= level.id %>. <%= level.title %>
+                        </div>
+                        <div class="card-body">
+                            Miniatura: 
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </body>
+</html>
