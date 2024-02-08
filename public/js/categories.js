@@ -3,18 +3,13 @@ const API_ENDPOINT = "http://localhost:3001/api";
 let content = null;
 let categories = [];
 
-const categoriesView = (categories) => {
+const categoriesView = async (categories) => {
   let view = "";
   for (const category of categories) {
-    category.levels = 0;
-    getNumber(category.id).then(function (result) {
-      category.levels = result;
-      console.log(category.levels);
-      console.log(result);
-    });
-    console.log(category.levels);
+    category.levels = await getNumber(category.id);
     view += categoryDiv(category);
   }
+  console.log(view);
   return view;
 };
 
@@ -63,7 +58,7 @@ const getNumber = async (category) => {
 const initController = async () => {
   content = document.getElementById("categories");
   categories = await getCategories();
-  content.innerHTML = categoriesView(categories);
+  content.innerHTML = await categoriesView(categories);
 };
 
 const init = () => {
