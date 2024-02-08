@@ -24,8 +24,9 @@ export default class LevelEditor extends Phaser.Scene {
   preload(): void {
     const themePath = `assets/sprites/default`;
     this.load.image("chest", `${themePath}/chest.png`);
-    this.load.image("player", `${themePath}/player.png`);
-    this.load.image("trap", `${themePath}/trap.png`);
+    this.load.multiatlas("player", `${themePath}/player.json`, themePath);
+    let x = this.load.multiatlas("trap", `${themePath}/trap.json`, themePath);
+    console.log(x);
     this.load.image("wall", `${themePath}/wall.png`);
     //por alguna razon sin eso no funciona, a pesar de que YA ESTA
     this.load.scenePlugin({
@@ -38,35 +39,30 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   create(): void {
-    let items: RexUIPlugin.Label[] = [];
-    items.push(this.createButton("chest"));
-    items.push(this.createButton("player"));
-    items.push(this.createButton("trap"));
-    items.push(this.createButton("wall"));
-    let menu = this.CreateMenu(this, items)
-    .add(this.createButton("chest"))
-    .add(this.createButton("player"))
-    .add(this.createButton("trap"))
-    .add(this.createButton("wall"));
-    let sizer = this.rexUI.add.overlapSizer({
-      anchor: {
-        left: 'left',
-        top: 'top',
-        width: '100%',
-        height: '100%'
-      }
-     
-    })
-    .add(menu, { align: 'left-center', expand: false })
+    //  let items: RexUIPlugin.Label[] = [];
+    let menu = this.CreateMenu(this, [])
+      .add(this.createButton("chest"))
+      .add(this.createButton("player"))
+      .add(this.createButton("trap"))
+      .add(this.createButton("wall"));
+    let sizer = this.rexUI.add
+      .overlapSizer({
+        anchor: {
+          left: "left",
+          top: "top",
+          width: "100%",
+          height: "100%",
+        },
+      })
+      .add(menu, { align: "left-center", expand: false })
       .layout();
 
     this.board = new EditorBoard(this, NUM_ROWS, NUM_COLS);
 
-
     // TESTING
     // const chest = new ArticodingObject(this,100,100,this.board.getScaleFactor(),"chest",0,false);
   }
-/*
+  /*
  createButtonCallback: function (item, i, items) {
         return this.rexUI.add.label({
           background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0),
@@ -85,22 +81,24 @@ export default class LevelEditor extends Phaser.Scene {
       },
 */
 
-  CreateMenu(scene : Phaser.Scene, items : RexUIPlugin.Label[]): RexUIPlugin.Menu {
-
+  CreateMenu(
+    scene: Phaser.Scene,
+    items: RexUIPlugin.Label[]
+  ): RexUIPlugin.Menu {
     let menu = this.rexUI.add.menu({
-      orientation: 'y',
+      orientation: "y",
       popup: false,
       items: items,
       // easeIn: 500,
       easeIn: {
         duration: 500,
-        orientation: 'y',
+        orientation: "y",
       },
 
       // easeOut: 100,
       easeOut: {
         duration: 100,
-        orientation: 'y',
+        orientation: "y",
       },
 
       // expandEvent: 'button.over',
@@ -129,9 +127,31 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   createButton(icon: string): RexUIPlugin.Label {
-    const iconStyle = {
-      key: icon,
-    };
+    console.log(icon);
+    let iconStyle = {};
+    switch (icon) {
+      case "player": {
+        iconStyle = {
+          key: icon,
+          frame: "0",
+        };
+        break;
+      }
+      case "trap":
+        iconStyle = {
+          key: icon,
+          frame: "3"
+        };
+        break;
+      default:{
+
+        iconStyle = {
+          key: icon,
+        };
+        break;
+      }
+    }
+
     let buttonLabel = this.rexUI.add.label({
       width: 32,
       height: 32,
