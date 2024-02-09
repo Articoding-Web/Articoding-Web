@@ -3,28 +3,22 @@ const API_ENDPOINT = "http://localhost:3001/api";
 let content = null;
 let levels = [];
 
-const levelsView = (categories) => {
+const levelsView = (levels) => {
   let view = "";
-  for (const category of categories) view += levelDiv(category);
+  for (const category of levels) view += levelDiv(category);
   return view;
 };
 
-const levelDiv = (category) => {
+const levelDiv = (level) => {
   let view = `
-  <div class="col">
-    <div class="card border-dark d-flex flex-column h-100">
-      <a href="/level/levelsByCategory/${category.id}">
-        <h5 class="card-header card-title text-dark">
-          ${category.name}
-        </h5>
-        <div class="card-body text-dark">
-          <h6 class="card-subtitle mb-2 text-muted">
-            <!-- TODO: Calcular el número de niveles de la categoría -->
-            Niveles: ${levels}
-          </h6>
-          ${category.description}
-        </div>
-      </a>
+  <div class="row">
+    <div class="card border-dark">
+      <div class="card-header">
+        ${level.name}
+      </div>
+      <div class="card-body">
+        Miniatura: 
+      </div>
     </div>
   </div>
   `;
@@ -32,7 +26,7 @@ const levelDiv = (category) => {
 };
 
 const getLevelsByCategory = async () => {
-  const response = fetch(API_ENDPOINT + "/level/categories", {
+  const response = fetch(API_ENDPOINT + "/levelsByCategory/:id", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -42,13 +36,18 @@ const getLevelsByCategory = async () => {
 };
 
 const initController = async () => {
-  content = document.getElementById("categories");
-  categories = await getLevelsByCategory();
-  content.innerHTML = levelsView(categories);
+  content = document.getElementById("levels");
+  levels = await getLevelsByCategory();
+  content.innerHTML = levelsView(levels);
 };
 
 const init = () => {
   document.addEventListener("DOMContentLoaded", initController);
+  const url = new URL(window.location.href);
+  const parameters = new URLSearchParams(window.location.query);
+  window.addEventListener("locationchange", function () {
+    console.log("location changed!");
+  });
 };
 
 init();
