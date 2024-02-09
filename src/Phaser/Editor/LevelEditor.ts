@@ -23,10 +23,9 @@ export default class LevelEditor extends Phaser.Scene {
 
   preload(): void {
     const themePath = `assets/sprites/default`;
-    this.load.image("chest", `${themePath}/chest.png`);
+   this.load.image("chest", `${themePath}/chest.png`);
     this.load.multiatlas("player", `${themePath}/player.json`, themePath);
-    let x = this.load.multiatlas("trap", `${themePath}/trap.json`, themePath);
-    console.log(x);
+   this.load.multiatlas("trap", `${themePath}/trap.json`, themePath);
     this.load.image("wall", `${themePath}/wall.png`);
     //por alguna razon sin eso no funciona, a pesar de que YA ESTA
     this.load.scenePlugin({
@@ -40,11 +39,14 @@ export default class LevelEditor extends Phaser.Scene {
 
   create(): void {
     //  let items: RexUIPlugin.Label[] = [];
-    let menu = this.CreateMenu(this, [])
-      .add(this.createButton("chest"))
-      .add(this.createButton("player"))
-      .add(this.createButton("trap"))
-      .add(this.createButton("wall"));
+    let menu = this.CreateMenu(this, []);
+      // .add(this.createButton("chest"))
+      // .add(this.createButton("player"))
+      // .add(this.createButton("trap"))
+      // .add(this.createButton("wall"));
+
+    this.addSpritesToMenu(menu);
+      
     let sizer = this.rexUI.add
       .overlapSizer({
         anchor: {
@@ -52,34 +54,27 @@ export default class LevelEditor extends Phaser.Scene {
           top: "top",
           width: "100%",
           height: "100%",
-        },
+        }
       })
-      .add(menu, { align: "left-center", expand: false })
+      .add(menu, { align: "left-center", expand: false, minWidth: 300, minHeight: 500})
       .layout();
 
     this.board = new EditorBoard(this, NUM_ROWS, NUM_COLS);
 
     // TESTING
     // const chest = new ArticodingObject(this,100,100,this.board.getScaleFactor(),"chest",0,false);
-  }
-  /*
- createButtonCallback: function (item, i, items) {
-        return this.rexUI.add.label({
-          background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0),
-          text: scene.add.text(0, 0, item.name, {
-            fontSize: "20px",
-          }),
-          icon: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x260e04),
-          space: {
-            left: 10,
-            right: 10,
-            top: 10,
-            bottom: 10,
-            icon: 10,
-          },
-        });
-      },
-*/
+    }
+    
+    addSpritesToMenu(menu) {
+      // objects
+      menu.add(this.add.sprite(0,0, "chest"))
+      .add(this.add.sprite(0, 0, "player"))
+      .add(this.add.sprite(0, 0, "trap", "3.png"))
+      .add(this.add.sprite(0, 0, "wall"));
+
+      // background
+
+    }
 
   CreateMenu(
     scene: Phaser.Scene,
@@ -89,6 +84,7 @@ export default class LevelEditor extends Phaser.Scene {
       orientation: "y",
       popup: false,
       items: items,
+      background: this.add.rectangle(),
       // easeIn: 500,
       easeIn: {
         duration: 500,
