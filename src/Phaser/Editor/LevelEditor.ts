@@ -243,7 +243,7 @@ export default class LevelEditor extends Phaser.Scene {
       const icon = cellContainer.getElement("icon");
       if (this.rexUI.isInTouching(icon)) {
         // Create a new game object for dragging
-        const dragObject = new ArticodingObject(this, icon.x, icon.y, 2, item.textureKey, item.frame, true); 
+        const dragObject = new ArticodingObject(this, icon.x, icon.y, (<EditorBoard>this.board).getScaleFactor(), item.textureKey, item.frame, true); 
         // Start dragging
         this.plugins.get("rexdragplugin").add(dragObject).drag();
       }

@@ -56,9 +56,14 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
             console.log("Destroyed old sprite");
             this.objectSprite.destroy();
         }
-
-        // Create duplicate sprite
-        this.objectSprite = sprite;
+        
+        if(this.bgSprite !== undefined){
+            // Create duplicate sprite only if has background
+            this.objectSprite = sprite;
+        } else {
+            // Destroy sprite
+            sprite.destroy();
+        }
     }
 
     setBgSprite(sprite: Phaser.GameObjects.Sprite) {
