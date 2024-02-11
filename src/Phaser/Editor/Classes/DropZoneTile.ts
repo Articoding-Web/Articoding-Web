@@ -33,6 +33,19 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
         return this.bgSprite;
     }
 
+    addSprite(sprite: ArticodingObject) {
+        this.objectSprite = sprite;
+    }
+    
+    contains(x: number, y: number): boolean {
+        const left = this.x;
+        const right = this.x + this.width;
+        const top = this.y;
+        const bottom = this.y + this.height;
+
+        return x >= left && x <= right && y >= top && y <= bottom;
+    }
+
     getObjectSprite(): Phaser.GameObjects.Sprite {
         return this.objectSprite;
     }

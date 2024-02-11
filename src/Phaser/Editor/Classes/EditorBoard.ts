@@ -157,4 +157,15 @@ export default class EditorBoard {
     getScaleFactor(): number {
         return this.scaleFactor;
     }
+
+
+    getDropZoneAt(x: number, y: number): DropZoneTile {
+        for (const tile of this.dropZoneTiles) {
+            if (tile.contains(x, y)) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
 }
