@@ -46,10 +46,6 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDragStart(dropZone) {
     this.scene.children.bringToTop(this);
-    // let tile = this.board.findTile(this);
-    // if (tile !== undefined) {
-    //   this.isOnDropZone = true;
-    // }
   }
 
   onDragEnter() {
@@ -84,7 +80,10 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
         true
       );
 
-      dropZone.setObjectSprite(newObj);
+      if(this.texture.key === "background")
+        dropZone.setBgSprite(newObj);
+      else
+        dropZone.setObjectSprite(newObj);
 
       this.isOnDropZone = false;
     } else {

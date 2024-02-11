@@ -3,11 +3,9 @@ import EditorBoard from "./Classes/EditorBoard";
 import config from "../config";
 import ArticodingObject from "./Classes/ArticodingObject";
 import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
-import TabPages from "phaser3-rex-plugins/templates/ui/tabpages/TabPages";
+import RexDragPlugin from "phaser3-rex-plugins/dist/rexdragplugin";
 import GridTable from "phaser3-rex-plugins/plugins/gridtable";
-import Sizer from "phaser3-rex-plugins/templates/ui/sizer/Sizer";
-import Label from "phaser3-rex-plugins/templates/ui/label/Label";
-import RoundRectangle from "phaser3-rex-plugins/plugins/roundrectangle";
+import OverlapSizer from "phaser3-rex-plugins/templates/ui/overlapsizer/OverlapSizer";
 
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
@@ -18,15 +16,18 @@ const COLOR_DARK = 0x003366;
 const SELECTOR_WIDTH = 500;
 const SELECTOR_HEIGHT = 800;
 
+type gridItem = {
+  id: number;
+  textureKey: string;
+  frame?: string;
+};
+
 export default class LevelEditor extends Phaser.Scene {
   rexUI: RexUIPlugin;
   board: EditorBoard;
-  // selector: spriteSelector
-  // leveldata
-  draggableSprites: Phaser.GameObjects.Sprite[];
+
   constructor() {
     super("LevelEditor");
-    this.draggableSprites = [];
   }
 
   init(): void {
@@ -44,6 +45,7 @@ export default class LevelEditor extends Phaser.Scene {
 
     //por alguna razon sin eso no funciona, a pesar de que YA ESTA
     this.load.scenePlugin("rexuiplugin", RexUIPlugin, undefined, "rexUI");
+    this.load.plugin("rexdragplugin", RexDragPlugin, true, "rexdrag");
 
     // TODO: load level or default assets
   }
@@ -55,33 +57,6 @@ export default class LevelEditor extends Phaser.Scene {
     // this.addSpritesToMenu(menuItems);
 
     this.createTabMenu();
-    //Once created, we prepare the sprites, to make them draggable into the board's drop zones:
-    this.prepareSprites();
-    // let sizer = this.rexUI.add
-    //   .overlapSizer({
-    //     anchor: {
-    //       left: "left",
-    //       top: "top",
-    //       width: "100%",
-    //       height: "100%",
-    //     }
-    //   })
-    //   .add(menu, { align: "left-center", expand: false, minWidth: 300, minHeight: 500 })
-    //   .add(menuBG, { align: "left-center", expand: false, minWidth: 300, minHeight: 500 })
-    //   .layout();
-
-    // TESTING
-    // const chest = new ArticodingObject(this,100,100,this.board.getScaleFactor(),"chest",0,false);
-  }
-
-  prepareSprites() {
-    for (let i = 0; i < this.draggableSprites.length; i++) {
-      const sprite = this.draggableSprites[i];
-      this.input.setDraggable(sprite);
-      this.input.on("dragstart", this.onDragStart, this);
-      this.input.on("drag", this.onDrag, this);
-      this.input.on("dragend", this.onDragEnd, this);
-    }
   }
 
   onDragStart(pointer, gameObject) {
@@ -161,6 +136,7 @@ export default class LevelEditor extends Phaser.Scene {
     // Remove page testing
     // tabPages.removePage('page2', true).layout();
   }
+
   createTabLabel(scene, text) {
     return scene.rexUI.add.label({
       width: 40,
@@ -176,6 +152,8 @@ export default class LevelEditor extends Phaser.Scene {
   createGridPage(isBackgroundGrid: boolean) {
     const scene = this;
     const scrollMode = 0; // 0:vertical, 1:horizontal
+    let items = isBackgroundGrid ? this.createBackgroundItems() : this.createObjectItems();
+
     let gridTable = this.rexUI.add
       .gridTable({
         x: 400,
@@ -210,10 +188,10 @@ export default class LevelEditor extends Phaser.Scene {
           thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
         },
 
-        mouseWheelScroller: {
-          focus: false,
-          speed: 0.1,
-        },
+        // mouseWheelScroller: {
+        //   focus: false,
+        //   speed: 0.1,
+        // },
 
         space: {
           left: 20,
@@ -226,74 +204,79 @@ export default class LevelEditor extends Phaser.Scene {
           footer: 10,
         },
 
-        createCellContainerCallback: function (cell, cellContainer) {
+        createCellContainerCallback: function (cell, cellContainer: OverlapSizer) {
           let width = cell.width,
             height = cell.height,
-            item = cell.item;
+            item = <gridItem>cell.item;
           if (cellContainer === null) {
-            cellContainer = scene.rexUI.add.label({
-              width: width,
-              height: height,
-
-              orientation: <Sizer.OrientationTypes>scrollMode,
-              background: scene.rexUI.add
-                .roundRectangle(0, 0, 20, 20, 0)
-                .setStrokeStyle(2, COLOR_DARK),
-              icon: <Phaser.GameObjects.Sprite>item,
-
-              space: {
-                left: 30,
-                top: scrollMode === 0 ? 0 : 15,
-              },
-            });
+            cellContainer = scene.rexUI.add.overlapSizer()
+              .addBackground(
+                scene.rexUI.add.roundRectangle(0, 0, 20, 20, 0).setStrokeStyle(2, COLOR_DARK),
+                undefined, 'background'
+              )
+              .add(scene.add.image(0, 0, ''), { key: 'icon', align: 'center', expand: false }
+              );
           }
 
           // Set properties from item value
-          (<Label>cellContainer).setMinSize(width, height); // Size might changed in this demo
-          (<RoundRectangle>(<Label>cellContainer).getElement("background"))
-            .setStrokeStyle(2, COLOR_DARK)
-            .setDepth(0);
+          cellContainer.setMinSize(width, height); // Size might changed in this demo
+          const icon = <Phaser.GameObjects.Image>cellContainer.getElement('icon');
+          if (item.textureKey) {
+            icon.setTexture(item.textureKey).setFrame(item.frame)
+          }
+          cellContainer.setChildVisible(icon, !!item.textureKey);
+
           return cellContainer;
         },
-        items: isBackgroundGrid
-          ? this.createBackgroundItems()
-          : this.createObjectItems(),
+        items: items
       })
       .layout();
+
+    gridTable.on('cell.down', function (cellContainer, cellIndex, pointer, event) {
+      event.stopPropagation();
+      const item = items[cellIndex];
+
+      if (!item.textureKey) {
+        return;
+      }
+
+      const icon = cellContainer.getElement("icon");
+      if (this.rexUI.isInTouching(icon)) {
+        // Create a new game object for dragging
+        const dragObject = new ArticodingObject(this, icon.x, icon.y, 2, item.textureKey, item.frame, true); 
+        // Start dragging
+        this.plugins.get("rexdragplugin").add(dragObject).drag();
+      }
+    }, this);
 
     return gridTable;
   }
 
-  createBackgroundItems() {
+  createBackgroundItems(): gridItem[] {
     let items = [];
 
     const frameNames = this.textures.get("background").getFrameNames();
-
     for (let x = 0; x < frameNames.length; x++) {
-      let sprite = this.add.sprite(
-        0,
-        x * config.TILE_SIZE,
-        "background",
-        frameNames[x]
-      );
-      sprite.scale = this.board.getScaleFactor() / 2;
-      items.push(sprite);
-      this.draggableSprites.push(sprite);
+      items.push({
+        id: x,
+        textureKey: 'background',
+        frame: frameNames[x]
+      });
     }
 
     return items;
   }
 
-  createObjectItems() {
+  createObjectItems(): gridItem[] {
     let items = [];
 
     let spriteNames = config.SPRITE_NAMES;
     for (let i = 0; i < spriteNames.length; i++) {
       if (spriteNames[i] !== "background") {
-        let sprite = this.add.sprite(0, 0, spriteNames[i]);
-        sprite.scale = this.board.getScaleFactor() / 2;
-        items.push(sprite);
-        this.draggableSprites.push(sprite);
+        items.push({
+          id: i,
+          textureKey: spriteNames[i]
+        });
       }
     }
 
