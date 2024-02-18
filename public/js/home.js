@@ -6,7 +6,7 @@ let categories = [];
 const categoriesView = async (categories) => {
   let view = "";
   for (const category of categories) {
-    category.levels = await getNumber(category.id);
+    category.levels = await fetchRequest(`${API_ENDPOINT}/level/countByCategory/${category.id}`, 'GET') 
     view += categoryDiv(category);
   }
   return view;
@@ -15,19 +15,19 @@ const categoriesView = async (categories) => {
 const categoryDiv = (category) => {
   let view = `
   <div class="col">
-    <div class="card border-dark d-flex flex-column h-100">
-      <a class="category href="/level/levelsByCategory?id=${category.id}">
-        <h5 class="card-header card-title text-dark">
-          ${category.name}
-        </h5>
-        <div class="card-body text-dark">
-          <h6 class="card-subtitle mb-2 text-muted">
-            Niveles: ${category.levels}
-          </h6>
-          ${category.description}
-        </div>
-      </a>
-    </div>
+    <a class="category" href="${API_ENDPOINT}/level/levelsByCategory/${category.id}">
+      <div class="card border-dark d-flex flex-column h-100">
+          <h5 class="card-header card-title text-dark">
+            ${category.name}
+          </h5>
+          <div class="card-body text-dark">
+            <h6 class="card-subtitle mb-2 text-muted">
+              Niveles: ${category.levels}
+            </h6>
+            ${category.description}
+          </div>
+      </div>
+    </a>
   </div>
   `;
   return view;
@@ -43,86 +43,68 @@ const categoryLevelsView = async (category) => {
 
 const categoryLevelsDiv = (level) => {
   let view = `
-  <div class="row">
-    <div class="card border-dark">
-      <div class="card-header">
-        ${level.name}
+  <div class="col">
+    <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
+      <div class="card border-dark">
+        <div class="card-header">
+          ${level.title}
+        </div>
+        <div class="card-body">
+          Miniatura: 
+        </div>
       </div>
-      <div class="card-body">
-        Miniatura: 
-      </div>
-    </div>
+    </a>
   </div>
   `;
   return view;
 };
 
-const getCategories = async () => {
-  const response = fetch(API_ENDPOINT + "/level/categories", {
-    method: "GET",
+async function fetchRequest(endpoint, method) {
+  const response = fetch(endpoint, {
+    method,
     headers: {
       "Content-Type": "application/json",
     },
   });
   return (await response).json();
-};
-
-const getCategoryById = async (id) => {
-  const response = await fetch(API_ENDPOINT + "/level/category/" + id, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return (await response).json();
-};
-
-const getLevelsByCategory = async (id) => {
-  const response = await fetch(API_ENDPOINT + "level/levelsByCategory/" + id, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return (await response).json();
-};
-
-const getNumber = async (category) => {
-  const response = fetch(API_ENDPOINT + "/level/countByCategory/" + category, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  return (await response).json();
-};
+}
 
 const initController = async () => {
   content = document.getElementById("categories");
-  categories = await getCategories();
+  categories = await fetchRequest(`${API_ENDPOINT}/level/categories`, "GET");
   content.innerHTML = await categoriesView(categories);
-  console.log("Fuera");
-  // La última vez falló aquí, por si lo vais a mirar ahora en la reunión,
-  // yo creo que falta muy poco a ver si lo sacais
-  document.querySelectorAll("a.category").forEach((event) => {
-    console.log("Dentro");
-    event.addEventListener("click", loadCategory);
+  document.querySelectorAll("a.category").forEach((anchorTag) => {
+    anchorTag.addEventListener("click", loadCategory);
   });
-};
-
-const init = () => {
-  document.addEventListener("DOMContentLoaded", initController);
 };
 
 async function loadCategory(event) {
   event.preventDefault();
-  const urlParams = URLSearchParams(event.target.href.search);
-  console.log(urlParams);
-  const id = urlParams.get("id");
-  const category = await getCategoryById(id);
-  const levels = await getLevelsByCategory(category.id);
+  const anchorTag = event.target.closest('a.category');
+  
+  const id = (anchorTag.href).split("/level/levelsByCategory/")[1];
+  const levels = await fetchRequest(`${API_ENDPOINT}/level/levelsByCategory/${id}`, "GET");
+
   content = document.getElementById("categories");
   content.innerHTML = await categoryLevelsView(levels);
+
+  // Add getLevel event listener
+  const getLevelanchorTags = document.querySelectorAll("a.getLevel").forEach(elem => {
+    elem.addEventListener("click", playLevel);
+  })
 }
+
+function playLevel(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest('a.getLevel');
+
+  const levelId = (anchorTag.href).split("level/")[1];
+
+    
+}
+
+const init = () => {
+  document.addEventListener("DOMContentLoaded", initController);
+};
 
 init();
