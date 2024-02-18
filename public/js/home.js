@@ -102,6 +102,8 @@ const initController = async () => {
   categories = await getCategories();
   content.innerHTML = await categoriesView(categories);
   console.log("Fuera");
+  // La última vez falló aquí, por si lo vais a mirar ahora en la reunión,
+  // yo creo que falta muy poco a ver si lo sacais
   document.querySelectorAll("a.category").forEach((event) => {
     console.log("Dentro");
     event.addEventListener("click", loadCategory);
