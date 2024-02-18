@@ -38,7 +38,7 @@ export default {
             'colour': '#e13030',
             'contents': [
                 {
-                    'type': 'textSpecial',
+                    'type': 'text',
                     'kind': 'block',
                 }
             ]

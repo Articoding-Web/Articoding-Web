@@ -4,7 +4,7 @@ import config from "../config";
 import { Player } from "../Classes/Player";
 import { GridPhysics } from "../Classes/GridPhysics";
 import { Direction } from "../types/Direction";
-import { appendModal } from "../../../public/js/utils.js";
+import { appendModal } from "../../../public/utils.js";
 import ChestObject from "../Classes/ChestObject";
 
 export default class LevelPlayer extends Phaser.Scene {
@@ -24,7 +24,7 @@ export default class LevelPlayer extends Phaser.Scene {
   private chests: ChestObject[] = [];
 
   private gridPhysics: GridPhysics;
-  private _cd = 0; //TODO reemplazar
+  private _cd = 0;//TODO reemplazar
   constructor() {
     super("LevelPlayer");
   }
@@ -65,42 +65,30 @@ export default class LevelPlayer extends Phaser.Scene {
         themePath
       );
     } else {
-      this.load.image(assetKey, `${themePath}/${assetKey}.png`);
+      this.load.image(assetKey, `${themePath}/${assetKey}.png`)
     }
   }
 
   create() {
     // this.zoom();
-    this.createBackground(); // create un tilemap
+    this.createBackground();  // create un tilemap
     this.createPlayers(); // create sprites y obj jugadores
     this.createObjects(); // create sprites obj, incl. cofres
   }
 
   createBackground() {
-    this.tilemap = this.make.tilemap({
-      tileWidth: config.TILE_SIZE,
-      tileHeight: config.TILE_SIZE,
-      width: this.width,
-      height: this.height,
-    });
+    this.tilemap = this.make.tilemap({ tileWidth: config.TILE_SIZE, tileHeight: config.TILE_SIZE, width: this.width, height: this.height });
 
     const layerWidth = this.tilemap.width * config.TILE_SIZE;
     const layerHeight = this.tilemap.height * config.TILE_SIZE;
 
-    this.scaleFactor = Math.floor(this.cameras.main.height / layerHeight / 2);
+    this.scaleFactor = Math.floor((this.cameras.main.height) / layerHeight / 2);
 
-    this.mapCoordX =
-      (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
-    this.mapCoordY =
-      (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
+    this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
+    this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
     this.tilemap.addTilesetImage(this.backgroundLayerJson.spriteSheet);
-    const layer = this.tilemap.createBlankLayer(
-      this.backgroundLayerJson.spriteSheet,
-      this.tilemap.tilesets,
-      this.mapCoordX,
-      this.mapCoordY
-    );
+    const layer = this.tilemap.createBlankLayer(this.backgroundLayerJson.spriteSheet, this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
     layer.scale = this.scaleFactor;
     layer.depth = this.backgroundLayerJson.depth || layer.depth;
 
@@ -112,35 +100,20 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createPlayers() {
-    this.gridPhysics = new GridPhysics(
-      this.tilemap,
-      this.scaleFactor,
-      this.chests
-    );
+    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor, this.chests);
 
     // Create sprites
     for (let x in this.playersLayerJson.objects) {
       const player = this.playersLayerJson.objects[x];
 
       // Create and scale sprite
-      const sprite = this.add.sprite(
-        player.x,
-        player.y,
-        this.playersLayerJson.spriteSheet
-      );
+      const sprite = this.add.sprite(player.x, player.y, this.playersLayerJson.spriteSheet);
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
       // Add physics and create player object
       this.physics.add.existing(sprite);
-      this.players.push(
-        new Player(
-          sprite,
-          this.gridPhysics,
-          new Phaser.Math.Vector2(player.x, player.y),
-          this.scaleFactor
-        )
-      );
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(player.x, player.y), this.scaleFactor));
     }
 
     this.cameras.main.roundPixels = true;
@@ -155,20 +128,22 @@ export default class LevelPlayer extends Phaser.Scene {
     runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
   }
 
-  createPlayerAnimation(name: string) {
+  createPlayerAnimation(
+    name: string,
+  ) {
     this.anims.create({
       key: name,
       frames: this.anims.generateFrameNames("player", {
         start: 0,
         end: 3,
         prefix: `${name}/`,
-        suffix: ".png",
+        suffix: '.png',
       }),
       frameRate: 8,
       repeat: -1,
       yoyo: true,
     });
-  }
+  };
 
   createObjects() {
     console.log(this.objectsLayerJson);
@@ -179,12 +154,7 @@ export default class LevelPlayer extends Phaser.Scene {
         const obj = objects[y];
 
         if (obj.type === "chest") {
-          const chest = new ChestObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
-          );
+          const chest = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(chest, obj.x, obj.y);
           chest.setDepth(objectJson.depth);
           this.chests.push(chest);
@@ -198,12 +168,8 @@ export default class LevelPlayer extends Phaser.Scene {
     }
   }
 
-  scaleSprite(
-    sprite: Phaser.GameObjects.Sprite,
-    gridXPosition: number,
-    gridYPosition: number
-  ) {
-    const offsetX = (config.TILE_SIZE / 2) * this.scaleFactor + this.mapCoordX;
+  scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
+    const offsetX = config.TILE_SIZE / 2 * this.scaleFactor + this.mapCoordX;
     const offsetY = config.TILE_SIZE * this.scaleFactor + this.mapCoordY;
 
     sprite.setOrigin(0.5, 1);
@@ -243,7 +209,8 @@ export default class LevelPlayer extends Phaser.Scene {
       setTimeout(() => {
         this.processInstructionQueue();
       }, this._cd);
-    } else {
+    }
+    else {
       this._cd = 0;
       setTimeout(() => {
         if (this.checkWinCondition()) {
@@ -256,7 +223,7 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   checkWinCondition(): boolean {
-    for (let x in this.players) {
+    for(let x in this.players){
       const player = this.players[x];
       if (player.getCollidingObject() === undefined) {
         return false;
@@ -271,10 +238,10 @@ export default class LevelPlayer extends Phaser.Scene {
   move(steps: number, direction: string) {
     this._cd = steps * (config.MOVEMENT_ANIMDURATION + 150);
 
-    this.events.emit("moveOrder", steps, Direction[direction]);
+    this.events.emit('moveOrder', steps, Direction[direction]);
   }
 
   rotate(direction: string) {
-    this.events.emit("rotateOrder", Direction[direction]);
+    this.events.emit('rotateOrder', Direction[direction]);
   }
 }

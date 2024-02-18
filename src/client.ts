@@ -45,11 +45,10 @@ function addNavbarListeners() {
 
 function playLevel() {
   const toolbox = level.blockly.toolbox;
-  const maxInstances = level.blockly.maxInstances;
   const workspaceBlocks = level.blockly.workspaceBlocks;
   const levelJSON = level.phaser;
   phaserController = new PhaserController("LevelPlayer", LevelPlayer, levelJSON);
-  blocklyController = new BlocklyController(toolbox, maxInstances, workspaceBlocks);
+  blocklyController = new BlocklyController(toolbox, workspaceBlocks);
 
   globalThis.phaserController = phaserController;
   globalThis.blocklyController = blocklyController;

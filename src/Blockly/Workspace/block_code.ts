@@ -37,7 +37,7 @@ export function defineAllBlocks() {
     }
 
     //Text block
-    javascriptGenerator.forBlock['textSpecial'] = function (block, generator) {
+    javascriptGenerator.forBlock['text'] = function (block, generator) {
         let text = block.getFieldValue('TEXT');
         let code = '"' + text + '"'; 
         return code; //TODO order atomic check
