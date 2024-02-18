@@ -128,7 +128,7 @@ export default [
     },
     //HERE ENDS BEGIN BLOCKS (PINK SECTION FROM TOOLBOX)
     {
-        "type": "text",
+        "type": "textSpecial",
         "message0": "%1",
         "args0": [
             {

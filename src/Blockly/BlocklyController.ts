@@ -13,25 +13,31 @@ export default class BlocklyController {
   startBlock: Blockly.BlockSvg;
   workspace: Blockly.WorkspaceSvg;
 
-  constructor(toolbox: string | ToolboxDefinition | Element, workspaceBlocks?: any) {
-    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox });
+  // TODO: Eliminar numero magico
+  blockOffset = 50;
+
+  constructor(toolbox: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox, maxInstances});
     Blockly.defineBlocksWithJsonArray(blocks);
 
     this.startBlock = this.workspace.newBlock('start');
     this.startBlock.initSvg();
     this.startBlock.render();
+    this.startBlock.moveBy(this.blockOffset, this.blockOffset);
 
-    // TODO: Crear workspaceBlocks
-    for(let x in workspaceBlocks){
+    let offset = this.blockOffset;
+    for (let x in workspaceBlocks) {
+      offset += this.blockOffset;
       const block = this.workspace.newBlock(workspaceBlocks[x]);
       block.initSvg();
       block.render();
+      block.moveBy(this.blockOffset, offset);
     }
-    
+
     block_code.defineAllBlocks();
   }
 
-  destroy(){
+  destroy() {
     this.workspace.dispose();
   }
 
