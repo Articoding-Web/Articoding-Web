@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <%- include("fragments/header") %>
+  </head>
+  <body class="vh-100 bg-secondary">
+      <%- include("fragments/navbar") %>
+      <div class="container">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            <% levels.forEach(function(level) { %>
+            <div class="col">
+              <div class="card">
+                <img class="card-img-top" src="/images/logo.png" alt="level">
+                <div class="card-body">
+                  <h3 class="card-title"><%= level.title %></h3>
+                  <p class="card-text">Autor: <%= level.name %></p>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+      </div>
+  </body>
+</html>

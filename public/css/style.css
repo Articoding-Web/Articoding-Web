@@ -2,3 +2,52 @@
     height: 100%;
     width: 100%;
 }
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.row {
+    width: 100%;
+}
+
+.navbar {
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    border-bottom-left-radius: 0.75rem;
+    box-shadow: 0rem 0rem 1rem black;
+}
+
+.below {
+    padding-top: 5rem;
+}
+
+.card-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card {
+    background-color: whitesmoke;
+    border-style: none;
+    margin: 1.5rem;
+    border-radius: 2rem;
+}
+
+.card:hover {
+    background-color: lavender;
+}
+
+.card-text {
+    font-weight: 700;
+    font-size: large;
+    text-align: right;
+}
