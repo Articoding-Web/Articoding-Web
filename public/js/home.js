@@ -6,7 +6,10 @@ let categories = [];
 const categoriesView = async (categories) => {
   let view = "";
   for (const category of categories) {
-    category.levels = await fetchRequest(`${API_ENDPOINT}/level/countByCategory/${category.id}`, 'GET') 
+    category.levels = await fetchRequest(
+      `${API_ENDPOINT}/level/countByCategory/${category.id}`,
+      "GET"
+    );
     view += categoryDiv(category);
   }
   return view;
@@ -76,31 +79,55 @@ const initController = async () => {
   document.querySelectorAll("a.category").forEach((anchorTag) => {
     anchorTag.addEventListener("click", loadCategory);
   });
+  const community = document.querySelector("a.community");
+  community.addEventListener("click", printCommunityLevels);
 };
+
+async function printCommunityLevels(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.community");
+
+  const link = anchorTag.href;
+  console.log("Link:", link);
+  const communityLevels = fetchRequest(`${API_ENDPOINT}/${link}`, "GET");
+  console.log("Niveles:", communityLevels);
+  content.innerHTML = await buildCommunity(communityLevels);
+}
+
+async function buildCommunity(levels) {
+  let view = "";
+  for (const level of levels) {
+    view += categoryLevelsDiv(level);
+  }
+  return view;
+}
 
 async function loadCategory(event) {
   event.preventDefault();
-  const anchorTag = event.target.closest('a.category');
-  
-  const id = (anchorTag.href).split("/level/levelsByCategory/")[1];
-  const levels = await fetchRequest(`${API_ENDPOINT}/level/levelsByCategory/${id}`, "GET");
+  const anchorTag = event.target.closest("a.category");
+
+  const id = anchorTag.href.split("/level/levelsByCategory/")[1];
+  const levels = await fetchRequest(
+    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+    "GET"
+  );
 
   content = document.getElementById("categories");
   content.innerHTML = await categoryLevelsView(levels);
 
   // Add getLevel event listener
-  const getLevelanchorTags = document.querySelectorAll("a.getLevel").forEach(elem => {
-    elem.addEventListener("click", playLevel);
-  })
+  const getLevelanchorTags = document
+    .querySelectorAll("a.getLevel")
+    .forEach((level) => {
+      level.addEventListener("click", playLevel);
+    });
 }
 
 function playLevel(event) {
   event.preventDefault();
-  const anchorTag = event.target.closest('a.getLevel');
+  const anchorTag = event.target.closest("a.getLevel");
 
-  const levelId = (anchorTag.href).split("level/")[1];
-
-    
+  const levelId = anchorTag.href.split("level/")[1];
 }
 
 const init = () => {
