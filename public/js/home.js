@@ -79,17 +79,16 @@ const initController = async () => {
   document.querySelectorAll("a.category").forEach((anchorTag) => {
     anchorTag.addEventListener("click", loadCategory);
   });
-  const community = document.querySelector("a.community");
+  const community = document.getElementById("community");
   community.addEventListener("click", printCommunityLevels);
 };
 
 async function printCommunityLevels(event) {
   event.preventDefault();
-  const anchorTag = event.target.closest("a.community");
-
-  const link = anchorTag.href;
-  console.log("Link:", link);
-  const communityLevels = fetchRequest(`${API_ENDPOINT}/${link}`, "GET");
+  const communityLevels = await fetchRequest(
+    `${API_ENDPOINT}/level/community/levels`,
+    "GET"
+  );
   console.log("Niveles:", communityLevels);
   content.innerHTML = await buildCommunity(communityLevels);
 }
