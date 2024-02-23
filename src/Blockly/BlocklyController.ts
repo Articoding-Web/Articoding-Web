@@ -7,17 +7,14 @@ import blocks from "./Workspace/blocks";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 
 export default class BlocklyController {
-  blocklyArea = globalThis.blocklyArea;
-  blocklyDiv = globalThis.blocklyDiv;
-  isVisible: boolean = false;
   startBlock: Blockly.BlockSvg;
   workspace: Blockly.WorkspaceSvg;
 
   // TODO: Eliminar numero magico
   blockOffset = 50;
 
-  constructor(toolbox: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
-    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox, maxInstances});
+  constructor(container: string | Element, toolbox: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+    this.workspace = Blockly.inject(container, { toolbox, maxInstances});
     Blockly.defineBlocksWithJsonArray(blocks);
 
     this.startBlock = this.workspace.newBlock('start');
@@ -35,6 +32,18 @@ export default class BlocklyController {
     }
 
     block_code.defineAllBlocks();
+
+    const blocklyArea = document.getElementById('blocklyArea');
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    const onresize = () => {
+      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+      Blockly.svgResize(this.workspace);
+    };    
+
+    window.addEventListener('resize', onresize, false);
+    
+    onresize();
   }
 
   destroy() {
@@ -106,18 +115,6 @@ export default class BlocklyController {
   //   }
   //   return xml;
   // }
-
-  showWorkspace() {
-    globalThis.blocklyArea.classList.remove("d-none");
-    this.isVisible = true;
-    window.dispatchEvent(new Event("resize"));
-  }
-
-  hideWorkspace() {
-    globalThis.blocklyArea.classList.add("d-none");
-    this.isVisible = false;
-    window.dispatchEvent(new Event("resize"));
-  }
 
   fetchCode() {
     let nextBlock = this.startBlock.getNextBlock();

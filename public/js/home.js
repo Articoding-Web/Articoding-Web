@@ -1,4 +1,5 @@
 "use strict"
+import { startLevel } from "../client.js";
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
@@ -29,13 +30,6 @@ async function fillContent(divElement, items, htmlGenerator) {
   for (let item of items) {
     divElement.insertAdjacentHTML("beforeend", await htmlGenerator(item));
   }
-}
-
-function playLevel(event) {
-  event.preventDefault();
-  const anchorTag = event.target.closest("a.getLevel");
-
-  const levelId = anchorTag.href.split("level/")[1];
 }
 
 /**
@@ -152,11 +146,66 @@ async function loadCommunityLevels() {
 }
 
 /**
+ * 
+ * @param {Event} event - click event of <a> to href with level id
+ */
+async function playLevel(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.getLevel");
+
+  const levelId = anchorTag.href.split("level/")[1];
+
+  let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
+
+  document.getElementById("content").innerHTML = getLevelPlayerHTML();
+  startLevel(level);
+}
+
+// function getLevelPlayerHTML() {
+//   return `<div class="row row-cols-1 row-cols-lg-2 h-100">
+//             <div id="blocklyArea" class="col col-lg-4 h-100 position-relative pe-0">
+//                 <div id="blocklyDiv" class="blocks"></div>
+//                 <div class="position-absolute top-0 end-0 me-3">
+//                     <button class="btn btn-primary" id="runCodeBtn">
+//                         Run Code
+//                     </button>
+//                 </div>
+//             </div>
+//             <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
+//                 <canvas id="phaserCanvas"></canvas>
+                
+//                 <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0">
+//                     Toggle Blockly
+//                 </button>
+//             </div>
+//           </div>`
+// }
+function getLevelPlayerHTML() {
+  return `<div class="row row-cols-1 row-cols-lg-2 h-100">
+            <div id="blocklyArea" class="col col-lg-4 h-100 position-relative pe-0">
+                <div id="blocklyDiv" class="position-absolute"></div>
+                <div class="position-absolute top-0 end-0 me-3">
+                    <button class="btn btn-primary" id="runCodeBtn">
+                        Run Code
+                    </button>
+                </div>
+            </div>
+            <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
+                <canvas id="phaserCanvas"></canvas>
+                
+                <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0">
+                    Toggle Blockly
+                </button>
+            </div>
+          </div>`
+}
+
+/**
  * init function
  */
 (async function () {
   // Create row
-  document.getElementById("content").innerHTML = '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2" id="categories"></div>';
+  document.getElementById("content").innerHTML = '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
 
   setNavbarListeners();
   loadCategories();
