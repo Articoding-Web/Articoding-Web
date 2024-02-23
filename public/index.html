@@ -1,58 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="./css/bootstrap.min.css" rel="stylesheet">
-        <link href="./css/style.css" rel="stylesheet">
-        <link href="./images/logo.png" rel="shortcut icon">
-        <link rel="stylesheet" href= "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-        <title>Articoding</title>
-    </head>
-    <body class="vh-100 bg-secondary">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
+    <link href="./images/logo.png" rel="shortcut icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <title>Articoding</title>
+</head>
+
+<body class="vh-100 bg-secondary">
+    <header class="navbar bg-dark">
         <div class="container-fluid">
             <div class="row">
-                <div class="navbar bg-dark" id="a">
-                    <div class="col col-1 offset-1">
-                        <a href="/">
-                            <i class="bi bi-house-door-fill h1" title="Home"></i>
-                        </a>
-                    </div>
-                    <div class="col col-1 offset-2 text-center">
-                        <a href="#">
-                            <i class="bi bi-pencil-square h2" title="Editor"></i>
-                        </a>
-                    </div>
-                    <div class="col col-1 text-center">
-                        <a href="#">
-                            <i class="bi bi-book h2" title="Manual"></i>
-                        </a>
-                    </div>
-                    <div class="col col-1 text-center">
-                        <a href="/level/community">
-                            <i class="bi bi-people-fill h2" title="Community"></i>
-                        </a>
-                    </div>
-                    <div class="col col-1 text-center">
-                        <a href="#">
-                            <i class="bi bi-person-circle h2" title="Profile"></i>
-                        </a>
-                    </div>
-                    <div class="col col-1 offset-3">
-                        <a href="#">
-                            <i class="bi bi-gear h1" title="Configuration"></i>
-                        </a>
-                    </div>
+                <div class="col col-1 offset-1">
+                    <a href="/">
+                        <i class="bi bi-house-door-fill h1" title="Home"></i>
+                    </a>
+                </div>
+                <div class="col col-1 offset-2 text-center">
+                    <span id="official">
+                        <i class="bi bi-controller h2" title="Official"></i>
+                    </span>
+                </div>
+                <div class="col col-1 text-center">
+                    <span id="editor">
+                        <i class="bi bi-pencil-square h2" title="Editor"></i>
+                    </span>
+                </div>
+                <div class="col col-1 text-center">
+                    <a href="#">
+                        <i class="bi bi-book h2" title="Manual"></i>
+                    </a>
+                </div>
+                <div class="col col-1 text-center">
+                    <span id="community">
+                        <i class="bi bi-people-fill h2" title="Community"></i>
+                    </span>
+                </div>
+                <div class="col col-1 text-center">
+                    <a href="#">
+                        <i class="bi bi-person-circle h2" title="Profile"></i>
+                    </a>
+                </div>
+                <div class="col col-1 offset-2">
+                    <a href="#">
+                        <i class="bi bi-gear h1" title="Configuration"></i>
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <div class="container below">
-            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2" id="categories"></div>
-        </div>
+    </header>
 
-        <!--
+    <div class="container below" id="content">
+
+    </div>
+
+    <!--
         <div class="container-fluid h-100">
             <div class="row row-cols-1 row-cols-lg-2 h-100">
                 <div id="blocklyArea" class="col col-lg-4 h-100 d-none position-relative pe-0">
@@ -112,10 +118,11 @@
             </div>
         </div>-->
 
-        <script src="./js/bootstrap.min.js"></script>
-        <script src="./client.js"></script>
-        <script type="module" src="./js/utils.js"></script>
-        <script type="module" src="./js/login.js"></script>
-        <script type="module" src="./js/home.js"></script>
-    </body>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./client.js"></script>
+    <script type="module" src="./js/utils.js"></script>
+    <script type="module" src="./js/login.js"></script>
+    <script type="module" src="./js/home.js"></script>
+</body>
+
 </html>
