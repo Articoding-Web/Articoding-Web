@@ -1,5 +1,6 @@
 "use strict"
 import { startLevel } from "../client.js";
+import { editLevel } from "../client.js";
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
@@ -40,6 +41,7 @@ async function setNavbarListeners() {
   document.getElementById("official").addEventListener("click", loadCategories);
 
   // TODO: Manual
+  document.getElementById("editor").addEventListener("click", loadLevelEditor);
 
   // Community Levels
   document.getElementById("community").addEventListener("click", loadCommunityLevels);
@@ -146,7 +148,7 @@ async function loadCommunityLevels() {
 }
 
 /**
- * 
+ * Sets content and starts phaser LevelPlayer
  * @param {Event} event - click event of <a> to href with level id
  */
 async function playLevel(event) {
@@ -161,28 +163,13 @@ async function playLevel(event) {
   startLevel(level);
 }
 
-// function getLevelPlayerHTML() {
-//   return `<div class="row row-cols-1 row-cols-lg-2 h-100">
-//             <div id="blocklyArea" class="col col-lg-4 h-100 position-relative pe-0">
-//                 <div id="blocklyDiv" class="blocks"></div>
-//                 <div class="position-absolute top-0 end-0 me-3">
-//                     <button class="btn btn-primary" id="runCodeBtn">
-//                         Run Code
-//                     </button>
-//                 </div>
-//             </div>
-//             <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
-//                 <canvas id="phaserCanvas"></canvas>
-                
-//                 <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0">
-//                     Toggle Blockly
-//                 </button>
-//             </div>
-//           </div>`
-// }
+/**
+ * 
+ * @returns String of HTMLElement for LevelPlayer
+ */
 function getLevelPlayerHTML() {
-  return `<div class="row row-cols-1 row-cols-lg-2 h-100">
-            <div id="blocklyArea" class="col col-lg-4 h-100 position-relative pe-0">
+  return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
+            <div id="blocklyArea" class="col col-lg-4 h-100 position-relative collapse collapse-horizontal show">
                 <div id="blocklyDiv" class="position-absolute"></div>
                 <div class="position-absolute top-0 end-0 me-3">
                     <button class="btn btn-primary" id="runCodeBtn">
@@ -193,9 +180,30 @@ function getLevelPlayerHTML() {
             <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
                 <canvas id="phaserCanvas"></canvas>
                 
-                <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0">
+                <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0" type="button" data-bs-toggle="collapse" data-bs-target="#blocklyArea" aria-expanded="false" aria-controls="blocklyArea">
                     Toggle Blockly
                 </button>
+            </div>
+          </div>`
+}
+
+/**
+ * Sets content and starts phaser LevelEditor
+ */
+function loadLevelEditor() {
+  document.getElementById("content").innerHTML = getLevelEditorHTML();
+
+  editLevel();
+}
+
+/**
+ * 
+ * @returns String of HTMLElement for LevelEditor
+ */
+function getLevelEditorHTML() {
+  return `<div class="row h-100">
+            <div id="phaserDiv" class="col mh-100">
+                <canvas id="phaserCanvas"></canvas>
             </div>
           </div>`
 }
