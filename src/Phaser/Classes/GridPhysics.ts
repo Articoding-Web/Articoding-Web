@@ -1,9 +1,10 @@
 import * as Phaser from "phaser";
 
 import { Direction } from "../types/Direction";
-import config from "../config"
+import config from "../../config"
 import ChestObject from "./ChestObject";
 import { Player } from "./Player";
+import ArticodingSprite from "./ArticodingSprite";
 
 const Vector2 = Phaser.Math.Vector2;
 type Vector2 = Phaser.Math.Vector2;
@@ -21,7 +22,7 @@ export class GridPhysics {
     constructor(
         private tileMap: Phaser.Tilemaps.Tilemap,
         private scaleFactor: number,
-        private objects: ChestObject[]    // TODO: cambiar ChestObject por tipo generico
+        private objects: ArticodingSprite[]
     ) {
         this.speedPixelsPerSecond = config.TILE_SIZE * this.scaleFactor;
     }
@@ -50,7 +51,6 @@ export class GridPhysics {
 
     hasBlockingTile(pos: Vector2): boolean {
         if (this.hasNoTile(pos)){
-            console.log("No tile");
             return true;
         }
         return this.tileMap.layers.some((layer) => {

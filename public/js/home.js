@@ -75,6 +75,7 @@ async function generateCategoryDiv(category) {
  * Gets categories from DB and shows them on screen
  */
 async function loadCategories() {
+  document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
   const categories = await fetchRequest(`${API_ENDPOINT}/level/categories`, "GET");
 
@@ -133,6 +134,7 @@ async function loadCategoryLevels(event) {
  * Gets community levels from DB and shows them on screen
  */
 async function loadCommunityLevels() {
+  document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
 
   const communityLevels = await fetchRequest(
@@ -209,11 +211,19 @@ function getLevelEditorHTML() {
 }
 
 /**
+ * 
+ * @returns String of HTMLDivElement for showing levels/categories
+ */
+function getRowHTML() {
+  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+}
+
+/**
  * init function
  */
 (async function () {
   // Create row
-  document.getElementById("content").innerHTML = '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+  document.getElementById("content").innerHTML = getRowHTML();
 
   setNavbarListeners();
   loadCategories();

@@ -3,8 +3,8 @@
         "width": 6,
         "height": 6,
         "theme": "default",
-        "layers" : {
-            "background" : {
+        "layers": {
+            "background": {
                 "spriteSheet": "background",
                 "spriteSheetType": "multi",
                 "objects": [
@@ -184,14 +184,10 @@
                 ],
                 "depth": 0
             },
-            "players" : {
+            "players": {
                 "spriteSheet": "player",
                 "spriteSheetType": "multi",
                 "objects": [
-                    {
-                        "x": 1,
-                        "y": 1
-                    },
                     {
                         "x": 2,
                         "y": 3
@@ -199,14 +195,26 @@
                 ],
                 "depth": 2
             },
-            "objects" : [
+            "objects": [
                 {
                     "spriteSheet": "trap",
                     "spriteSheetType": "multi",
                     "objects": [
                         {
                             "x": 3,
-                            "y": 1
+                            "y": 1,
+                            "type": "trap"
+                        }
+                    ],
+                    "depth": 1
+                },
+                {
+                    "spriteSheet": "enemy",
+                    "spriteSheetType": "multi",
+                    "objects": [
+                        {
+                            "x": 2,
+                            "y": 2
                         }
                     ],
                     "depth": 1
@@ -238,7 +246,7 @@
                 {
                     "kind": "category",
                     "name": "Actions",
-                    "colour": "#a5a55b",
+                    "colour": "#745ba5",
                     "contents": [
                         {
                             "type": "movement",
@@ -271,7 +279,7 @@
                     "colour": "#0d44ba",
                     "contents": [
                         {
-                            "type": "numberSpecial",
+                            "type": "math_number",
                             "kind": "block"
                         }
                     ]
@@ -279,7 +287,7 @@
                 {
                     "kind": "category",
                     "name": "Loops",
-                    "colour": "#36e82a",
+                    "colour": "#5ba55b",
                     "contents": [
                         {
                             "type": "for_X_times",
@@ -293,8 +301,8 @@
                 },
                 {
                     "kind": "category",
-                    "name": "Conditions",
-                    "colour": "#0b6b0c",
+                    "name": "Logic",
+                    "colour": "#5b80a5",
                     "contents": [
                         {
                             "type": "if_do",
@@ -321,9 +329,24 @@
             "numberSpecial": 5
         },
         "workspaceBlocks": [
-            "movement",
-            "numberSpecial",
-            "textSpecial"
+            {
+                "id": "movement",
+                "opts": {
+                    "isDeletable": false
+                }
+            },
+            {
+                "id": "math_number"
+            },
+            {
+                "id": "math_number"
+            },
+            {
+                "id": "for_X_times"
+            },
+            {
+                "id": "changeStatus"
+            }
         ]
     }
 }

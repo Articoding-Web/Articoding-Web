@@ -1,14 +1,14 @@
 import { Direction } from "../types/Direction";
-import config from "../config"
+import config from "../../config"
 import { GridPhysics } from "./GridPhysics";
-import ChestObject from "./ChestObject";
 
 export class Player {
     private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
     private movementDirection: Direction = Direction.NONE;  // Always none except when moving
     private steps: number = 0;
     private playerDir : number = 0; //por defecto la ranita mira "abajo" down/left/up/right
-    private collidingWith: ChestObject = undefined; // TODO: cambiar esto por obj. general / interfaz
+    private isAlive = true;
+    private collectedChest = false;
 
     constructor(
         private sprite: Phaser.GameObjects.Sprite,
@@ -20,14 +20,12 @@ export class Player {
     }
 
     private addEventListeners() {
-        this.sprite.scene.events.on("moveOrder", (steps: number, direction: Direction) => {
-            console.log("received move");
-            this.steps = steps;
-            this.movePlayer(direction);
+        document.addEventListener("move", e => {
+            const data = (<CustomEvent>e).detail;
+            this.steps = 1;
+            this.movePlayer(Direction[data["direction"]]);
         });
         this.sprite.scene.events.on("rotateOrder", (direction: Direction) => {
-            console.log(`received rotate order: in ${direction}`);
-
             this.rotatePlayer(direction);
         });
     }
@@ -71,6 +69,7 @@ export class Player {
             onComplete: (--this.steps > 0) ? this.movePlayer.bind(this, this.movementDirection) : this.stopMoving.bind(this),
         })
     }
+    
     private stopMoving(): void {
         this.stopAnimation();
         this.movementDirection = Direction.NONE;
@@ -114,7 +113,7 @@ export class Player {
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION,
+            duration: config.MOVEMENT_ANIMDURATION / 2,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopAnimation.bind(this)
@@ -122,32 +121,31 @@ export class Player {
     }
 
     movePlayer(direction: Direction): void {
-        if (this.steps == 0)
+        if (this.steps == 0 || !this.isAlive || this.collectedChest)
             return;
 
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
             this.startAnimation(direction);
             this.bounceAnimation(direction);
         } else {
-            this.setCollidingObject(undefined);
             this.startMoving(direction);
             this.gridPhysics.collide(this);
         }
-        
     }
 
-    setCollidingObject(obj: ChestObject) { 
-        this.collidingWith = obj;
+    getIsAlive(): Boolean {
+        return this.isAlive;
     }
 
-    getCollidingObject() : ChestObject {
-        return this.collidingWith;
+    hasCollectedChest(): Boolean {
+        return this.collectedChest;
     }
 
-    // update(delta: number) {
-    //     if (this.isMoving()) {
-    //         this.updatePlayerPosition(delta);
-    //     }
-    //     this.lastMovementIntent = Direction.NONE;
-    // }
+    kill() {
+        this.isAlive = false;
+    }
+    
+    collectChest() {
+        this.collectedChest = true;
+    }
 }
