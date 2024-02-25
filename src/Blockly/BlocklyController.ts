@@ -1,136 +1,132 @@
 import * as Blockly from "blockly";
-import * as block_code from "./Workspace/block_code";
+import * as block_code from "./javascript/block_code";
 
 import { javascriptGenerator } from "blockly/javascript";
-
-import blocks from "./Workspace/blocks";
+import blocks from "./Blocks/blocks";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
+import { BlockCode } from "./types/BlockCode";
+import config from "../config";
 
 export default class BlocklyController {
-  blocklyArea = globalThis.blocklyArea;
-  blocklyDiv = globalThis.blocklyDiv;
-  isVisible: boolean = false;
   startBlock: Blockly.BlockSvg;
   workspace: Blockly.WorkspaceSvg;
+  code: BlockCode[];
+
+  blocklyEvents = [
+    Blockly.Events.BLOCK_CHANGE,
+    Blockly.Events.BLOCK_CREATE,
+    Blockly.Events.BLOCK_DELETE,
+    Blockly.Events.BLOCK_MOVE,
+  ];
 
   // TODO: Eliminar numero magico
   blockOffset = 50;
 
-  constructor(toolbox: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
-    this.workspace = Blockly.inject(this.blocklyDiv, { toolbox, maxInstances});
+  constructor(container: string | Element, toolbox: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+    this.workspace = Blockly.inject(container, { toolbox, maxInstances });
+
+    const blocklyArea = document.getElementById('blocklyArea');
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    const onresize = () => {
+      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+      Blockly.svgResize(this.workspace);
+    };    
+
+    window.addEventListener('resize', onresize, false);
+    onresize();
+
     Blockly.defineBlocksWithJsonArray(blocks);
 
     this.startBlock = this.workspace.newBlock('start');
     this.startBlock.initSvg();
     this.startBlock.render();
+    this.startBlock.setDeletable(false);
+    this.startBlock
     this.startBlock.moveBy(this.blockOffset, this.blockOffset);
 
     let offset = this.blockOffset;
-    for (let x in workspaceBlocks) {
+    for (let workspaceBlock of workspaceBlocks) {
       offset += this.blockOffset;
-      const block = this.workspace.newBlock(workspaceBlocks[x]);
+
+      // Create block
+      const block = this.workspace.newBlock(workspaceBlock.id);
       block.initSvg();
       block.render();
       block.moveBy(this.blockOffset, offset);
+
+      // Process block options
+      if (workspaceBlock.opts?.isDeletable !== undefined)
+        block.setDeletable(workspaceBlock.opts.isDeletable);
     }
 
+    javascriptGenerator.init(this.workspace);
     block_code.defineAllBlocks();
+
+    this.workspace.addChangeListener(event => {
+      if (this.workspace.isDragging()) return; // Don't update while changes are happening.
+      if (!this.blocklyEvents.includes(event.type)) return;
+      this.code = this.generateCode();
+    });
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+  }
+
+  highlightBlock(id: string | null) {
+    this.workspace.highlightBlock(id);
+  }
+
+  generateCode(): BlockCode[] {
+    let nextBlock = this.startBlock.getNextBlock();
+    let code = [];
+
+    while (nextBlock) {
+      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
+
+      if(Array.isArray(blockCode)) {
+        for(let innerBlockCode of blockCode)
+          code.push(<BlockCode>innerBlockCode);
+      } else 
+        code.push(<BlockCode>blockCode);
+      
+      nextBlock = nextBlock.getNextBlock();
+    }
+    return code;
   }
 
   destroy() {
     this.workspace.dispose();
   }
 
-  // constructor(removeBlocks: string[], removeCategories: string[]) {
-  //   //this.workspace = Blockly.inject(this.blocklyDiv,{toolbox});
-  //   let updatedToolbox = this.loadToolBox(removeBlocks, removeCategories);
-  //   console.log(updatedToolbox === toolbox);
-  //   this.workspace = Blockly.inject(this.blocklyDiv, {toolbox: updatedToolbox});
-  //   Blockly.defineBlocksWithJsonArray(blocks);
-  //   this.startBlock = this.workspace.newBlock('start');
-  //   this.startBlock.initSvg();
-  //   this.startBlock.render();
-  //   this.workspace.centerOnBlock(this.startBlock.id);
-  //   block_code.defineAllBlocks();
+  runCode() {
+    let index = 0;
+    const executeNextBlock = () => {
+      if (index < this.code.length) {
+        let code = this.code[index];
+        this.highlightBlock(code.blockId);
 
-  // }
-
-  //YA FUNCIONA SE ELIMINAN BLOQUES Y CATEGORIAS SIUUUUUUU
-  //vamos a especificar que bloques se pueden usar en el workspace
-  // loadToolBox(categories_to_remove: string[], blocks_to_remove: string[]): object {
-  //   let updated_toolbox: any = JSON.parse(JSON.stringify(toolbox));
-
-  //   for (let i = 0; i < updated_toolbox.contents.length; i++) {
-  //     if (updated_toolbox.contents[i].kind === 'category') {
-  //       let category_contents: any = updated_toolbox.contents[i].contents;
-  //       for (let j = 0; j < category_contents.length; j++) {
-  //         if (blocks_to_remove.indexOf(category_contents[j].type) !== -1) {
-  //           category_contents.splice(j, 1);
-  //           j--;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   for (let i = 0; i < updated_toolbox.contents.length; i++) {
-  //     if (updated_toolbox.contents[i].kind === 'category') {
-  //       if (updated_toolbox.contents[i].contents.length == 0 || categories_to_remove.indexOf(updated_toolbox.contents[i].name) !== -1) {
-  //         // found in remove list or the category is empty after block removal
-  //         updated_toolbox.contents.splice(i, 1);
-  //         i--;
-  //       }
-  //     }
-  //   }
-  //   console.log(updated_toolbox);
-  //   return updated_toolbox;
-  // }
-
-  // jsonToXml(jsonObj) {
-  //   let xml = '';
-  //   for (let prop in jsonObj) {
-  //     if (!jsonObj.hasOwnProperty(prop)) {
-  //       continue;
-  //     }
-
-  //     if (jsonObj[prop] == undefined) {
-  //       continue;
-  //     }
-
-  //     xml += "<" + prop + ">";
-  //     if (typeof jsonObj[prop] === "object") {
-  //       xml += this.jsonToXml(jsonObj[prop]);
-  //     } else {
-  //       xml += jsonObj[prop];
-  //     }
-  //     xml += "</" + prop + ">";
-  //   }
-  //   return xml;
-  // }
-
-  showWorkspace() {
-    globalThis.blocklyArea.classList.remove("d-none");
-    this.isVisible = true;
-    window.dispatchEvent(new Event("resize"));
-  }
-
-  hideWorkspace() {
-    globalThis.blocklyArea.classList.add("d-none");
-    this.isVisible = false;
-    window.dispatchEvent(new Event("resize"));
-  }
-
-  fetchCode() {
-    let nextBlock = this.startBlock.getNextBlock();
-    let code = [];
-
-    while (nextBlock !== null) {
-      const blockCode = javascriptGenerator.blockToCode(nextBlock, true);
-
-      code.push(blockCode);
-
-      nextBlock = nextBlock.getNextBlock();
-    }
-    console.log("the code is: ", code);
-    return code;
+        let times = 0;
+        const emitEvent = (eventName: string, eventData) => {
+          if(times < (code.times || 1)) {
+            const event = new CustomEvent(eventName, { detail: eventData});
+            document.dispatchEvent(event);
+            times++
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION, eventName, eventData);
+          } else {
+            index++;
+            executeNextBlock();
+          }
+        }
+        emitEvent(code.eventName, code.data);
+      } else {
+        // Finished code execution
+        this.highlightBlock(null);
+        const event = new CustomEvent("execution-finished");
+        document.dispatchEvent(event);
+      }
+    };
+    executeNextBlock();
   }
 }

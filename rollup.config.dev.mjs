@@ -18,7 +18,7 @@ export default [
     output: {
       file: "./public/client.js",
       name: "client",
-      format: "iife",
+      format: "es",
       sourcemap: true,
     },
 
