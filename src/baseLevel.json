@@ -1,10 +1,10 @@
 {
     "phaser": {
-        "width": 6,
-        "height": 6,
+        "width": 5,
+        "height": 4,
         "theme": "default",
-        "layers": {
-            "background": {
+        "layers" : {
+            "background" : {
                 "spriteSheet": "background",
                 "spriteSheetType": "multi",
                 "objects": [
@@ -82,37 +82,6 @@
                     {
                         "x": 0,
                         "y": 2,
-                        "spriteIndex": "10",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 1,
-                        "y": 2,
-                        "spriteIndex": "11"
-                    },
-                    {
-                        "x": 2,
-                        "y": 2,
-                        "spriteIndex": "12"
-                    },
-                    {
-                        "x": 3,
-                        "y": 2,
-                        "spriteIndex": "13"
-                    },
-                    {
-                        "x": 4,
-                        "y": 2,
-                        "spriteIndex": "14",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 0,
-                        "y": 3,
                         "spriteIndex": "15",
                         "properties": {
                             "collides": true
@@ -120,22 +89,22 @@
                     },
                     {
                         "x": 1,
-                        "y": 3,
+                        "y": 2,
                         "spriteIndex": "16"
                     },
                     {
                         "x": 2,
-                        "y": 3,
+                        "y": 2,
                         "spriteIndex": "17"
                     },
                     {
                         "x": 3,
-                        "y": 3,
+                        "y": 2,
                         "spriteIndex": "18"
                     },
                     {
                         "x": 4,
-                        "y": 3,
+                        "y": 2,
                         "spriteIndex": "19",
                         "properties": {
                             "collides": true
@@ -143,7 +112,7 @@
                     },
                     {
                         "x": 0,
-                        "y": 4,
+                        "y": 3,
                         "spriteIndex": "20",
                         "properties": {
                             "collides": true
@@ -151,31 +120,22 @@
                     },
                     {
                         "x": 1,
-                        "y": 4,
-                        "spriteIndex": "21",
-                        "properties": {
-                            "collides": true
-                        }
+                        "y": 3,
+                        "spriteIndex": "21"
                     },
                     {
                         "x": 2,
-                        "y": 4,
-                        "spriteIndex": "22",
-                        "properties": {
-                            "collides": true
-                        }
+                        "y": 3,
+                        "spriteIndex": "22"
                     },
                     {
                         "x": 3,
-                        "y": 4,
-                        "spriteIndex": "23",
-                        "properties": {
-                            "collides": true
-                        }
+                        "y": 3,
+                        "spriteIndex": "23"
                     },
                     {
                         "x": 4,
-                        "y": 4,
+                        "y": 3,
                         "spriteIndex": "24",
                         "properties": {
                             "collides": true
@@ -184,52 +144,24 @@
                 ],
                 "depth": 0
             },
-            "players": {
+            "players" : {
                 "spriteSheet": "player",
                 "spriteSheetType": "multi",
                 "objects": [
                     {
-                        "x": 2,
-                        "y": 3
+                        "x": 1,
+                        "y": 2
                     }
                 ],
                 "depth": 2
             },
-            "objects": [
-                {
-                    "spriteSheet": "trap",
-                    "spriteSheetType": "multi",
-                    "objects": [
-                        {
-                            "x": 3,
-                            "y": 1,
-                            "type": "trap"
-                        }
-                    ],
-                    "depth": 1
-                },
-                {
-                    "spriteSheet": "enemy",
-                    "spriteSheetType": "multi",
-                    "objects": [
-                        {
-                            "x": 2,
-                            "y": 2
-                        }
-                    ],
-                    "depth": 1
-                },
+            "objects" : [
                 {
                     "spriteSheet": "chest",
                     "spriteSheetType": "img",
                     "objects": [
                         {
                             "x": 3,
-                            "y": 3,
-                            "type": "chest"
-                        },
-                        {
-                            "x": 2,
                             "y": 1,
                             "type": "chest"
                         }
@@ -246,7 +178,7 @@
                 {
                     "kind": "category",
                     "name": "Actions",
-                    "colour": "#745ba5",
+                    "colour": "#a5a55b",
                     "contents": [
                         {
                             "type": "movement",
@@ -279,7 +211,7 @@
                     "colour": "#0d44ba",
                     "contents": [
                         {
-                            "type": "math_number",
+                            "type": "numberSpecial",
                             "kind": "block"
                         }
                     ]
@@ -287,7 +219,7 @@
                 {
                     "kind": "category",
                     "name": "Loops",
-                    "colour": "#5ba55b",
+                    "colour": "#36e82a",
                     "contents": [
                         {
                             "type": "for_X_times",
@@ -301,8 +233,8 @@
                 },
                 {
                     "kind": "category",
-                    "name": "Logic",
-                    "colour": "#5b80a5",
+                    "name": "Conditions",
+                    "colour": "#0b6b0c",
                     "contents": [
                         {
                             "type": "if_do",
@@ -324,29 +256,9 @@
                 }
             ]
         },
-        "maxInstances": {
-            "start": 1,
-            "numberSpecial": 5
-        },
         "workspaceBlocks": [
-            {
-                "id": "movement",
-                "opts": {
-                    "isDeletable": false
-                }
-            },
-            {
-                "id": "math_number"
-            },
-            {
-                "id": "math_number"
-            },
-            {
-                "id": "for_X_times"
-            },
-            {
-                "id": "changeStatus"
-            }
+            "movement",
+            "numberSpecial"
         ]
     }
 }
