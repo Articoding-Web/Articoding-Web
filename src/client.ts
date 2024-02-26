@@ -1,12 +1,8 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
 import LevelPlayer from "./Phaser/scenes/LevelPlayer";
-import LevelEditor from "./Phaser/scenes/LevelEditor";
-
 // Temp
 import level from './baseLevel.json';
-
-
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let blocklyController: BlocklyController;
@@ -24,6 +20,20 @@ export function startLevel(level) {
   blocklyController = new BlocklyController(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 
+//esta tiene que ser asincrona para poder hacer el fetch
+export async function startLevelById(levelId: number) {
+  try {
+    const response = await fetch(`http://localhost:3001/api/level/${levelId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const level = await response.json();
+
+    startLevel(level);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
 export function editLevel() {
   phaserController = new PhaserController("LevelEditor", LevelEditor);
 }

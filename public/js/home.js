@@ -129,6 +129,16 @@ async function loadCategoryLevels(event) {
 }
 
 /**
+ * Fetches a level by its ID and starts it
+ * @param {String} levelId - The ID of the level to start
+ */
+async function startLevelById(levelId) {
+  let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
+  document.getElementById("content").innerHTML = getLevelPlayerHTML();
+  startLevel(level);
+}
+
+/**
  * 
  * @param {Event} event 
  * Gets community levels from DB and shows them on screen
@@ -162,9 +172,9 @@ async function playLevel(event) {
   let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
 
   document.getElementById("content").innerHTML = getLevelPlayerHTML();
+  document.getElementById("content").setAttribute("data-level-id", level.id);
   startLevel(level);
 }
-
 /**
  * 
  * @returns String of HTMLElement for LevelPlayer
