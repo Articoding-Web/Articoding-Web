@@ -1,11 +1,11 @@
-"use strict"
+"use strict";
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
 /**
- * 
+ *
  * @param {URL} endpoint endpoint where the call should be made
- * @param {String} method "GET" is the only method supported 
+ * @param {String} method "GET" is the only method supported
  * @returns json response
  */
 async function fetchRequest(endpoint, method) {
@@ -19,13 +19,13 @@ async function fetchRequest(endpoint, method) {
 }
 
 /**
- * 
- * @param {HTMLDivElement} divElement where the items generated are appended 
+ *
+ * @param {HTMLDivElement} divElement where the items generated are appended
  * @param {Array} items items used to generate html that is inserted
  * @param {Function} htmlGenerator html string generator to process items and generate html
  */
 async function fillContent(divElement, items, htmlGenerator) {
-  divElement.innerHTML = '';
+  divElement.innerHTML = "";
   for (let item of items) {
     divElement.insertAdjacentHTML("beforeend", await htmlGenerator(item));
   }
@@ -48,16 +48,21 @@ async function setNavbarListeners() {
   // TODO: Manual
 
   // Community Levels
-  document.getElementById("community").addEventListener("click", loadCommunityLevels);
+  document
+    .getElementById("community")
+    .addEventListener("click", loadCommunityLevels);
 }
 
 /**
- * 
+ *
  * @param {Object} category category with id, name, levels and description
  * @returns String of HTMLDivElement
  */
 async function generateCategoryDiv(category) {
-  category.levels = await fetchRequest(`${API_ENDPOINT}/level/countByCategory/${category.id}`, "GET");
+  category.levels = await fetchRequest(
+    `${API_ENDPOINT}/level/countByCategory/${category.id}`,
+    "GET"
+  );
   return `<div class="col">
             <a class="category" href="${API_ENDPOINT}/level/levelsByCategory/${category.id}">
               <div class="card border-dark d-flex flex-column h-100">
@@ -80,7 +85,10 @@ async function generateCategoryDiv(category) {
  */
 async function loadCategories() {
   const divElement = document.getElementById("categories");
-  const categories = await fetchRequest(`${API_ENDPOINT}/level/categories`, "GET");
+  const categories = await fetchRequest(
+    `${API_ENDPOINT}/level/categories`,
+    "GET"
+  );
 
   await fillContent(divElement, categories, generateCategoryDiv);
 
@@ -90,7 +98,7 @@ async function loadCategories() {
 }
 
 /**
- * 
+ *
  * @param {Object} level with id, title, etc
  * @returns String of HTMLDivElement
  */
@@ -110,7 +118,7 @@ async function generateLevelDiv(level) {
 }
 
 /**
- * 
+ *
  * @param {Event} event
  * Gets levels of a category from DB and shows them on screen
  */
@@ -119,7 +127,10 @@ async function loadCategoryLevels(event) {
   const anchorTag = event.target.closest("a.category");
 
   const id = anchorTag.href.split("/level/levelsByCategory/")[1];
-  const levels = await fetchRequest(`${API_ENDPOINT}/level/levelsByCategory/${id}`, "GET");
+  const levels = await fetchRequest(
+    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+    "GET"
+  );
 
   const divElement = document.getElementById("categories");
 
@@ -132,8 +143,8 @@ async function loadCategoryLevels(event) {
 }
 
 /**
- * 
- * @param {Event} event 
+ *
+ * @param {Event} event
  * Gets community levels from DB and shows them on screen
  */
 async function loadCommunityLevels() {
@@ -156,7 +167,8 @@ async function loadCommunityLevels() {
  */
 (async function () {
   // Create row
-  document.getElementById("content").innerHTML = '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2" id="categories"></div>';
+  document.getElementById("content").innerHTML =
+    '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2" id="categories"></div>';
 
   setNavbarListeners();
   loadCategories();

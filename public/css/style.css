@@ -3,12 +3,12 @@
     width: 100%;
 }
 
-a, span {
+a, span.icon {
     color: white;
     text-decoration: none;
 }
 
-span:hover, a:hover {
+span.icon:hover, a:hover {
     color: white;
     text-decoration: none;
     cursor: pointer;
@@ -39,7 +39,7 @@ span:hover, a:hover {
     background-color: whitesmoke;
     border-style: none;
     margin: 1.5rem;
-    border-radius: 2rem;
+    border-radius: 0.5rem;
 }
 
 .card:hover {
