@@ -191,6 +191,8 @@ export default class LevelPlayer extends Phaser.Scene {
           const trap = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(trap, obj.x, obj.y);
           trap.setDepth(objectJson.depth);
+          if(obj.properties.enabled)
+            trap.enable();
           this.objects.push(trap);
         } 
         else {

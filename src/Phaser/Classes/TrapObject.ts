@@ -22,12 +22,10 @@ export default class TrapObject extends ArticodingSprite {
 
       if (this.isOn && !turnOn) {
         // Turn off
-        this.anims.playReverse({ key: "trap", duration: config.MOVEMENT_ANIMDURATION });
-        this.isOn = false;
+        this.disable();
       } else if (!this.isOn && turnOn) {
         // Turn on
-        this.anims.play({ key: "trap", duration: config.MOVEMENT_ANIMDURATION });
-        this.isOn = true;
+        this.enable();
       }
     });
   }
@@ -37,5 +35,15 @@ export default class TrapObject extends ArticodingSprite {
       console.log("Player killed");
       player.kill();
     }
+  }
+
+  enable() {
+    this.anims.play({ key: "trap", duration: config.MOVEMENT_ANIMDURATION });
+    this.isOn = true;
+  }
+
+  disable () {
+    this.anims.playReverse({ key: "trap", duration: config.MOVEMENT_ANIMDURATION });
+    this.isOn = false;
   }
 }
