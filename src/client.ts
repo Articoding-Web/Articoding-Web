@@ -1,6 +1,7 @@
 import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
 import LevelPlayer from "./Phaser/scenes/LevelPlayer";
+import LevelEditor from "./Phaser/scenes/LevelEditor";
 // Temp
 import level from './baseLevel.json';
 const BLOCKLY_DIV_ID = "blocklyDiv";
@@ -28,7 +29,9 @@ export async function startLevelById(levelId: number) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const level = await response.json();
-
+    //TODO cambiarlo para que blockly salga tal y como estaba si has fracasado el nivel
+    blocklyController.destroy();
+    phaserController.destroy();
     startLevel(level);
   } catch (error) {
     console.error('Error:', error);

@@ -15,7 +15,7 @@ function launchModal(msg, stars, status) {
                       </div>
                       <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cerrar</button>
-                          <button type="button" class="btn btn-primary" id="nextLevelButton">${status === 0 ? 'Reintentar Nivel' : 'Siguiente Nivel'}</button>
+                          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="nextLevelButton">${status === 0 ? 'Reintentar Nivel' : 'Siguiente Nivel'}</button>
                       </div>
               </div>
           </div>
@@ -44,19 +44,21 @@ document.addEventListener('winConditionModal', function (event) {
     modalElement.addEventListener('shown.bs.modal', function () {
         let btn = document.querySelector('#nextLevelButton');
         btn.addEventListener("click", function() {
-            const contentElement = document.getElementById("content");
-            const levelId = parseInt(contentElement.getAttribute("data-level-id"));
-            
+            let contentElement = document.getElementById("content");
+            let levelId = parseInt(contentElement.getAttribute("data-level-id"));
+            console.log("levelId: ", levelId);
+            levelId+=1;
+            console.log("voy a cargar el nivel con id: " , levelId);
             try {
-                startLevelById(levelId + 1);//TODO refactorizar para que si no lo carga, (porque es el ultimo nivel de la categoria, pase de categoria o algo)
-                document.getElementById("content").setAttribute("data-level-id", levelId+1);
-                //se que esto es overkill, lo cambiare:
-                    let modal = document.getElementById("msgModal");
-                    console.log("modal: ", modal);
-                    if (modal) {
-                      modal.dispose();
-                      //TODO el modal no se va, que perro
-                    }
+                startLevelById(levelId);//TODO refactorizar para que si no lo carga, (porque es el ultimo nivel de la categoria, pase de categoria o algo)
+                document.getElementById("content").setAttribute("data-level-id", levelId);
+                // //se que esto es overkill, lo cambiare:
+                //     let modal = document.getElementById("msgModal");
+                //     console.log("modal: ", modal);
+                //     if (modal) {
+                //       modal.dispose();
+                //       //TODO el modal no se va, que perro
+                //     }
             } catch (error) {
                 console.error(error);
             }

@@ -1,4 +1,5 @@
 import * as Blockly from "blockly";
+import { ZoomToFitControl } from "@blockly/zoom-to-fit";
 import * as block_code from "./javascript/block_code";
 
 import { javascriptGenerator } from "blockly/javascript";
@@ -22,27 +23,48 @@ export default class BlocklyController {
   // TODO: Eliminar numero magico
   blockOffset = 50;
 
-  constructor(container: string | Element, toolbox: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
-    this.workspace = Blockly.inject(container, { toolbox, maxInstances });
+  constructor(
+    container: string | Element,
+    toolbox: string | ToolboxDefinition | Element,
+    maxInstances?: { [blockType: string]: number },
+    workspaceBlocks?: any
+  ) {
+    this.workspace = Blockly.inject(container, {
+      toolbox,
+      maxInstances,
+      zoom: {
+        controls: true,
+        wheel: true,
+        startScale: 1.0,
+        maxScale: 3,
+        minScale: 0.3,
+        scaleSpeed: 1.2,
+        pinch: true,
+      },
+    });
 
-    const blocklyArea = document.getElementById('blocklyArea');
-    const blocklyDiv = document.getElementById('blocklyDiv');
+    // Initialize plugin.
+    const zoomToFit = new ZoomToFitControl(this.workspace);
+    zoomToFit.init();
+
+    const blocklyArea = document.getElementById("blocklyArea");
+    const blocklyDiv = document.getElementById("blocklyDiv");
     const onresize = () => {
-      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
-      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+      blocklyDiv.style.width = blocklyArea.offsetWidth + "px";
+      blocklyDiv.style.height = blocklyArea.offsetHeight + "px";
       Blockly.svgResize(this.workspace);
-    };    
+    };
 
-    window.addEventListener('resize', onresize, false);
+    window.addEventListener("resize", onresize, false);
     onresize();
 
     Blockly.defineBlocksWithJsonArray(blocks);
 
-    this.startBlock = this.workspace.newBlock('start');
+    this.startBlock = this.workspace.newBlock("start");
     this.startBlock.initSvg();
     this.startBlock.render();
     this.startBlock.setDeletable(false);
-    this.startBlock
+    this.startBlock;
     this.startBlock.moveBy(this.blockOffset, this.blockOffset);
 
     let offset = this.blockOffset;
@@ -63,7 +85,7 @@ export default class BlocklyController {
     javascriptGenerator.init(this.workspace);
     block_code.defineAllBlocks();
 
-    this.workspace.addChangeListener(event => {
+    this.workspace.addChangeListener((event) => {
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
       this.code = this.generateCode();
@@ -83,14 +105,15 @@ export default class BlocklyController {
     let code = [];
 
     while (nextBlock) {
-      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
+      const blockCode = JSON.parse(
+        javascriptGenerator.blockToCode(nextBlock, true)
+      );
 
-      if(Array.isArray(blockCode)) {
-        for(let innerBlockCode of blockCode)
+      if (Array.isArray(blockCode)) {
+        for (let innerBlockCode of blockCode)
           code.push(<BlockCode>innerBlockCode);
-      } else 
-        code.push(<BlockCode>blockCode);
-      
+      } else code.push(<BlockCode>blockCode);
+
       nextBlock = nextBlock.getNextBlock();
     }
     return code;
@@ -109,16 +132,21 @@ export default class BlocklyController {
 
         let times = 0;
         const emitEvent = (eventName: string, eventData) => {
-          if(times < (code.times || 1)) {
-            const event = new CustomEvent(eventName, { detail: eventData});
+          if (times < (code.times || 1)) {
+            const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
-            times++
-            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION, eventName, eventData);
+            times++;
+            setTimeout(
+              emitEvent,
+              config.MOVEMENT_ANIMDURATION,
+              eventName,
+              eventData
+            );
           } else {
             index++;
             executeNextBlock();
           }
-        }
+        };
         emitEvent(code.eventName, code.data);
       } else {
         // Finished code execution

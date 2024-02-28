@@ -65,14 +65,8 @@ export class Player {
             x: newPlayerPos.x,
             y: newPlayerPos.y,
             duration: config.MOVEMENT_ANIMDURATION,
-            ease: "Sine.inOut",
-            onComplete: (--this.steps > 0) ? this.movePlayer.bind(this, this.movementDirection) : this.stopMoving.bind(this),
+            ease: "Sine.inOut"
         })
-    }
-    
-    private stopMoving(): void {
-        this.stopAnimation();
-        this.movementDirection = Direction.NONE;
     }
 
     getPosition(): Phaser.Math.Vector2 {
@@ -83,17 +77,8 @@ export class Player {
         this.sprite.setPosition(position.x, position.y);
     }
 
-    stopAnimation() {
-        this.sprite.anims.stop();
-
-        // Set new idle frame
-        const animationManager = this.sprite.anims.animationManager;
-        const standingFrame = animationManager.get(this.facingDirections[this.playerDir]).frames[0].frame.name;
-        this.sprite.setFrame(standingFrame);
-    }
-
     startAnimation(direction: Direction) {
-        this.sprite.anims.play(direction);
+        this.sprite.anims.play({key: direction, duration: config.MOVEMENT_ANIMDURATION});
     }
 
     getTilePos(): Phaser.Math.Vector2 {
@@ -115,8 +100,7 @@ export class Player {
             y: newPlayerPos.y,
             duration: config.MOVEMENT_ANIMDURATION / 2,
             ease: "Sine.inOut",
-            yoyo: true,
-            onComplete: this.stopAnimation.bind(this)
+            yoyo: true
         })
     }
 
@@ -128,7 +112,9 @@ export class Player {
             this.startAnimation(direction);
             this.bounceAnimation(direction);
         } else {
-            this.startMoving(direction);
+            this.movementDirection = direction;
+            this.startAnimation(direction);
+            this.movePlayerSprite();
             this.gridPhysics.collide(this);
         }
     }
