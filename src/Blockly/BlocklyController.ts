@@ -120,7 +120,7 @@ export default class BlocklyController {
   }
 
   destroy() {
-    this.workspace.dispose();
+        this.workspace.dispose();
   }
 
   runCode() {
