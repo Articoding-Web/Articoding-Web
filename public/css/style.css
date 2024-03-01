@@ -23,7 +23,8 @@ span:hover, a:hover {
     z-index: 1;
     width: 100%;
     border-bottom-left-radius: 0.75rem;
-    box-shadow: 0rem 0rem 1rem black;
+    box-shadow: 0rem 0rem 0.5rem black;
+    opacity: 0.85;
 }
 
 .below {
@@ -39,7 +40,7 @@ span:hover, a:hover {
     background-color: whitesmoke;
     border-style: none;
     margin: 1.5rem;
-    border-radius: 2rem;
+    border-radius: 0.5rem;
 }
 
 .card:hover {
