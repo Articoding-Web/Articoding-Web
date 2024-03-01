@@ -57,7 +57,7 @@ async function setNavbarListeners() {
  */
 async function generateCategoryDiv(category) {
   return `<div class="col">
-            <a class="category" href="${API_ENDPOINT}/level/levelsByCategory/${category.id}">
+            <a class="category" href="category/${category.id}">
               <div class="card border-dark d-flex flex-column h-100">
                   <h5 class="card-header card-title text-dark">
                     ${category.name}
@@ -73,17 +73,42 @@ async function generateCategoryDiv(category) {
           </div>`;
 }
 
+function generateCategoryDivPlaceholder() {
+  return `<div class="col placeholder-col">
+            <div class="card border-dark d-flex flex-column h-100">
+                <h5 class="card-header card-title text-dark">
+                    <span class="placeholder col-6 bg-secondary"></span>
+                </h5>
+                <div class="card-body text-dark">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        Niveles: <span class="placeholder col-1 bg-secondary"></span>
+                    </h6>
+                    <p class="card-text placeholder-glow">
+                        <span class="placeholder col-7 bg-secondary"></span>
+                        <span class="placeholder col-4 bg-secondary"></span>
+                        <span class="placeholder col-4 bg-secondary"></span>
+                        <span class="placeholder col-6 bg-secondary"></span>
+                        <span class="placeholder col-8 bg-secondary"></span>
+                    </p>
+                </div>
+            </div>
+          </div>`
+}
+
 /**
  * Gets categories from DB and shows them on screen
  */
 async function loadCategories() {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
+
+  // Load placeholders
+  await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
+
   const categories = await fetchRequest(
     `${API_ENDPOINT}/level/categories`,
     "GET"
   );
-
   await fillContent(divElement, categories, generateCategoryDiv);
 
   document.querySelectorAll("a.category").forEach((anchorTag) => {
@@ -118,32 +143,29 @@ async function generateLevelDiv(level) {
  */
 async function loadCategoryLevels(event) {
   event.preventDefault();
+
   const anchorTag = event.target.closest("a.category");
 
-  const id = anchorTag.href.split("/level/levelsByCategory/")[1];
+  const id = anchorTag.href.split("category/")[1];
+  history.pushState({ id }, "", `category?id=${id}`);
+
+  loadCategoryById(id);
+}
+
+async function loadCategoryById(id) {
+  document.getElementById("content").innerHTML = getRowHTML();
+  
   const levels = await fetchRequest(
     `${API_ENDPOINT}/level/levelsByCategory/${id}`,
     "GET"
   );
-
   const divElement = document.getElementById("categories");
-
   await fillContent(divElement, levels, generateLevelDiv);
 
   // Add getLevel event listener
   document.querySelectorAll("a.getLevel").forEach((level) => {
     level.addEventListener("click", playLevel);
   });
-}
-
-/**
- * Fetches a level by its ID and starts it
- * @param {String} levelId - The ID of the level to start
- */
-async function startLevelById(levelId) {
-  let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
-  document.getElementById("content").innerHTML = getLevelPlayerHTML();
-  startLevel(level);
 }
 
 /**
@@ -174,15 +196,24 @@ async function loadCommunityLevels() {
 async function playLevel(event) {
   event.preventDefault();
   const anchorTag = event.target.closest("a.getLevel");
+  const id = anchorTag.href.split("level/")[1];
+  history.pushState({ id }, "", `level?id=${id}`);
 
-  const levelId = anchorTag.href.split("level/")[1];
+  playLevelById(id);
+}
 
-  let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
+/**
+ * Fetches a level by its ID and starts it
+ * @param {String} id - The ID of the level to start
+ */
+async function playLevelById(id) {
+  let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
 
   document.getElementById("content").innerHTML = getLevelPlayerHTML();
-  document.getElementById("content").setAttribute("data-level-id", level.id);
+  document.getElementById("content").setAttribute("data-level-id", id);
   startLevel(level);
 }
+
 /**
  *
  * @returns String of HTMLElement for LevelPlayer
@@ -270,13 +301,26 @@ function getRowHTML() {
   return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
 }
 
+function popStateHandler(e) {
+  if(e.state !== null) {
+    switch(window.location.pathname) {
+      case "/category":
+        loadCategoryById(e.state.id)
+        break;
+      case "/level":
+        playLevelById(e.state.id);
+    }
+  } else {
+    loadCategories();
+  }
+}
+
 /**
  * init function
  */
 (async function () {
-  // Create row
-  document.getElementById("content").innerHTML = getRowHTML();
-
   setNavbarListeners();
+
+  window.addEventListener("popstate", popStateHandler);
   loadCategories();
 })();
