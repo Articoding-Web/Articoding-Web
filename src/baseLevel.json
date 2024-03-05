@@ -250,15 +250,39 @@
                     "contents": [
                         {
                             "type": "movement",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "This block allows you to move in any direction",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         },
                         {
                             "type": "rotate",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "This block makes the frog rotate left (counterclockwise) or right (clockwise)",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         },
                         {
                             "type": "changeStatus",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "This block changes the status of a door (open or closed) or a trap (up or down)",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         }
                     ]
                 },
@@ -269,7 +293,15 @@
                     "contents": [
                         {
                             "type": "text",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "This block allows you to create text!",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         }
                     ]
                 },
@@ -280,7 +312,15 @@
                     "contents": [
                         {
                             "type": "math_number",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "This block allows you to create and use a number",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         }
                     ]
                 },
@@ -291,11 +331,27 @@
                     "contents": [
                         {
                             "type": "for_X_times",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "This block allows you to repeat whatever is inside any amount of times",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         },
                         {
                             "type": "while_do",
-                            "kind": "block"
+                            "kind": "block",
+                            "icons": {
+                                "comment": {
+                                  "text" : "With this block you can repeat the code inside until the condition shown in this block is no longer true",
+                                  "pinned" : false,
+                                  "height" : 80,
+                                  "width" : 160
+                                }
+                              }
                         }
                     ]
                 },
