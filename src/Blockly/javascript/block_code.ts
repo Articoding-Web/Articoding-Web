@@ -144,4 +144,15 @@ export function defineAllBlocks() {
     // let code = "";
     return doCode;
   };
+  //if (condition) DO 
+  //the condition can vary, so blocks like "entity in position X Y can and should go inside here"
+  javascriptGenerator.forBlock["if_do"] = function (
+    block: Block,
+    generator: Blocks.Generator
+  ): string {
+    const condition = generator.valueToCode(block, "CONDITION", Blocks.ORDER_NONE) as string;
+    const doBlock = generator.statementToCode(block, "DO");
+
+    //TODO @sanord8
+  };
 }
