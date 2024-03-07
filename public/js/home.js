@@ -5,6 +5,26 @@ import { editLevel } from "../client.js";
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
+const registerServiceWorker = async () => {
+  if ("serviceWorker" in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register(
+        "/worker.js",
+        { scope: "/" }
+      );
+      if (registration.installing) {
+        console.log("Service worker installing");
+      } else if (registration.waiting) {
+        console.log("Service worker installed");
+      } else if (registration.active) {
+        console.log("Service worker active");
+      }
+    } catch (error) {
+      console.error(`Registration failed with ${error}`);
+    }
+  }
+};
+
 /**
  *
  * @param {URL} endpoint endpoint where the call should be made
@@ -237,7 +257,7 @@ function getRowHTML() {
 }
 
 /**
- * init function
+ * Init function
  */
 (async function () {
   // Create row
@@ -245,4 +265,5 @@ function getRowHTML() {
 
   setNavbarListeners();
   loadCategories();
+  registerServiceWorker();
 })();
