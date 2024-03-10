@@ -152,6 +152,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createPlayerAnimation(Direction.RIGHT);
     this.createPlayerAnimation(Direction.DOWN);
     this.createPlayerAnimation(Direction.LEFT);
+    this.createDyingAnimation();
   }
 
   createPlayerAnimation(name: string) {
@@ -168,7 +169,14 @@ export default class LevelPlayer extends Phaser.Scene {
       yoyo: true,
     });
   }
-
+createDyingAnimation() {
+  this.anims.create({
+    key: 'dying',
+    frames: this.anims.generateFrameNumbers('player', { start: 10, end: 14 }),
+    frameRate: 10,
+    repeat: 0
+  });
+}
   createObjects() {
     for (let x in this.objectsLayerJson) {
       const objectJson = this.objectsLayerJson[x];

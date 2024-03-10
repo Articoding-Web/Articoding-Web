@@ -122,37 +122,63 @@ export function defineAllBlocks() {
         events += ","
     }
     events += "]"
+    /** IDEA PENDIENTE
+     *     let code = `
+      let startTime = Date.now();
+      while (${condition}) {
+        let currentTime = Date.now();
+        let deltaTime = currentTime - startTime;
+        if (deltaTime > 1000) { // Set your desired delta time here
+          break;
+        }
+        ${doCode}
+      }
+    `;
+     */
 
     return events;
   };
 
-  //While do block
-  javascriptGenerator.forBlock["while_do"] = function (
+  javascriptGenerator.forBlock["if_do"] = function (
     block: Block,
     generator: any
   ) {
-    let condition = generator.valueToCode(
-      block,
-      "CONDITION",
-      javascriptGenerator.ORDER_ATOMIC
-    );
-    let doCode = generator.statementToCode(block, "DO");
-    //////////////////////////////////////////////////////////
-    doCode = generator.addLoopTrap(block, "DO");
-    console.log("loop code: ", doCode);
-    //TODO test & ver si se crea bien la funcion...
-    // let code = "";
-    return doCode;
-  };
-  //if (condition) DO 
-  //the condition can vary, so blocks like "entity in position X Y can and should go inside here"
-  javascriptGenerator.forBlock["if_do"] = function (
-    block: Block,
-    generator: Blocks.Generator
-  ): string {
-    const condition = generator.valueToCode(block, "CONDITION", Blocks.ORDER_NONE) as string;
-    const doBlock = generator.statementToCode(block, "DO");
-
-    //TODO @sanord8
+    let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
+    //TODO @sanord8, estoy en ello---
+    let children = block.getChildren(true);
+    let childBlock;
+    if(children.length === 1 && children[0].type != "math_number")
+      childBlock = children[0];
+    else if(children.length > 1) {
+      childBlock = children[1]
+    }
+  //js allows .map?? maybe test 
+    let childBlockCode = [];
+    while(childBlock) {
+      const blockCode = generator.blockToCode(childBlock, true);
+      childBlockCode.push(blockCode);
+      childBlock = childBlock.getNextBlock();
+    }
+  
+    // Create the event code.
+    let events = `[`;
+    for(let y = 0; y < childBlockCode.length; y++) {
+      events += childBlockCode[y];
+      if(y < childBlockCode.length - 1)
+        events += ","
+    }
+    events += "]"
+  
+    // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
+    let code = {
+      blockId: block.id,
+      eventName: "if_do",
+      data: {
+        condition: condition,
+        events: events
+      }
+    };
+  
+    return JSON.stringify(code);
   };
 }

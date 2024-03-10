@@ -132,6 +132,21 @@ export class Player {
             this.gridPhysics.collide(this);
         }
     }
+//TODO test @sanord8
+    die() {
+        this.sprite.scene.tweens.add({
+            targets: this.sprite,
+            alpha: 0,
+            scale: 0,
+            angle: 360,
+            duration: 2000,
+            onComplete: () => {
+              this.sprite.destroy();
+            }
+          });
+        this.sprite.anims.play('dying', true);
+
+      }
 
     getIsAlive(): Boolean {
         return this.isAlive;
