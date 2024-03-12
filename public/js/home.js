@@ -41,6 +41,9 @@ async function setNavbarListeners() {
   // Official Levels
   document.getElementById("official").addEventListener("click", loadCategories);
 
+  // Profile
+  document.getElementById("profile").addEventListener("click", loadProfile);
+
   // TODO: Manual
   document.getElementById("editor").addEventListener("click", loadLevelEditor);
 
@@ -89,6 +92,34 @@ async function loadCategories() {
   document.querySelectorAll("a.category").forEach((anchorTag) => {
     anchorTag.addEventListener("click", loadCategoryLevels);
   });
+}
+
+/**
+ * Gets user information from DB and shows it on screen
+ */
+async function loadProfile() {
+  document.getElementById("content").innerHTML = getRowHTML();
+  const divElement = document.getElementById("categories");
+  /* const user = await fetchRequest(
+    `${API_ENDPOINT}/user/userById/:id`,
+    "GET"
+  ); */
+
+  const user = {
+    name: "Diego",
+    role: "Estudiante",
+  };
+
+  await fillContent(divElement, user, generateProfile);
+}
+
+/**
+ *
+ * @param {Object} user with name, role
+ * @returns String of HTMLDivElement
+ */
+async function generateLevelDiv(user) {
+  return ``;
 }
 
 /**
