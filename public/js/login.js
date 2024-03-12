@@ -1,3 +1,84 @@
+function sessionCookieValue() {
+  const sessionInfo = getCookieValue("session");
+  if (sessionInfo) {
+    const cleanedSessionInfo = sessionInfo.substring(2);
+    const sessionObject = JSON.parse(cleanedSessionInfo);
+    return sessionObject;
+  } else {
+    return null;
+  }
+}
+
+function getCookieValue(cookieName) {
+  const cookies = document.cookie.split("; ");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.split("=");
+    if (name === cookieName) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+function checkSessionCookie() {
+  const cookies = document.cookie.split("; ");
+  const sessionCookie = cookies.find((cookie) => cookie.startsWith("session="));
+  return sessionCookie !== undefined;
+}
+
+function userLogin() {
+  const userId = document.getElementById("userId").value;
+  const password = document.getElementById("password").value;
+  const postData = {
+    id: userId,
+    password: password,
+  };
+  fetch("http://localhost:3001/api/user/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(postData),
+  })
+    .then((response) => {
+      console.log("Respuesta completa del servidor:", response);
+
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Respuesta JSON del servidor:", data);
+    })
+    .catch((error) => {
+      console.error("Error al realizar la petición:", error);
+    });
+}
+
+function useRegister() {
+  const userName = document.getElementById("userName").value;
+  const userPassword = document.getElementById("userPassword").value;
+
+  const postData = {
+    userName: userName,
+    userPassword: userPassword,
+  };
+
+  fetch("http://localhost:3001/api/user/registro", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(postData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Respuesta del servidor:", data);
+    })
+    .catch((error) => {
+      console.error("Error al realizar la petición:", error);
+    });
+}
+
 function appendLoginModal() {
   let loginModalHtml = `
         <div id="loginModal" class="modal fade" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
@@ -48,35 +129,12 @@ function appendLoginModal() {
       appendRegisterModal();
     });
   }
+
   let loginBtn = document.getElementById("loginReq");
   if (loginBtn) {
-    loginBtn.addEventListener("click", function () {
-      const userId = document.getElementById("userId").value;
-      const password = document.getElementById("password").value;
-      const postData = {
-        id: userId,
-        password: password,
-      };
-      fetch("http://localhost:3001/api/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(postData),
-      })
-        .then((response) => {
-          console.log("Respuesta completa del servidor:", response);
-
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Respuesta JSON del servidor:", data);
-        })
-        .catch((error) => {
-          console.error("Error al realizar la petición:", error);
-        });
-      loginModalInstance.hide();
+    loginBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      userLogin();
     });
   }
 }
@@ -127,31 +185,8 @@ function appendRegisterModal() {
   let registerSubmitBtn = document.getElementById("registerSubmitBtn");
   if (registerSubmitBtn) {
     registerSubmitBtn.addEventListener("click", function (event) {
-      event.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
-
-      const userName = document.getElementById("userName").value;
-      const userPassword = document.getElementById("userPassword").value;
-
-      const postData = {
-        userName: userName,
-        userPassword: userPassword,
-      };
-
-      fetch("http://localhost:3001/api/user/registro", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Respuesta del servidor:", data);
-        })
-        .catch((error) => {
-          console.error("Error al realizar la petición:", error);
-        });
-
+      event.preventDefault();
+      useRegister();
       registerModalInstance.hide();
     });
   }
@@ -160,8 +195,14 @@ function appendRegisterModal() {
 document.addEventListener("DOMContentLoaded", function () {
   let loginBtn = document.getElementById("loginBtn");
   if (loginBtn) {
-    loginBtn.addEventListener("click", function () {
-      appendLoginModal();
+    loginBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      //Comprueba si ya hay sesion
+      if (checkSessionCookie()) {
+        console.log("🚀 ~ sessionCookieValue:", sessionCookieValue());
+      } else {
+        appendLoginModal();
+      }
     });
   }
 });
