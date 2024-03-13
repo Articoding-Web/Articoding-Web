@@ -139,12 +139,13 @@ export class Player {
             alpha: 0,
             scale: 0,
             angle: 360,
-            duration: 2000,
+            duration: 2500,
             onComplete: () => {
+              this.stopAnimation.bind(this)
               this.sprite.destroy();
             }
           });
-        this.sprite.anims.play('dying', true);
+        //this.sprite.anims.play('dying', true);
 
       }
 

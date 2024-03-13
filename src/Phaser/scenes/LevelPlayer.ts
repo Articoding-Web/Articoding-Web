@@ -174,7 +174,7 @@ createDyingAnimation() {
     key: 'dying',
     frames: this.anims.generateFrameNumbers('player', { start: 10, end: 14 }),
     frameRate: 10,
-    repeat: 0
+    repeat: -1
   });
 }
   createObjects() {
@@ -256,6 +256,7 @@ createDyingAnimation() {
     for(let x in this.players){
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasCollectedChest()) {
+        player.die(); 
         const event = new CustomEvent("winConditionModal", { detail: {msg: "Lose", stars: 0, status: 0}});
         document.dispatchEvent(event);
         return;
