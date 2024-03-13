@@ -1,164 +1,94 @@
 import * as Phaser from "phaser";
-
-import { LevelData } from "./Classes/LevelData";
-
-import Board from "./Classes/Board";
-import TileObject from "./Classes/TileObject";
+import Board from "./Classes/EditorBoard";
 import ArticodingObject from "./Classes/ArticodingObject";
 
-const TILE_SIZE = 100;
-const MIN_NUM_TILES = 2;
-const MAX_NUM_TILES = 10;
-const INITIAL_TILES = 5;
+// TODO: eliminar magic numbers
+const NUM_ROWS = 5;
+const NUM_COLS = 5;
 
 export default class LevelEditor extends Phaser.Scene {
-  resizeDialog = <HTMLDivElement>document.getElementById("gridResizeDialog");
-  numRowsInput = <HTMLInputElement>document.getElementById("numRowsInput");
-  numColsInput = <HTMLInputElement>document.getElementById("numColsInput");
-  rows: integer;
-  columns: integer;
-  tiles: TileObject[] = [];
-  frog: Phaser.GameObjects.Sprite;
-  chest: Phaser.GameObjects.Sprite;
-  level: LevelData;
+  selectedIcon: HTMLImageElement;
   board: Board;
-
-  objectX: integer;
-  objectY: integer;
 
   constructor() {
     super("LevelEditor");
   }
 
-  init(level?: LevelData): void {
-    if (level.rows !== undefined) {
-      this.level = level;
-    }
+  init(): void {
+    // TODO: get leveldata  (if passing from player to editor)
   }
 
   preload(): void {
-    this.resizeDialog.classList.remove("d-none");
-    this.rows = this.level ? this.level.rows : INITIAL_TILES;
-    this.columns = this.level ? this.level.columns : INITIAL_TILES;
-    this.setMinMaxNumTiles();
-    this.tiles = [];
-    this.objectX = this.cameras.main.width / 10;
-    this.objectY = this.cameras.main.height / 3;
-
-    // Load froggy
-    this.load.multiatlas(
-      "FrogSpriteSheet",
-      "assets/sprites/FrogSpriteSheet.json",
-      "assets/sprites/"
-    );
-    // Load chest
-    this.load.multiatlas(
-      "BigTreasureChest",
-      "assets/sprites/BigTreasureChest.json",
-      "assets/sprites/"
-    );
-
-    this.load.image("tile", "assets/tiles/tile.png");
+    const themePath = `assets/sprites/default`;
+    this.load.setBaseURL(themePath);
+    this.load.multiatlas("player", "player.json");
+    this.load.image("chest", "chest.png");
+    this.load.multiatlas("trap", "trap.json");
+    this.load.image("wall", "wall.png");
+    this.load.multiatlas("enemy", "enemy.json");
+    this.load.multiatlas("background", "background.json");
   }
 
   create(): void {
-    this.board = new Board();
-    this.frog = new ArticodingObject(
-      this,
-      this.objectX,
-      this.objectY,
-      "FrogSpriteSheet",
-      this.board,
-      "down/SpriteSheet-02.png"
-    );
-    this.chest = new ArticodingObject(
-      this,
-      this.objectX,
-      this.objectY + 100,
-      "BigTreasureChest",
-      this.board,
-      "BigTreasureChest-0.png",
-      true
-    );
+    this.board = new Board(this, NUM_ROWS, NUM_COLS);
 
-    this.createLevel();
-    this.zoom();
+    this.createBackgroundSelectors();
+    this.createObjectSelectors();
 
-    document
-      .getElementById("changeGridSize")
-      .addEventListener("click", (event) => {
-        if (
-          +this.numRowsInput.value > MIN_NUM_TILES ||
-          +this.numRowsInput.value < MAX_NUM_TILES
-        ) {
-          this.rows = +this.numRowsInput.value;
-          this.columns = +this.numColsInput.value;
-          this.board.removeAll();
-          this.createLevel();
-        }
+    document.querySelectorAll(".selector-icon").forEach(icon => {
+      icon.addEventListener("click", (e) => {
+        this.selectedIcon?.classList.remove("border");
+
+        this.selectedIcon = <HTMLImageElement>e.target;
+        this.selectedIcon.classList.add("border");
       });
-
-    this.events.on("shutdown", (event) => {
-      this.resizeDialog.classList.add("d-none");
-    });
+    }, this);
   }
 
-  zoom(): void {
-    this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-      if (deltaY > 0) {
-        var zoom = this.cameras.main.zoom - 0.05;
-        if (zoom > 0.5) this.cameras.main.zoom -= 0.05;
-      }
-      if (deltaY < 0) {
-        var zoom = this.cameras.main.zoom + 0.05;
-        if (zoom < 1.5) this.cameras.main.zoom = zoom;
-      }
-    });
+  createObjectImage(key, frame?): HTMLDivElement  {
+    let col = document.createElement('div');
+    col.classList.add("col", "text-center");
+
+    const url = this.textures.getBase64(key, frame);
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.width = 32 + "px"; // Set width
+    img.style.height = 32 + "px"; // Set height
+    img.id = `selector-${key}`;
+    img.classList.add(frame, "selector-icon", "border-primary", "border-3");
+
+    col.appendChild(img);
+    return col;
   }
 
-  setMinMaxNumTiles(): void {
-    this.numColsInput.setAttribute("min", MIN_NUM_TILES.toString());
-    this.numColsInput.setAttribute("max", MAX_NUM_TILES.toString());
-    this.numColsInput.value = this.columns.toString();
-    this.numRowsInput.setAttribute("min", MIN_NUM_TILES.toString());
-    this.numRowsInput.setAttribute("max", MAX_NUM_TILES.toString());
-    this.numRowsInput.value = this.rows.toString();
-  }
+  createBackgroundSelectors() {
+    let bgSelector = document.querySelector("#pills-background .row");
 
-  createLevel(): void {
-    const SCREEN_WIDTH = this.cameras.main.width;
-    const SCREEN_HEIGHT = this.cameras.main.height;
-    let x = (SCREEN_WIDTH - this.rows * TILE_SIZE) / 2;
-    let y = (SCREEN_HEIGHT - this.columns * TILE_SIZE) / 2;
-
-    let numTiles = this.rows * this.columns;
-
-    if (numTiles < this.tiles.length) {
-      this.frog.setPosition(this.objectX, this.objectY);
-      this.chest.setPosition(this.objectX, this.objectY + 100);
-
-      while (this.tiles.length > numTiles) {
-        this.tiles.pop()?.destroy();
-      }
-    } else if (numTiles > this.tiles.length) {
-      this.frog.setPosition(this.objectX, this.objectY);
-      this.chest.setPosition(this.objectX, this.objectY + 100);
-
-      while (this.tiles.length < numTiles) {
-        const tile = new TileObject(this, 0, 0, "tile");
-        this.tiles.push(tile);
-      }
+    let bgFrameNames = this.textures.get("background").getFrameNames();
+    for(let frame of bgFrameNames) {
+      bgSelector.appendChild(this.createObjectImage("background", frame));
     }
+  }
 
-    this.tiles = Phaser.Actions.GridAlign(this.tiles, {
-      width: this.rows,
-      height: this.columns,
-      cellWidth: TILE_SIZE,
-      cellHeight: TILE_SIZE,
-      x,
-      y,
-    });
+  createObjectSelectors() {
+    let objSelector = document.querySelector("#pills-objects .row");
 
-    this.board.setTiles(this.tiles);
+    // Player
+    objSelector.appendChild(this.createObjectImage("player", 0));
+
+    // Chest
+    objSelector.appendChild(this.createObjectImage("chest"));
+
+    // Trap - disabled
+    objSelector.appendChild(this.createObjectImage("trap", 0));
+
+    // Trap - enabled
+    objSelector.appendChild(this.createObjectImage("trap", "3.png"));
+
+    // Wall
+    objSelector.appendChild(this.createObjectImage("wall"));
+
+    // Enemy
+    objSelector.appendChild(this.createObjectImage("enemy", 0));
   }
 }

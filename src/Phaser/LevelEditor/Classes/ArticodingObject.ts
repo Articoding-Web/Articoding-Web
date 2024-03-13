@@ -1,38 +1,29 @@
 import * as Phaser from "phaser";
-
-import TileObject from "./TileObject";
-import Board from "./Board";
+import LevelEditor from "../LevelEditor";
+import DropZoneTile from "./DropZoneTile";
 
 export default class ArticodingObject extends Phaser.GameObjects.Sprite {
-  allowMultiple: Boolean = false; // allow object to be duplicated or not
   allowDestruction: Boolean = false;
-  frameString: string | number | undefined;
   isOnDropZone: Boolean = false;
   origX: number;
   origY: number;
-  board: Board;
 
   constructor(
-    scene: Phaser.Scene,
+    scene: LevelEditor,
     x: number,
     y: number,
+    scale: number,
     texture: string | Phaser.Textures.Texture,
-    board: Board,
     frame?: string | number | undefined,
-    allowMultiple?: Boolean,
     allowDestruction?: Boolean
   ) {
     super(scene, x, y, texture, frame);
     this.scene = scene;
-    this.frameString = frame;
-    this.allowMultiple = allowMultiple;
     this.origX = x;
     this.origY = y;
-    this.board = board;
     this.allowDestruction = allowDestruction;
 
-    const scaleFactor = Math.min(100 / this.width, 100 / this.height); //TODO change texture
-    this.setScale(scaleFactor);
+    this.setScale(scale);
 
     this.setInteractive();
     this.scene.input.setDraggable(this);
@@ -54,10 +45,6 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDragStart(dropZone) {
     this.scene.children.bringToTop(this);
-    let tile = this.board.findTile(this);
-    if (tile !== undefined) {
-      this.isOnDropZone = true;
-    }
   }
 
   onDragEnter() {
@@ -71,7 +58,7 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
   onDragEnd() {
     if (!this.isOnDropZone) {
       if (this.allowDestruction) {
-        this.board.remove(this);
+        this.destroy();
       } else {
         this.x = this.origX;
         this.y = this.origY;
@@ -79,42 +66,29 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
     }
   }
 
-  onDrop(dropZone: TileObject) {
-    if (this.isOnDropZone && !dropZone.isOccupied()) {
-      this.resetDropZone();
+  onDrop(dropZone: DropZoneTile) {
+    if (this.isOnDropZone) {
+      // Create duplicate
+      const newObj = new ArticodingObject(
+        <LevelEditor>this.scene,
+        dropZone.x,
+        dropZone.y,
+        this.scale,
+        this.texture,
+        this.frame.name,
+        true
+      );
 
-      if (this.allowMultiple) {
-        // Duplicate object as deletable
-        let newObj = new ArticodingObject(
-          this.scene,
-          dropZone.x,
-          dropZone.y,
-          this.texture,
-          this.board,
-          this.frameString,
-          false,
-          true
-        );
-        this.board.addObject(newObj, dropZone);
-        // Reset position
-        // this.x = this.origX; //MAYBE DELETE
-        // this.y = this.origY;
-        this.isOnDropZone = false;
-      } else {
-        // Set position
-        this.board.move(this, dropZone);
-      }
-      // Zone occupied
+      if(this.texture.key === "background")
+        dropZone.setBgSprite(newObj);
+      else
+        dropZone.setObjectSprite(newObj);
+
+      this.isOnDropZone = false;
     } else {
+      // Should never get here?
       this.x = this.origX;
       this.y = this.origY;
-    }
-  }
-
-  resetDropZone() {
-    let tile = this.board.findTile(this);
-    if (tile !== undefined) {
-      tile.object = undefined;
     }
   }
 
