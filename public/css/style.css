@@ -3,12 +3,12 @@
     width: 100%;
 }
 
-a, span {
+a, span.icon {
     color: white;
     text-decoration: none;
 }
 
-span:hover, a:hover {
+span.icon:hover, a:hover {
     color: white;
     text-decoration: none;
     cursor: pointer;

@@ -1,5 +1,86 @@
+function sessionCookieValue() {
+  const sessionInfo = getCookieValue("session");
+  if (sessionInfo) {
+    const cleanedSessionInfo = sessionInfo.substring(2);
+    const sessionObject = JSON.parse(cleanedSessionInfo);
+    return sessionObject;
+  } else {
+    return null;
+  }
+}
+
+function getCookieValue(cookieName) {
+  const cookies = document.cookie.split("; ");
+  for (let cookie of cookies) {
+    const [name, value] = cookie.split("=");
+    if (name === cookieName) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+function checkSessionCookie() {
+  const cookies = document.cookie.split("; ");
+  const sessionCookie = cookies.find((cookie) => cookie.startsWith("session="));
+  return sessionCookie !== undefined;
+}
+
+function userLogin() {
+  const userId = document.getElementById("userId").value;
+  const password = document.getElementById("password").value;
+  const postData = {
+    id: userId,
+    password: password,
+  };
+  fetch("http://localhost:3001/api/user/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(postData),
+  })
+    .then((response) => {
+      console.log("Respuesta completa del servidor:", response);
+
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Respuesta JSON del servidor:", data);
+    })
+    .catch((error) => {
+      console.error("Error al realizar la petición:", error);
+    });
+}
+
+function useRegister() {
+  const userName = document.getElementById("userName").value;
+  const userPassword = document.getElementById("userPassword").value;
+
+  const postData = {
+    userName: userName,
+    userPassword: userPassword,
+  };
+
+  fetch("http://localhost:3001/api/user/registro", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(postData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Respuesta del servidor:", data);
+    })
+    .catch((error) => {
+      console.error("Error al realizar la petición:", error);
+    });
+}
+
 function appendLoginModal() {
-    let loginModalHtml = `
+  let loginModalHtml = `
         <div id="loginModal" class="modal fade" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -20,41 +101,46 @@ function appendLoginModal() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Iniciar Sesión</button>
+                        <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
                         <button type="button" class="btn btn-secondary" id="registerBtn" >¿No tienes cuenta?</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    
-    let loginModal = document.createElement('div');
-    loginModal.innerHTML = loginModalHtml;
-    document.body.appendChild(loginModal);
 
-    let loginModalElement = document.querySelector('#loginModal');
-    let loginModalInstance = new bootstrap.Modal(loginModalElement);
+  let loginModal = document.createElement("div");
+  loginModal.innerHTML = loginModalHtml;
+  document.body.appendChild(loginModal);
 
-    loginModalElement.addEventListener('hidden.bs.modal', function () {
-        loginModalElement.remove();
+  let loginModalElement = document.querySelector("#loginModal");
+  let loginModalInstance = new bootstrap.Modal(loginModalElement);
+
+  loginModalElement.addEventListener("hidden.bs.modal", function () {
+    loginModalElement.remove();
+  });
+
+  loginModalInstance.show();
+
+  let registerBtn = document.getElementById("registerBtn");
+  if (registerBtn) {
+    registerBtn.addEventListener("click", function () {
+      loginModalInstance.hide();
+      appendRegisterModal();
     });
+  }
 
-    loginModalInstance.show();
-
-    // Agrega un event listener para el clic en el botón de registrarse
-    let registerBtn = document.getElementById("registerBtn");
-    if (registerBtn) {
-        registerBtn.addEventListener("click", function() {
-            loginModalInstance.hide();
-            // Abre el modal de registro
-            appendRegisterModal();
-        });
-    }
-
+  let loginBtn = document.getElementById("loginReq");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      userLogin();
+    });
+  }
 }
 
 function appendRegisterModal() {
-    let registerModalHtml = `
+  let registerModalHtml = `
         <div id="registerModal" class="modal fade" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -83,63 +169,40 @@ function appendRegisterModal() {
         </div>
     `;
 
-    let registerModal = document.createElement('div');
-    registerModal.innerHTML = registerModalHtml;
-    document.body.appendChild(registerModal);
+  let registerModal = document.createElement("div");
+  registerModal.innerHTML = registerModalHtml;
+  document.body.appendChild(registerModal);
 
-    let registerModalElement = document.querySelector('#registerModal');
-    let registerModalInstance = new bootstrap.Modal(registerModalElement);
+  let registerModalElement = document.querySelector("#registerModal");
+  let registerModalInstance = new bootstrap.Modal(registerModalElement);
 
-    registerModalElement.addEventListener('hidden.bs.modal', function () {
-        registerModalElement.remove();
+  registerModalElement.addEventListener("hidden.bs.modal", function () {
+    registerModalElement.remove();
+  });
+
+  registerModalInstance.show();
+
+  let registerSubmitBtn = document.getElementById("registerSubmitBtn");
+  if (registerSubmitBtn) {
+    registerSubmitBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      useRegister();
+      registerModalInstance.hide();
     });
-
-    registerModalInstance.show();
-
-    // Agrega un event listener para el clic en el botón de registrarse
-    let registerSubmitBtn = document.getElementById("registerSubmitBtn");
-    if (registerSubmitBtn) {
-        registerSubmitBtn.addEventListener("click", function(event) {
-            event.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
-
-             // Obtiene los valores directamente de los campos del formulario
-             const userName = document.getElementById("userName").value;
-             const userPassword = document.getElementById("userPassword").value;
- 
-             // Construye el objeto de datos para enviar en la solicitud POST
-             const postData = {
-                 userName: userName,
-                 userPassword: userPassword
-             };
-
-            // Realiza la petición POST
-            fetch("http://localhost:3001/api/user/registro", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(postData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Respuesta del servidor:', data);
-            })
-            .catch(error => {
-                console.error('Error al realizar la petición:', error);
-            });
-
-            // Cierra el modal después de realizar la petición
-            registerModalInstance.hide();
-        });
-    }
+  }
 }
 
-// Espera a que el contenido del DOM esté cargado
-document.addEventListener("DOMContentLoaded", function() {
-    let loginBtn = document.getElementById("loginBtn");
-    if (loginBtn) {
-        loginBtn.addEventListener("click", function() {
-            appendLoginModal();
-        });
-    }
+document.addEventListener("DOMContentLoaded", function () {
+  let loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      //Comprueba si ya hay sesion
+      if (checkSessionCookie()) {
+        console.log("🚀 ~ sessionCookieValue:", sessionCookieValue());
+      } else {
+        appendLoginModal();
+      }
+    });
+  }
 });
