@@ -118,7 +118,7 @@ async function loadProfile() {
  * @param {Object} user with name, role
  * @returns String of HTMLDivElement
  */
-async function generateLevelDiv(user) {
+async function generateProfile(user) {
   return ``;
 }
 
