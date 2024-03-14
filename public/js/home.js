@@ -42,7 +42,7 @@ async function setNavbarListeners() {
   document.getElementById("official").addEventListener("click", loadCategories);
 
   // Profile
-  document.getElementById("profile").addEventListener("click", loadProfile);
+  // document.getElementById("profile").addEventListener("click", loadProfile);
 
   // TODO: Manual
   document.getElementById("editor").addEventListener("click", loadLevelEditor);

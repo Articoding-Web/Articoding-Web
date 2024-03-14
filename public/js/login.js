@@ -193,7 +193,7 @@ function appendRegisterModal() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  let loginBtn = document.getElementById("loginBtn");
+  let loginBtn = document.getElementById("profile");
   if (loginBtn) {
     loginBtn.addEventListener("click", function (event) {
       event.preventDefault();
