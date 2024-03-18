@@ -1,29 +1,19 @@
 import * as Phaser from "phaser";
 import LevelEditor from "../LevelEditor";
 import DropZoneTile from "./DropZoneTile";
+import config from "../../../config";
 
 export default class ArticodingObject extends Phaser.GameObjects.Sprite {
-  allowDestruction: Boolean = false;
   isOnDropZone: Boolean = false;
-  origX: number;
-  origY: number;
+  dropZoneTile: DropZoneTile;
 
-  constructor(
-    scene: LevelEditor,
-    x: number,
-    y: number,
-    scale: number,
-    texture: string | Phaser.Textures.Texture,
-    frame?: string | number | undefined,
-    allowDestruction?: Boolean
-  ) {
-    super(scene, x, y, texture, frame);
+  constructor(scene: LevelEditor, dropZoneTile: DropZoneTile, texture: string | Phaser.Textures.Texture, frame?: string | number | undefined) {
+    super(scene, dropZoneTile.x, dropZoneTile.y, texture, frame);
     this.scene = scene;
-    this.origX = x;
-    this.origY = y;
-    this.allowDestruction = allowDestruction;
+    this.dropZoneTile = dropZoneTile;
 
-    this.setScale(scale);
+    const scaleFactor = this.dropZoneTile.width / config.TILE_SIZE;
+    this.setScale(scaleFactor);
 
     this.setInteractive();
     this.scene.input.setDraggable(this);
@@ -57,48 +47,17 @@ export default class ArticodingObject extends Phaser.GameObjects.Sprite {
 
   onDragEnd() {
     if (!this.isOnDropZone) {
-      if (this.allowDestruction) {
-        this.destroy();
-      } else {
-        this.x = this.origX;
-        this.y = this.origY;
-      }
+      this.destroy();
     }
   }
 
   onDrop(dropZone: DropZoneTile) {
-    if (this.isOnDropZone) {
-      // Create duplicate
-      const newObj = new ArticodingObject(
-        <LevelEditor>this.scene,
-        dropZone.x,
-        dropZone.y,
-        this.scale,
-        this.texture,
-        this.frame.name,
-        true
-      );
-
-      if(this.texture.key === "background")
-        dropZone.setBgSprite(newObj);
-      else
-        dropZone.setObjectSprite(newObj);
-
-      this.isOnDropZone = false;
-    } else {
-      // Should never get here?
-      this.x = this.origX;
-      this.y = this.origY;
-    }
-  }
-
-  resetOrDestroy() {
-    // Reset/Destroy object
-    if (this.allowDestruction) {
+    if (!this.isOnDropZone) {
+      this.dropZoneTile.setObjectSprite(undefined);
       this.destroy();
     } else {
-      this.x = this.origX;
-      this.y = this.origY;
+      this.x = this.dropZoneTile.x;
+      this.y = this.dropZoneTile.y;
     }
   }
 }

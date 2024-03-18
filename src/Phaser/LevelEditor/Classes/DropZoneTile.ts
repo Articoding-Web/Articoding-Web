@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser'
 import ArticodingObject from './ArticodingObject';
 import LevelEditor from '../LevelEditor';
+import config from '../../../config';
 
 export default class DropZoneTile extends Phaser.GameObjects.Zone {
   //owned sprite:
@@ -18,6 +19,29 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
     graphics.strokeRect(this.x - this.input.hitArea.width / 2, this.y - this.input.hitArea.height / 2, this.input.hitArea.width, this.input.hitArea.height);
 
     this.scene.add.existing(this);
+
+    this.on("pointerdown", this.clickEvent);
+    this.on('pointerover', this.pointerOverEvent);
+  }
+
+  pointerOverEvent(pointer: Phaser.Input.Pointer) {
+    if(pointer.leftButtonDown())
+      this.clickEvent();
+  }
+
+  clickEvent() {
+    const icon = (<LevelEditor>(this.scene)).getSelectedIcon();
+    if(icon.texture === undefined)
+      return;
+
+    if(icon.texture === "background") {
+      const scaleFactor = this.width / config.TILE_SIZE;
+      const bgObject = this.scene.add.sprite(this.x, this.y, icon.texture, icon.frame);
+      bgObject.setScale(scaleFactor);
+      this.setBgSprite(bgObject);
+    } else {
+      this.setObjectSprite(new ArticodingObject(<LevelEditor>(this.scene), this, icon.texture, icon.frame));
+    }
   }
 
   resize(x: number, y: number, width: number, height: number) {
@@ -64,7 +88,9 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
     }
   }
 
-  setBgSprite(sprite: Phaser.GameObjects.Sprite) {
+  setBgSprite(sprite: Phaser.GameObjects.Sprite | undefined) {
     this.bgSprite = sprite;
+    if(!this.bgSprite)
+      this.objectSprite?.destroy();
   }
 }

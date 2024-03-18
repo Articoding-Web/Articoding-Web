@@ -39,8 +39,12 @@ export default class LevelEditor extends Phaser.Scene {
       icon.addEventListener("click", (e) => {
         this.selectedIcon?.classList.remove("border");
 
-        this.selectedIcon = <HTMLImageElement>e.target;
-        this.selectedIcon.classList.add("border");
+        if(this.selectedIcon?.id === (<HTMLImageElement>e.target).id)
+          this.selectedIcon = undefined;
+        else {
+          this.selectedIcon = <HTMLImageElement>e.target;
+          this.selectedIcon.classList.add("border");
+        }
       });
     }, this);
   }
@@ -54,7 +58,7 @@ export default class LevelEditor extends Phaser.Scene {
     img.src = url;
     img.style.width = 32 + "px"; // Set width
     img.style.height = 32 + "px"; // Set height
-    img.id = `selector-${key}`;
+    img.id = `${key}-${frame}`;
     img.classList.add(frame, "selector-icon", "border-primary", "border-3");
 
     col.appendChild(img);
@@ -74,13 +78,13 @@ export default class LevelEditor extends Phaser.Scene {
     let objSelector = document.querySelector("#pills-objects .row");
 
     // Player
-    objSelector.appendChild(this.createObjectImage("player", 0));
+    objSelector.appendChild(this.createObjectImage("player"));
 
     // Chest
     objSelector.appendChild(this.createObjectImage("chest"));
 
     // Trap - disabled
-    objSelector.appendChild(this.createObjectImage("trap", 0));
+    objSelector.appendChild(this.createObjectImage("trap"));
 
     // Trap - enabled
     objSelector.appendChild(this.createObjectImage("trap", "3.png"));
@@ -89,6 +93,14 @@ export default class LevelEditor extends Phaser.Scene {
     objSelector.appendChild(this.createObjectImage("wall"));
 
     // Enemy
-    objSelector.appendChild(this.createObjectImage("enemy", 0));
+    objSelector.appendChild(this.createObjectImage("enemy"));
+  }
+
+  getSelectedIcon(): {texture: string, frame: string | undefined } {
+    if(!this.selectedIcon) {
+      return {texture: undefined, frame: undefined};
+    }
+    let data = this.selectedIcon.id.split("-");
+    return {texture: data[0], frame: (data[1] === "undefined" ? undefined : data[1])};
   }
 }
