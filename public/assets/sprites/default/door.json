@@ -1,7 +1,7 @@
 {
 	"textures": [
 		{
-			"image": "door.png",
+			"image": "sprites/default/door.png",
 			"format": "RGBA8888",
 			"size": {
 				"w": 27,

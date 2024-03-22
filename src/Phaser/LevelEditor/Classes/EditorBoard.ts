@@ -12,6 +12,11 @@ export default class EditorBoard {
     private numCols: number;
     private scene: Phaser.Scene;
 
+    private rmColBtn: Phaser.GameObjects.Sprite;
+    private addColBtn: Phaser.GameObjects.Sprite;
+    private rmRowBtn: Phaser.GameObjects.Sprite;
+    private addRowBtn: Phaser.GameObjects.Sprite;
+
     constructor(scene: LevelEditor, rows: number, cols: number, tiles?: DropZoneTile[]) {
         this.scene = scene;
         this.numRows = rows;
@@ -36,7 +41,7 @@ export default class EditorBoard {
         const layerHeight = this.numRows * config.TILE_SIZE;
 
         this.scaleFactor = Math.floor((this.scene.cameras.main.height) / layerHeight / 2);
-        this.x = (this.scene.cameras.main.width - layerWidth * this.scaleFactor) / 2;
+        this.x = (this.scene.cameras.main.width - layerWidth * this.scaleFactor) / 2 - layerWidth;
         this.y = (this.scene.cameras.main.height - layerHeight * this.scaleFactor) / 2;
     }
 
@@ -52,17 +57,43 @@ export default class EditorBoard {
     }
 
     private createResizeButtons(): void {
-        const rightCenterCoords = this.getRightCenter();
-        const addColBtn = this.scene.add.sprite(rightCenterCoords.x + 50, rightCenterCoords.y - 50, "+");
-        const rmColBtn = this.scene.add.sprite(rightCenterCoords.x + 50, rightCenterCoords.y + 50, "-");
+        const tlCoords = this.getTopLeft();
 
-        addColBtn.setInteractive().on("pointerdown", () => this.addCol(this.numRows));
+        // Remove column
+        this.rmColBtn = this.scene.add.sprite(0, 0, "red").setInteractive();
+        this.rmColBtn.on("pointerdown", () => this.rmColBtn.setTexture("red-pressed"));
+        this.rmColBtn.on("pointerup", this.removeCol, this);
 
-        const bottomCenterCoords = this.getBottomCenter();
-        const addRowBtn = this.scene.add.sprite(bottomCenterCoords.x + 50, bottomCenterCoords.y + 50, "+");
-        const rmRowBtn = this.scene.add.sprite(bottomCenterCoords.x - 50, bottomCenterCoords.y + 50, "-");
+        const rmColContainer = this.scene.add.container(tlCoords.x + 50, tlCoords.y - 50);
+        rmColContainer.add(this.rmColBtn);
+        rmColContainer.add(this.scene.add.sprite(0, 0, "minus"));
 
-        addRowBtn.setInteractive().on("pointerdown", () => this.addRow(this.numCols));
+        // Add column
+        this.addColBtn = this.scene.add.sprite(0, 0, "green").setInteractive();
+        this.addColBtn.on("pointerdown", () => this.addColBtn.setTexture("green-pressed"));
+        this.addColBtn.on("pointerup", this.addCol, this);
+
+        const addColContainer = this.scene.add.container(tlCoords.x + 150, tlCoords.y - 50);
+        addColContainer.add(this.addColBtn);
+        addColContainer.add(this.scene.add.sprite(0, 0, "plus"));
+
+        // Remove row
+        this.rmRowBtn = this.scene.add.sprite(0, 0, "red").setInteractive();
+        this.rmRowBtn.on("pointerdown", () => this.rmRowBtn.setTexture("red-pressed"));
+        this.rmRowBtn.on("pointerup", this.removeRow, this);
+
+        const rmRowContainer = this.scene.add.container(tlCoords.x - 50, tlCoords.y + 50);
+        rmRowContainer.add(this.rmRowBtn);
+        rmRowContainer.add(this.scene.add.sprite(0, 0, "minus"));
+
+        // Add column
+        this.addRowBtn = this.scene.add.sprite(0, 0, "green").setInteractive();
+        this.addRowBtn.on("pointerdown", () => this.addRowBtn.setTexture("green-pressed"));
+        this.addRowBtn.on("pointerup", this.addRow, this);
+
+        const addRowContainer = this.scene.add.container(tlCoords.x - 50, tlCoords.y + 150);
+        addRowContainer.add(this.addRowBtn);
+        addRowContainer.add(this.scene.add.sprite(0, 0, "plus"));
     }
 
     private getTopLeft(): Phaser.Math.Vector2 {
@@ -76,32 +107,23 @@ export default class EditorBoard {
         return new Phaser.Math.Vector2(tl.x + this.numCols * config.TILE_SIZE * this.scaleFactor, tl.y);
     }
 
-    private getRightCenter(): Phaser.Math.Vector2 {
-        const tl = this.getTopLeft();
-
-        return new Phaser.Math.Vector2(tl.x + this.numCols * config.TILE_SIZE * this.scaleFactor, tl.y + this.numRows / 2 * config.TILE_SIZE * this.scaleFactor);
-    }
-
     private getBottomLeft(): Phaser.Math.Vector2 {
         const tl = this.getTopLeft();
 
         return new Phaser.Math.Vector2(tl.x, tl.y + this.numRows * config.TILE_SIZE * this.scaleFactor);
     }
 
-    private getBottomCenter(): Phaser.Math.Vector2 {
-        const tl = this.getTopLeft();
-
-        return new Phaser.Math.Vector2(tl.x + this.numCols / 2 * config.TILE_SIZE * this.scaleFactor, tl.y + this.numRows * config.TILE_SIZE * this.scaleFactor);
-    }
-
-    private addCol(numRows: number) {
-        console.log("adding col");
+    private addCol() {
+        this.addColBtn.setTexture("green");
+        
+        if(this.numCols >= config.EDITOR_MAX_COLS)
+            return;
 
         const tileOffset = config.TILE_SIZE / 2 * this.scaleFactor;
         const scaledTileSize = config.TILE_SIZE * this.scaleFactor;
         const topRight = this.getTopRight();
 
-        for (let i = 0; i < numRows; i++) {
+        for (let i = 0; i < this.numRows; i++) {
             const tile = new DropZoneTile(this.scene, topRight.x + tileOffset, topRight.y + tileOffset + i * scaledTileSize, scaledTileSize, scaledTileSize);
             this.dropZoneTiles.splice(i * this.numCols + this.numCols - 1, 0, tile);
         }
@@ -109,14 +131,26 @@ export default class EditorBoard {
         this.numCols++;
     }
 
-    private addRow(numCols: number) {
-        console.log("adding row");
+    private removeCol() {
+        this.rmColBtn.setTexture("red");
+
+        if(this.numCols <= config.EDITOR_MIN_COLS)
+            return;
+
+        console.log("removing col");
+    }
+
+    private addRow() {
+        this.addRowBtn.setTexture("green");
+        
+        if(this.numRows >= config.EDITOR_MAX_ROWS)
+            return;
 
         const tileOffset = config.TILE_SIZE / 2 * this.scaleFactor;
         const scaledTileSize = config.TILE_SIZE * this.scaleFactor;
         const bottomLeft = this.getBottomLeft();
 
-        for (let i = 0; i < numCols; i++) {
+        for (let i = 0; i < this.numCols; i++) {
             const tile = new DropZoneTile(this.scene, bottomLeft.x + tileOffset + i * scaledTileSize, bottomLeft.y + tileOffset, scaledTileSize, scaledTileSize);
             this.dropZoneTiles.push(tile);
         }
@@ -124,47 +158,20 @@ export default class EditorBoard {
         this.numRows++;
     }
 
-    removeCol() {
-        this.numCols--;
-        for (let i = 0; i < this.numRows; i++) {
-            this.dropZoneTiles.splice(i * this.numCols + this.numCols, 1);
+    private removeRow() {
+        this.rmRowBtn.setTexture("red");
+
+        if(this.numRows <= config.EDITOR_MIN_ROWS)
+            return;
+
+        console.log("removing row");
+        for(let x = this.numRows * this.numCols; x < this.dropZoneTiles.length; x++) {
+            console.log(x);
         }
-    }
-
-    removeRow() {
-        this.numRows--;
-        for (let i = 0; i < this.numCols; i++) {
-            this.dropZoneTiles.splice(this.numCols * this.numRows, 1);
-        }
-    }
-
-    private autoScale() {
-        
-    }
-    
-    getX(): number {
-        return this.x;
-    }
-
-    getY(): number {
-        return this.y;
     }
 
     toJSON(): Record<any, any> {
-        //TODO pasar nivel actual a JSON siguiendo diseño de Nico
-        return null;
-    }
-
-    getScaleFactor(): number {
-        return this.scaleFactor;
-    }
-
-    getDropZoneAt(x: number, y: number): DropZoneTile {
-        for (const tile of this.dropZoneTiles) {
-            if (tile.contains(x, y)) {
-                return tile;
-            }
-        }
+        // let json = 
         return null;
     }
 }

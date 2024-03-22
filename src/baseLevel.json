@@ -7,152 +7,13 @@
             "background" : {
                 "spriteSheet": "background",
                 "spriteSheetType": "multi",
-                "objects": [
-                    {
-                        "x": 0,
-                        "y": 0,
-                        "spriteIndex": "0",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 1,
-                        "y": 0,
-                        "spriteIndex": "1",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 2,
-                        "y": 0,
-                        "spriteIndex": "2",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 3,
-                        "y": 0,
-                        "spriteIndex": "3",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 4,
-                        "y": 0,
-                        "spriteIndex": "4",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 0,
-                        "y": 1,
-                        "spriteIndex": "5",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 1,
-                        "y": 1,
-                        "spriteIndex": "6"
-                    },
-                    {
-                        "x": 2,
-                        "y": 1,
-                        "spriteIndex": "7"
-                    },
-                    {
-                        "x": 3,
-                        "y": 1,
-                        "spriteIndex": "8"
-                    },
-                    {
-                        "x": 4,
-                        "y": 1,
-                        "spriteIndex": "9",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 0,
-                        "y": 2,
-                        "spriteIndex": "15",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 1,
-                        "y": 2,
-                        "spriteIndex": "16"
-                    },
-                    {
-                        "x": 2,
-                        "y": 2,
-                        "spriteIndex": "17"
-                    },
-                    {
-                        "x": 3,
-                        "y": 2,
-                        "spriteIndex": "18"
-                    },
-                    {
-                        "x": 4,
-                        "y": 2,
-                        "spriteIndex": "19",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 0,
-                        "y": 3,
-                        "spriteIndex": "20",
-                        "properties": {
-                            "collides": true
-                        }
-                    },
-                    {
-                        "x": 1,
-                        "y": 3,
-                        "spriteIndex": "21"
-                    },
-                    {
-                        "x": 2,
-                        "y": 3,
-                        "spriteIndex": "22"
-                    },
-                    {
-                        "x": 3,
-                        "y": 3,
-                        "spriteIndex": "23"
-                    },
-                    {
-                        "x": 4,
-                        "y": 3,
-                        "spriteIndex": "24",
-                        "properties": {
-                            "collides": true
-                        }
-                    }
-                ],
+                "objects": [],
                 "depth": 0
             },
             "players" : {
                 "spriteSheet": "player",
                 "spriteSheetType": "multi",
-                "objects": [
-                    {
-                        "x": 1,
-                        "y": 2
-                    }
-                ],
+                "objects": [],
                 "depth": 2
             },
             "objects" : [
@@ -256,9 +117,6 @@
                 }
             ]
         },
-        "workspaceBlocks": [
-            "movement",
-            "numberSpecial"
-        ]
+        "workspaceBlocks": []
     }
 }

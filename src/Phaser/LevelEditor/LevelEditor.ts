@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 import Board from "./Classes/EditorBoard";
-import ArticodingObject from "./Classes/ArticodingObject";
+import config from "../../config";
 
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
@@ -19,14 +19,21 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   preload(): void {
-    const themePath = `assets/sprites/default`;
-    this.load.setBaseURL(themePath);
-    this.load.multiatlas("player", "player.json");
-    this.load.image("chest", "chest.png");
-    this.load.multiatlas("trap", "trap.json");
-    this.load.image("wall", "wall.png");
-    this.load.multiatlas("enemy", "enemy.json");
-    this.load.multiatlas("background", "background.json");
+    const assetPath = `assets`;
+    this.load.setBaseURL(assetPath);
+    this.load.multiatlas("player", "sprites/default/player.json");
+    this.load.image("chest", "sprites/default/chest.png");
+    this.load.multiatlas("trap", "sprites/default/trap.json");
+    this.load.image("wall", "sprites/default/wall.png");
+    this.load.multiatlas("enemy", "sprites/default/enemy.json");
+    this.load.multiatlas("background", "sprites/default/background.json");
+
+    this.load.image("green", "ui/button_green.png");
+    this.load.image("green-pressed", "ui/button_green_pressed.png");
+    this.load.image("red", "ui/button_red.png");
+    this.load.image("red-pressed", "ui/button_red_pressed.png");
+    this.load.image("plus", "ui/plus.png");
+    this.load.image("minus", "ui/minus.png");
   }
 
   create(): void {
@@ -44,9 +51,29 @@ export default class LevelEditor extends Phaser.Scene {
         else {
           this.selectedIcon = <HTMLImageElement>e.target;
           this.selectedIcon.classList.add("border");
+          (<HTMLInputElement>(document.getElementById('paintbrush'))).checked = true;
+          (<HTMLInputElement>(document.getElementById('eraser'))).checked = false;
         }
       });
     }, this);
+
+    document.getElementById("eraserBtn").addEventListener("click", () => {
+      this.selectedIcon?.classList.remove("border");
+    });
+
+    this.input.on('pointermove', (pointer) => {
+      if (!pointer.isDown) return;
+
+      const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked'))).id;
+      if(selectedTool !== "movement")
+        return;
+
+      this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+      this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+    });
+
+    // TODO: Remove magic number
+    this.cameras.main.setBounds(0, 0, this.cameras.main.width * 1.2, this.cameras.main.height * 1.2);
   }
 
   createObjectImage(key, frame?): HTMLDivElement  {
@@ -66,7 +93,7 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   createBackgroundSelectors() {
-    let bgSelector = document.querySelector("#pills-background .row");
+    let bgSelector = document.getElementById("background-selector");
 
     let bgFrameNames = this.textures.get("background").getFrameNames();
     for(let frame of bgFrameNames) {
@@ -75,7 +102,7 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   createObjectSelectors() {
-    let objSelector = document.querySelector("#pills-objects .row");
+    let objSelector = document.getElementById("object-selector");
 
     // Player
     objSelector.appendChild(this.createObjectImage("player"));
@@ -102,5 +129,10 @@ export default class LevelEditor extends Phaser.Scene {
     }
     let data = this.selectedIcon.id.split("-");
     return {texture: data[0], frame: (data[1] === "undefined" ? undefined : data[1])};
+  }
+
+  saveLevel() {
+    let levelJSON = this.board.toJSON();
+    console.log(levelJSON);
   }
 }

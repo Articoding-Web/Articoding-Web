@@ -1,7 +1,7 @@
 {
 	"textures": [
 		{
-			"image": "player.png",
+			"image": "sprites/default/player.png",
 			"format": "RGBA8888",
 			"size": {
 				"w": 192,
