@@ -33,7 +33,9 @@ export default class LevelEditor extends Phaser.Scene {
     this.load.image("red", "ui/button_red.png");
     this.load.image("red-pressed", "ui/button_red_pressed.png");
     this.load.image("plus", "ui/plus.png");
+    this.load.image("plus-pressed", "ui/plus_pressed.png");
     this.load.image("minus", "ui/minus.png");
+    this.load.image("minus-pressed", "ui/minus_pressed.png");
   }
 
   create(): void {
@@ -64,7 +66,7 @@ export default class LevelEditor extends Phaser.Scene {
     this.input.on('pointermove', (pointer) => {
       if (!pointer.isDown) return;
 
-      const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked'))).id;
+      const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
       if(selectedTool !== "movement")
         return;
 

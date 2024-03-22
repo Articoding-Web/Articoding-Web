@@ -20,13 +20,7 @@
                 {
                     "spriteSheet": "chest",
                     "spriteSheetType": "img",
-                    "objects": [
-                        {
-                            "x": 3,
-                            "y": 1,
-                            "type": "chest"
-                        }
-                    ],
+                    "objects": [],
                     "depth": 1
                 }
             ]

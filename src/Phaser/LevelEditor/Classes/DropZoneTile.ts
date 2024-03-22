@@ -7,15 +7,17 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
   private bgSprite: Phaser.GameObjects.Sprite | undefined;
   //owned object:
   private objectSprite: Phaser.GameObjects.Sprite | undefined;
+  // graphics:
+  private graphics: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number) {
     super(scene, x, y, width, height);
 
     this.setRectangleDropZone(width, height);
 
-    const graphics = this.scene.add.graphics();
-    graphics.lineStyle(2, 0xffff00);
-    graphics.strokeRect(this.x - this.input.hitArea.width / 2, this.y - this.input.hitArea.height / 2, this.input.hitArea.width, this.input.hitArea.height);
+    this.graphics = this.scene.add.graphics();
+    this.graphics.lineStyle(2, 0xffff00);
+    this.graphics.strokeRect(this.x - this.input.hitArea.width / 2, this.y - this.input.hitArea.height / 2, this.input.hitArea.width, this.input.hitArea.height);
 
     this.scene.add.existing(this);
 
@@ -24,13 +26,13 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
   }
 
   pointerOverEvent(pointer: Phaser.Input.Pointer) {
-    if(pointer.leftButtonDown())
+    if (pointer.leftButtonDown())
       this.clickEvent();
   }
 
   clickEvent() {
     const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked'))).id;
-    if(selectedTool === "paintbrush") {
+    if (selectedTool === "paintbrush") {
       this.paintIcon();
     } else {
       this.deleteIcon();
@@ -39,14 +41,14 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
 
   paintIcon() {
     const icon = (<LevelEditor>(this.scene)).getSelectedIcon();
-    if(icon.texture === undefined)
+    if (icon.texture === undefined)
       return;
 
     const scaleFactor = this.width / config.TILE_SIZE;
     const sprite = this.scene.add.sprite(this.x, this.y, icon.texture, icon.frame);
     sprite.setScale(scaleFactor);
 
-    if(icon.texture === "background") {
+    if (icon.texture === "background") {
       this.setBgSprite(sprite);
     } else {
       this.setObjectSprite(sprite);
@@ -54,7 +56,7 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
   }
 
   deleteIcon() {
-    if(this.objectSprite) {
+    if (this.objectSprite) {
       this.objectSprite.destroy(true);
       this.objectSprite = undefined;
     } else {
@@ -102,5 +104,13 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
   private setBgSprite(sprite: Phaser.GameObjects.Sprite) {
     this.bgSprite?.destroy(true); // destroy if existed
     this.bgSprite = sprite;
+  }
+
+  destroy(fromScene?: boolean): void {
+    this.graphics.clear();
+    this.graphics.destroy(true);
+    this.objectSprite?.destroy(true);
+    this.bgSprite?.destroy(true);
+    super.destroy(true);
   }
 }
