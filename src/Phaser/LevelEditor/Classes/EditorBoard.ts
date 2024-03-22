@@ -41,7 +41,7 @@ export default class EditorBoard {
         this.createResizeButtons();
     }
 
-    private calculateScale(){
+    private calculateScale() {
         const layerWidth = this.numCols * config.TILE_SIZE;
         const layerHeight = this.numRows * config.TILE_SIZE;
 
@@ -67,7 +67,7 @@ export default class EditorBoard {
 
         // Remove column
         this.rmColBtn = this.scene.add.sprite(0, 0, "red").setInteractive();
-        this.rmColBtn.on("pointerdown", () => {this.rmColBtn.setTexture("red-pressed"); this.rmColMinus.setTexture("minus-pressed")});
+        this.rmColBtn.on("pointerdown", () => { this.rmColBtn.setTexture("red-pressed"); this.rmColMinus.setTexture("minus-pressed") });
         this.rmColBtn.on("pointerup", this.removeCol, this);
 
         const rmColContainer = this.scene.add.container(tlCoords.x + 50, tlCoords.y - 50);
@@ -76,7 +76,7 @@ export default class EditorBoard {
 
         // Add column
         this.addColBtn = this.scene.add.sprite(0, 0, "green").setInteractive();
-        this.addColBtn.on("pointerdown", () => {this.addColBtn.setTexture("green-pressed"); this.addColPlus.setTexture("plus-pressed")});
+        this.addColBtn.on("pointerdown", () => { this.addColBtn.setTexture("green-pressed"); this.addColPlus.setTexture("plus-pressed") });
         this.addColBtn.on("pointerup", this.addCol, this);
 
         const addColContainer = this.scene.add.container(tlCoords.x + 150, tlCoords.y - 50);
@@ -85,7 +85,7 @@ export default class EditorBoard {
 
         // Remove row
         this.rmRowBtn = this.scene.add.sprite(0, 0, "red").setInteractive();
-        this.rmRowBtn.on("pointerdown", () => {this.rmRowBtn.setTexture("red-pressed"); this.rmRowMinus.setTexture("minus-pressed")});
+        this.rmRowBtn.on("pointerdown", () => { this.rmRowBtn.setTexture("red-pressed"); this.rmRowMinus.setTexture("minus-pressed") });
         this.rmRowBtn.on("pointerup", this.removeRow, this);
 
         const rmRowContainer = this.scene.add.container(tlCoords.x - 50, tlCoords.y + 50);
@@ -94,7 +94,7 @@ export default class EditorBoard {
 
         // Add column
         this.addRowBtn = this.scene.add.sprite(0, 0, "green").setInteractive();
-        this.addRowBtn.on("pointerdown", () => {this.addRowBtn.setTexture("green-pressed"); this.addRowPlus.setTexture("plus-pressed")});
+        this.addRowBtn.on("pointerdown", () => { this.addRowBtn.setTexture("green-pressed"); this.addRowPlus.setTexture("plus-pressed") });
         this.addRowBtn.on("pointerup", this.addRow, this);
 
         const addRowContainer = this.scene.add.container(tlCoords.x - 50, tlCoords.y + 150);
@@ -122,8 +122,8 @@ export default class EditorBoard {
     private addCol() {
         this.addColBtn.setTexture("green");
         this.addColPlus.setTexture("plus");
-        
-        if(this.numCols >= config.EDITOR_MAX_COLS)
+
+        if (this.numCols >= config.EDITOR_MAX_COLS)
             return;
 
 
@@ -143,7 +143,7 @@ export default class EditorBoard {
         this.rmColBtn.setTexture("red");
         this.rmColMinus.setTexture("minus");
 
-        if(this.numCols <= config.EDITOR_MIN_COLS)
+        if (this.numCols <= config.EDITOR_MIN_COLS)
             return;
 
         this.numCols--;
@@ -156,8 +156,8 @@ export default class EditorBoard {
     private addRow() {
         this.addRowBtn.setTexture("green");
         this.addRowPlus.setTexture("minus");
-        
-        if(this.numRows >= config.EDITOR_MAX_ROWS)
+
+        if (this.numRows >= config.EDITOR_MAX_ROWS)
             return;
 
         this.dropZoneTiles[this.numRows++] = [];
@@ -176,29 +176,29 @@ export default class EditorBoard {
         this.rmRowBtn.setTexture("red");
         this.rmRowMinus.setTexture("minus");
 
-        if(this.numRows <= config.EDITOR_MIN_ROWS)
+        if (this.numRows <= config.EDITOR_MIN_ROWS)
             return;
 
         this.numRows--;
 
-        for(let tile of this.dropZoneTiles[this.numRows]) {
+        for (let tile of this.dropZoneTiles[this.numRows]) {
             tile.destroy();
         }
     }
 
     toJSON(): Record<any, any> {
-        let levelJson = EmptyLevel;
+        let levelJson = JSON.parse(JSON.stringify(EmptyLevel)); // Create a copy
 
         levelJson.phaser.height = this.numRows;
         levelJson.phaser.width = this.numCols;
 
-        for(let x in this.dropZoneTiles) {
+        for (let x in this.dropZoneTiles) {
             const row = this.dropZoneTiles[x];
-            for(let y in row) {
+            for (let y in row) {
                 const tile = row[y];
                 const bgSprite = tile.getBgSprite();
 
-                if(bgSprite) {
+                if (bgSprite) {
                     // Add bg sprite to json
                     levelJson.phaser.layers.background.objects.push({
                         "x": x,
@@ -210,21 +210,45 @@ export default class EditorBoard {
                     });
 
                     const objSprite = tile.getObjectSprite();
-                    if(objSprite) {
-                        if(objSprite.texture.key === "player") {
+                    if (objSprite) {
+                        if (objSprite.texture.key === "player") {
+                            // Add player
                             levelJson.phaser.layers.players.objects.push({
                                 "x": x,
                                 "y": y
                             });
-                        } 
-                        // else {
-                        //     levelJson.phaser.layers.objects.push({
-                        //         "spriteSheet": objSprite.texture.key,
-                        //         "spriteSheetType": "img",
-                        //         "objects": [],
-                        //         "depth": 1
-                        //     });
-                        // }
+                        }
+                        else {
+                            // Object
+                            let object = {
+                                "x": x,
+                                "y": y,
+                                "type": objSprite.texture.key,
+                            };
+                            
+                            if(objSprite.texture.key === "trap") {
+                                object["properties"] = {
+                                    "enabled": objSprite.frame.name === "0.png" ? false : true
+                                };
+                            }
+
+                            // Check if spritesheet exists
+                            const dataIndex = levelJson.phaser.layers.objects.findIndex(obj => obj.spriteSheet === objSprite.texture.key);
+                            if (dataIndex !== -1) {
+                                // Already registerd, add object
+                                levelJson.phaser.layers.objects[dataIndex].objects.push(object);
+                            } else {
+                                // Not registered, create and add
+                                const spriteSheetType = (objSprite.texture.getFrameNames().length > 1 ? "multi" : "img");
+
+                                levelJson.phaser.layers.objects.push({
+                                    "spriteSheet": objSprite.texture.key,
+                                    "spriteSheetType": spriteSheetType,
+                                    "objects": [object],
+                                    "depth": 1
+                                });
+                            }
+                        }
                     }
                 }
             }
