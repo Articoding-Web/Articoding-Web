@@ -76,6 +76,8 @@ export default class LevelEditor extends Phaser.Scene {
 
     // TODO: Remove magic number
     this.cameras.main.setBounds(0, 0, this.cameras.main.width * 1.2, this.cameras.main.height * 1.2);
+
+    document.getElementById("saveEditorLevel").addEventListener("click", () => this.saveLevel())
   }
 
   createObjectImage(key, frame?): HTMLDivElement  {
@@ -134,7 +136,9 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   saveLevel() {
+    console.log("saving level");
     let levelJSON = this.board.toJSON();
     console.log(levelJSON);
+    console.log(JSON.stringify(levelJSON));
   }
 }

@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import DropZoneTile from './DropZoneTile';
 import LevelEditor from '../LevelEditor';
 import config from '../../../config';
+import EmptyLevel from './EmptyLevel';
 
 export default class EditorBoard {
     private dropZoneTiles: DropZoneTile[][] = [];
@@ -186,7 +187,49 @@ export default class EditorBoard {
     }
 
     toJSON(): Record<any, any> {
-        // let json = 
-        return null;
+        let levelJson = EmptyLevel;
+
+        levelJson.phaser.height = this.numRows;
+        levelJson.phaser.width = this.numCols;
+
+        for(let x in this.dropZoneTiles) {
+            const row = this.dropZoneTiles[x];
+            for(let y in row) {
+                const tile = row[y];
+                const bgSprite = tile.getBgSprite();
+
+                if(bgSprite) {
+                    // Add bg sprite to json
+                    levelJson.phaser.layers.background.objects.push({
+                        "x": x,
+                        "y": y,
+                        "spriteIndex": bgSprite.frame.name,
+                        "properties": {
+                            "collides": true
+                        }
+                    });
+
+                    const objSprite = tile.getObjectSprite();
+                    if(objSprite) {
+                        if(objSprite.texture.key === "player") {
+                            levelJson.phaser.layers.players.objects.push({
+                                "x": x,
+                                "y": y
+                            });
+                        } 
+                        // else {
+                        //     levelJson.phaser.layers.objects.push({
+                        //         "spriteSheet": objSprite.texture.key,
+                        //         "spriteSheetType": "img",
+                        //         "objects": [],
+                        //         "depth": 1
+                        //     });
+                        // }
+                    }
+                }
+            }
+        }
+
+        return levelJson;
     }
 }

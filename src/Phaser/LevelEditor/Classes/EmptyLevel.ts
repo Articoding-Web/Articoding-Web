@@ -1,7 +1,7 @@
-{
+export default {
     "phaser": {
-        "width": 5,
-        "height": 4,
+        "width": 0,
+        "height": 0,
         "theme": "default",
         "layers" : {
             "background" : {
@@ -10,20 +10,13 @@
                 "objects": [],
                 "depth": 0
             },
+            "objects" : [],
             "players" : {
                 "spriteSheet": "player",
                 "spriteSheetType": "multi",
                 "objects": [],
                 "depth": 2
             },
-            "objects" : [
-                {
-                    "spriteSheet": "chest",
-                    "spriteSheetType": "img",
-                    "objects": [],
-                    "depth": 1
-                }
-            ]
         }
     },
     "blockly": {
@@ -113,4 +106,4 @@
         },
         "workspaceBlocks": []
     }
-}
+};
