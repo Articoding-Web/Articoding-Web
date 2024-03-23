@@ -24,6 +24,7 @@ export default class LevelEditor extends Phaser.Scene {
 
     this.load.setBaseURL(assetPath);
     this.load.multiatlas("player", "sprites/default/player.json", spritePath);
+    this.load.image("exit", "sprites/default/exit.png");
     this.load.image("chest", "sprites/default/chest.png");
     this.load.multiatlas("trap", "sprites/default/trap.json", spritePath);
     this.load.image("wall", "sprites/default/wall.png");
@@ -112,6 +113,9 @@ export default class LevelEditor extends Phaser.Scene {
 
     // Player
     objSelector.appendChild(this.createObjectImage("player"));
+
+    // Exit
+    objSelector.appendChild(this.createObjectImage("exit"));
 
     // Chest
     objSelector.appendChild(this.createObjectImage("chest"));
