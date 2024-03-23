@@ -192,10 +192,10 @@ export default class EditorBoard {
         levelJson.phaser.height = this.numRows;
         levelJson.phaser.width = this.numCols;
 
-        for (let x in this.dropZoneTiles) {
-            const row = this.dropZoneTiles[x];
-            for (let y in row) {
-                const tile = row[y];
+        for (let y in this.dropZoneTiles) {
+            const row = this.dropZoneTiles[y];
+            for (let x in row) {
+                const tile = row[x];
                 const bgSprite = tile.getBgSprite();
 
                 if (bgSprite) {

@@ -1,7 +1,7 @@
 {
 	"textures": [
 		{
-			"image": "sprites/default/trap.png",
+			"image": "trap.png",
 			"format": "RGBA8888",
 			"size": {
 				"w": 64,

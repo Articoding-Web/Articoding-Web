@@ -20,13 +20,15 @@ export default class LevelEditor extends Phaser.Scene {
 
   preload(): void {
     const assetPath = `assets`;
+    const spritePath = `/sprites/default`;
+
     this.load.setBaseURL(assetPath);
-    this.load.multiatlas("player", "sprites/default/player.json");
+    this.load.multiatlas("player", "sprites/default/player.json", spritePath);
     this.load.image("chest", "sprites/default/chest.png");
-    this.load.multiatlas("trap", "sprites/default/trap.json");
+    this.load.multiatlas("trap", "sprites/default/trap.json", spritePath);
     this.load.image("wall", "sprites/default/wall.png");
-    this.load.multiatlas("enemy", "sprites/default/enemy.json");
-    this.load.multiatlas("background", "sprites/default/background.json");
+    this.load.multiatlas("enemy", "sprites/default/enemy.json", spritePath);
+    this.load.multiatlas("background", "sprites/default/background.json", spritePath);
 
     this.load.image("green", "ui/button_green.png");
     this.load.image("green-pressed", "ui/button_green_pressed.png");
