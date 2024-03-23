@@ -102,6 +102,9 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
   }
 
   private setBgSprite(sprite: Phaser.GameObjects.Sprite) {
+    this.objectSprite?.destroy(true); // destroy if existed
+    this.objectSprite = undefined;
+
     this.bgSprite?.destroy(true); // destroy if existed
     this.bgSprite = sprite;
   }
