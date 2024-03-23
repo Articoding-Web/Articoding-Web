@@ -92,7 +92,7 @@ export default class EditorBoard {
         rmRowContainer.add(this.rmRowBtn);
         rmRowContainer.add(this.rmRowMinus = this.scene.add.sprite(0, 0, "minus"));
 
-        // Add column
+        // Add row
         this.addRowBtn = this.scene.add.sprite(0, 0, "green").setInteractive();
         this.addRowBtn.on("pointerdown", () => { this.addRowBtn.setTexture("green-pressed"); this.addRowPlus.setTexture("plus-pressed") });
         this.addRowBtn.on("pointerup", this.addRow, this);
@@ -155,7 +155,7 @@ export default class EditorBoard {
 
     private addRow() {
         this.addRowBtn.setTexture("green");
-        this.addRowPlus.setTexture("minus");
+        this.addRowPlus.setTexture("plus");
 
         if (this.numRows >= config.EDITOR_MAX_ROWS)
             return;
