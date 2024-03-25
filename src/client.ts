@@ -37,13 +37,29 @@ export async function startLevelById(levelId: number) {
   }
 }
 
-export async function restartCurrentLevel() {
-  phaserController.destroy();
-  
-  const phaserJSON = currentLevelJSON.phaser;
-  phaserController = new PhaserController("LevelPlayer", LevelPlayer, phaserJSON);
-}
+export async function restartCurrentLevel(levelId: number) {
+  try {
+    const response = await fetch(`http://localhost:3001/api/level/${levelId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const level = await response.json();
+    let blocklyControllerRef = blocklyController;
+    phaserController.destroy();
+    const levelJSON = JSON.parse(level.data);
 
+    const toolbox = levelJSON.blockly.toolbox;
+    const maxInstances = levelJSON.blockly.maxInstances;
+    const workspaceBlocks = levelJSON.blockly.workspaceBlocks;
+    const phaserJSON = levelJSON.phaser;
+
+    phaserController = new PhaserController("LevelPlayer", LevelPlayer, phaserJSON);
+    blocklyController = blocklyControllerRef;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+}
 export function editLevel() {
   phaserController = new PhaserController("LevelEditor", LevelEditor);
 }

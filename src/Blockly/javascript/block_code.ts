@@ -110,7 +110,10 @@ export function defineAllBlocks() {
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-
+    if(repeats >= 25 || childBlockCode.length >= 25) {
+      console.log("You are trying to repeat too many times, this may cause performance issues.");
+      repeats = childBlockCode.length*15;
+    }
     let events = `[`;
     for(let x = 0; x < repeats; x++) {
       for(let y = 0; y < childBlockCode.length; y++) {
@@ -122,26 +125,47 @@ export function defineAllBlocks() {
         events += ","
     }
     events += "]"
-
     return events;
   };
 
-  //While do block
-  javascriptGenerator.forBlock["while_do"] = function (
+  javascriptGenerator.forBlock["if_do"] = function (
     block: Block,
     generator: any
   ) {
-    let condition = generator.valueToCode(
-      block,
-      "CONDITION",
-      javascriptGenerator.ORDER_ATOMIC
-    );
-    let doCode = generator.statementToCode(block, "DO");
-    //////////////////////////////////////////////////////////
-    doCode = generator.addLoopTrap(block, "DO");
-    console.log("loop code: ", doCode);
-    //TODO test & ver si se crea bien la funcion...
-    // let code = "";
-    return doCode;
+    let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
+    let children = block.getChildren(true);
+    let childBlock;
+    if(children.length === 1 && children[0].type != "math_number")
+      childBlock = children[0];
+    else if(children.length > 1) {
+      childBlock = children[1]
+    }
+    let childBlockCode = [];
+    while(childBlock) {
+      const blockCode = generator.blockToCode(childBlock, true);
+      childBlockCode.push(blockCode);
+      childBlock = childBlock.getNextBlock();
+    }
+  
+    // Create the event code.
+    let events = `[`;
+    for(let y = 0; y < childBlockCode.length; y++) {
+      events += childBlockCode[y];
+      if(y < childBlockCode.length - 1)
+        events += ","
+    }
+    events += "]"
+  
+    // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
+    let code = {
+      blockId: block.id,
+      eventName: "if_do",
+      data: {
+        condition: condition,
+        events: events
+      }
+    };
+  
+    return JSON.stringify(code);
   };
 }

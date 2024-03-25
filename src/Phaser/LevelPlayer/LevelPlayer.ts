@@ -152,6 +152,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createPlayerAnimation(Direction.RIGHT);
     this.createPlayerAnimation(Direction.DOWN);
     this.createPlayerAnimation(Direction.LEFT);
+    this.createDyingAnimation();
   }
 
   createPlayerAnimation(name: string) {
@@ -168,7 +169,14 @@ export default class LevelPlayer extends Phaser.Scene {
       yoyo: true,
     });
   }
-
+createDyingAnimation() {
+  this.anims.create({
+    key: 'dying',
+    frames: this.anims.generateFrameNumbers('player', { start: 10, end: 14 }),
+    frameRate: 10,
+    repeat: -1
+  });
+}
   createObjects() {
     for (let x in this.objectsLayerJson) {
       const objectJson = this.objectsLayerJson[x];
@@ -250,6 +258,7 @@ export default class LevelPlayer extends Phaser.Scene {
     for(let x in this.players){
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasCollectedChest()) {
+        player.die(); 
         const event = new CustomEvent("winConditionModal", { detail: {msg: "Lose", stars: 0, status: 0}});
         document.dispatchEvent(event);
         return;

@@ -93,10 +93,48 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Exit</button>
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="retryLevelButton">Try Again</button>
                     </div>
+                </div>
+            </div>
+        </div>-->
+        <div id="victoryModal" class="modal fade" data-bs-backdrop="true" tabindex="-1" aria-hidden="true" aria-labelledby="victoryModalLabel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success">
+                        <h1 class="modal-title fs-5" id="victoryModalLabel">Level Completed</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="stars">
+                            
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Exit</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Next Level</button>
+                        </div>
+                </div>
             </div>
         </div>
-    </div>
     
+        <div id="defeatModal" class="modal fade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger">
+                        <h1 class="modal-title fs-5">Level failed</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="stars">
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Exit</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="retryLevelButton">Try Again</button>
+                        </div>
+                </div>
+            </div>
+        </div>
+        
     <script src="./js/bootstrap.min.js"></script>
     <script type="module" src="./client.js"></script>
     <script type="module" src="./js/utils.js"></script>

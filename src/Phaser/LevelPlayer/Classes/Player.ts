@@ -109,6 +109,20 @@ export class Player {
     setTilePos(tilePosition: Phaser.Math.Vector2): void {
         this.tilePos = tilePosition.clone();
     }
+//TODO test @sanord8
+    die() {
+        this.sprite.scene.tweens.add({
+            targets: this.sprite,
+            alpha: 0,
+            scale: 0,
+            angle: 360,
+            duration: 2500,
+            onComplete: () => {
+             // nothing so far
+            }
+          });
+
+      }
 
     getIsAlive(): Boolean {
         return this.isAlive;

@@ -1,6 +1,5 @@
 import { startLevelById } from "../client.js";
 import { restartCurrentLevel } from "../client.js";
-
 let victoryModalInstance;
 let defeatModalInstance;
 
@@ -9,13 +8,18 @@ let defeatModalInstance;
     nextLevelButton.addEventListener("click", () => {
         let contentElement = document.getElementById("content");
         let levelId = parseInt(contentElement.getAttribute("data-level-id"));
+        let currentLevelId = levelId;
         levelId += 1;
         startLevelById(levelId);//TODO refactorizar para que si no lo carga, (porque es el ultimo nivel de la categoria, pase de categoria o algo)
         document.getElementById("content").setAttribute("data-level-id", levelId);
     });
 
     const retryLevelButton = document.querySelector("#defeatModal .btn-primary");
-    retryLevelButton.addEventListener("click", () => restartCurrentLevel());
+    retryLevelButton.addEventListener("click", () => {
+        let contentElement = document.getElementById("content");
+        let levelId = parseInt(contentElement.getAttribute("data-level-id"));
+        restartCurrentLevel(levelId);
+    });
 })();
 
 // Listen for the "winConditionModal" event

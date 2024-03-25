@@ -96,6 +96,8 @@ export default class BlocklyController {
     runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
   }
 
+  
+
   highlightBlock(id: string | null) {
     this.workspace.highlightBlock(id);
   }
