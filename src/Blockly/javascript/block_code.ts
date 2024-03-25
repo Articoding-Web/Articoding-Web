@@ -125,20 +125,6 @@ export function defineAllBlocks() {
         events += ","
     }
     events += "]"
-    /** IDEA PENDIENTE
-     *     let code = `
-      let startTime = Date.now();
-      while (${condition}) {
-        let currentTime = Date.now();
-        let deltaTime = currentTime - startTime;
-        if (deltaTime > 1000) { // Set your desired delta time here
-          break;
-        }
-        ${doCode}
-      }
-    `;
-     */
-
     return events;
   };
 
@@ -147,7 +133,6 @@ export function defineAllBlocks() {
     generator: any
   ) {
     let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
-    //TODO @sanord8, estoy en ello---
     let children = block.getChildren(true);
     let childBlock;
     if(children.length === 1 && children[0].type != "math_number")
@@ -155,7 +140,6 @@ export function defineAllBlocks() {
     else if(children.length > 1) {
       childBlock = children[1]
     }
-  //js allows .map?? maybe test 
     let childBlockCode = [];
     while(childBlock) {
       const blockCode = generator.blockToCode(childBlock, true);
