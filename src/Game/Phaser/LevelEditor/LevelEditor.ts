@@ -142,7 +142,6 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   saveLevel() {
-    console.log("saving level");
     let levelJSON = this.board.toJSON();
     console.log(levelJSON);
     console.log(JSON.stringify(levelJSON));
