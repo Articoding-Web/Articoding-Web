@@ -201,11 +201,11 @@ export default class EditorBoard {
                 if (bgSprite) {
                     // Add bg sprite to json
                     levelJson.phaser.layers.background.objects.push({
-                        "x": x,
-                        "y": y,
+                        "x": parseInt(x),
+                        "y": parseInt(y),
                         "spriteIndex": bgSprite.frame.name,
                         "properties": {
-                            "collides": true
+                            "collides": (bgSprite.frame.name == "6" ? false : true)
                         }
                     });
 

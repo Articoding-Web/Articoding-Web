@@ -31,7 +31,6 @@ export default class LevelPlayer extends Phaser.Scene {
     super("LevelPlayer");
   }
 
-  // TODO pasar la información del nivel
   init(...params) {
     const levelJson = params[0];
     this.theme = levelJson.theme;
@@ -113,7 +112,7 @@ export default class LevelPlayer extends Phaser.Scene {
     for (let y in this.backgroundLayerJson.objects) {
       const obj = this.backgroundLayerJson.objects[y];
       const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
-      if(tile)
+      if (tile)
         tile.properties = obj.properties;
     }
   }
@@ -126,23 +125,14 @@ export default class LevelPlayer extends Phaser.Scene {
       const player = this.playersLayerJson.objects[x];
 
       // Create and scale sprite
-      const sprite = this.add.sprite(
-        player.x,
-        player.y,
-        this.playersLayerJson.spriteSheet
-      );
+      const sprite = this.add.sprite(player.x, player.y, this.playersLayerJson.spriteSheet);
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
       // Add physics and create player object
       this.physics.add.existing(sprite);
       this.players.push(
-        new Player(
-          sprite,
-          this.gridPhysics,
-          new Phaser.Math.Vector2(player.x, player.y),
-          this.scaleFactor
-        )
+        new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)), this.scaleFactor)
       );
     }
 
@@ -169,14 +159,15 @@ export default class LevelPlayer extends Phaser.Scene {
       yoyo: true,
     });
   }
-createDyingAnimation() {
-  this.anims.create({
-    key: 'dying',
-    frames: this.anims.generateFrameNumbers('player', { start: 10, end: 14 }),
-    frameRate: 10,
-    repeat: -1
-  });
-}
+
+  createDyingAnimation() {
+    this.anims.create({
+      key: 'dying',
+      frameRate: 10,
+      repeat: -1
+    });
+  }
+
   createObjects() {
     for (let x in this.objectsLayerJson) {
       const objectJson = this.objectsLayerJson[x];
@@ -194,15 +185,15 @@ createDyingAnimation() {
           this.scaleSprite(chest, obj.x, obj.y);
           chest.setDepth(objectJson.depth);
           this.objects.push(chest);
-        } else if(obj.type === "trap") {
+        } else if (obj.type === "trap") {
           this.createTrapAnim();
           const trap = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(trap, obj.x, obj.y);
           trap.setDepth(objectJson.depth);
-          if(obj.properties.enabled)
+          if (obj.properties.enabled)
             trap.enable();
           this.objects.push(trap);
-        } 
+        }
         else {
           // Create and scale sprite
           const sprite = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
@@ -255,17 +246,17 @@ createDyingAnimation() {
   }
 
   checkWinCondition(): void {
-    for(let x in this.players){
+    for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasCollectedChest()) {
-        player.die(); 
-        const event = new CustomEvent("winConditionModal", { detail: {msg: "Lose", stars: 0, status: 0}});
+        player.die();
+        const event = new CustomEvent("winConditionModal", { detail: { msg: "Lose", stars: 0, status: 0 } });
         document.dispatchEvent(event);
         return;
       }
     }
 
-    const event = new CustomEvent("winConditionModal", { detail: {msg: "Win", stars: 3, status: 1}});
+    const event = new CustomEvent("winConditionModal", { detail: { msg: "Win", stars: 3, status: 1 } });
     document.dispatchEvent(event);
   }
 

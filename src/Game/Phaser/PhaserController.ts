@@ -18,6 +18,7 @@ function createPhaserConfig(): Phaser.Types.Core.GameConfig {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       zoom: Phaser.Scale.ZOOM_2X,
     },
+    banner: false
   };
 }
 

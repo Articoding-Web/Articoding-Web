@@ -1,30 +1,30 @@
-import { startLevelById } from "../client.js";
-import { restartCurrentLevel } from "../client.js";
+import * as bootstrap from 'bootstrap';
+import { restartCurrentLevel } from "../Game/client";
+import { route } from '../client';
 let victoryModalInstance;
 let defeatModalInstance;
 
-(function () {
+export default async function registerModals() {
     const nextLevelButton = document.querySelector("#victoryModal .btn-primary")
     nextLevelButton.addEventListener("click", () => {
-        let contentElement = document.getElementById("content");
-        let levelId = parseInt(contentElement.getAttribute("data-level-id"));
-        let currentLevelId = levelId;
-        levelId += 1;
-        startLevelById(levelId);//TODO refactorizar para que si no lo carga, (porque es el ultimo nivel de la categoria, pase de categoria o algo)
-        document.getElementById("content").setAttribute("data-level-id", levelId);
+        const url = new URL(window.location.href);
+        let levelId = parseInt(url.searchParams.get("id"));
+        const id = `${++levelId}`
+
+        // Change to new level
+        history.pushState({ id }, "", `level?id=${id}`);
+        route();
     });
 
     const retryLevelButton = document.querySelector("#defeatModal .btn-primary");
     retryLevelButton.addEventListener("click", () => {
-        let contentElement = document.getElementById("content");
-        let levelId = parseInt(contentElement.getAttribute("data-level-id"));
-        restartCurrentLevel(levelId);
+        restartCurrentLevel();
     });
-})();
+}
 
 // Listen for the "winConditionModal" event
 document.addEventListener('winConditionModal', function (event) {
-    const { stars, status } = event.detail;
+    const { stars, status } = (<CustomEvent>event).detail;
 
     if (status === 1) {
         document.querySelector("#victoryModal .stars").innerHTML = '<i class="fas fa-star"></i>'.repeat(stars);
