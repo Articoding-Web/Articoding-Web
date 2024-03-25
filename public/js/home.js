@@ -1,13 +1,14 @@
-"use strict"
+"use strict";
+
 import { startLevel } from "../client.js";
 import { editLevel } from "../client.js";
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
 /**
- * 
+ *
  * @param {URL} endpoint endpoint where the call should be made
- * @param {String} method "GET" is the only method supported 
+ * @param {String} method "GET" is the only method supported
  * @returns json response
  */
 async function fetchRequest(endpoint, method) {
@@ -21,13 +22,13 @@ async function fetchRequest(endpoint, method) {
 }
 
 /**
- * 
- * @param {HTMLDivElement} divElement where the items generated are appended 
+ *
+ * @param {HTMLDivElement} divElement where the items generated are appended
  * @param {Array} items items used to generate html that is inserted
  * @param {Function} htmlGenerator html string generator to process items and generate html
  */
 async function fillContent(divElement, items, htmlGenerator) {
-  divElement.innerHTML = '';
+  divElement.innerHTML = "";
   for (let item of items) {
     divElement.insertAdjacentHTML("beforeend", await htmlGenerator(item));
   }
@@ -44,16 +45,17 @@ async function setNavbarListeners() {
   document.getElementById("editor").addEventListener("click", loadLevelEditor);
 
   // Community Levels
-  document.getElementById("community").addEventListener("click", loadCommunityLevels);
+  document
+    .getElementById("community")
+    .addEventListener("click", loadCommunityLevels);
 }
 
 /**
- * 
+ *
  * @param {Object} category category with id, name, levels and description
  * @returns String of HTMLDivElement
  */
 async function generateCategoryDiv(category) {
-  category.levels = await fetchRequest(`${API_ENDPOINT}/level/countByCategory/${category.id}`, "GET");
   return `<div class="col">
             <a class="category" href="${API_ENDPOINT}/level/levelsByCategory/${category.id}">
               <div class="card border-dark d-flex flex-column h-100">
@@ -62,7 +64,7 @@ async function generateCategoryDiv(category) {
                   </h5>
                   <div class="card-body text-dark">
                     <h6 class="card-subtitle mb-2 text-muted">
-                      Niveles: ${category.levels}
+                      Niveles: ${category.count}
                     </h6>
                     ${category.description}
                   </div>
@@ -77,7 +79,10 @@ async function generateCategoryDiv(category) {
 async function loadCategories() {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
-  const categories = await fetchRequest(`${API_ENDPOINT}/level/categories`, "GET");
+  const categories = await fetchRequest(
+    `${API_ENDPOINT}/level/categories`,
+    "GET"
+  );
 
   await fillContent(divElement, categories, generateCategoryDiv);
 
@@ -87,7 +92,7 @@ async function loadCategories() {
 }
 
 /**
- * 
+ *
  * @param {Object} level with id, title, etc
  * @returns String of HTMLDivElement
  */
@@ -107,7 +112,7 @@ async function generateLevelDiv(level) {
 }
 
 /**
- * 
+ *
  * @param {Event} event
  * Gets levels of a category from DB and shows them on screen
  */
@@ -116,7 +121,10 @@ async function loadCategoryLevels(event) {
   const anchorTag = event.target.closest("a.category");
 
   const id = anchorTag.href.split("/level/levelsByCategory/")[1];
-  const levels = await fetchRequest(`${API_ENDPOINT}/level/levelsByCategory/${id}`, "GET");
+  const levels = await fetchRequest(
+    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+    "GET"
+  );
 
   const divElement = document.getElementById("categories");
 
@@ -129,8 +137,18 @@ async function loadCategoryLevels(event) {
 }
 
 /**
- * 
- * @param {Event} event 
+ * Fetches a level by its ID and starts it
+ * @param {String} levelId - The ID of the level to start
+ */
+async function startLevelById(levelId) {
+  let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
+  document.getElementById("content").innerHTML = getLevelPlayerHTML();
+  startLevel(level);
+}
+
+/**
+ *
+ * @param {Event} event
  * Gets community levels from DB and shows them on screen
  */
 async function loadCommunityLevels() {
@@ -165,9 +183,8 @@ async function playLevel(event) {
   document.getElementById("content").setAttribute("data-level-id", level.id);
   startLevel(level);
 }
-
 /**
- * 
+ *
  * @returns String of HTMLElement for LevelPlayer
  */
 function getLevelPlayerHTML() {
@@ -187,7 +204,7 @@ function getLevelPlayerHTML() {
                     Toggle Blockly
                 </button>
             </div>
-          </div>`
+          </div>`;
 }
 
 /**
@@ -200,19 +217,53 @@ function loadLevelEditor() {
 }
 
 /**
- * 
+ *
  * @returns String of HTMLElement for LevelEditor
  */
 function getLevelEditorHTML() {
-  return `<div class="row h-100">
-            <div id="phaserDiv" class="col mh-100">
-                <canvas id="phaserCanvas"></canvas>
+  return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
+            <div class="row row-cols-1 row-cols-md-2 h-100 g-0">
+                <div id="selector" class="col col-md-2 h-100">
+                    <!-- Tools -->
+                    <h5 class="card-title border-bottom pb-2 mb-2">Tool</h5>
+                    <div class="d-flex justify-content-around">
+                        <span id="paintbrushBtn">
+                            <input type="radio" class="btn-check" name="editor-tool" id="paintbrush" autocomplete="off" />
+                            <label class="btn btn-primary" for="paintbrush"><i class="bi bi-brush-fill"></i></label>
+                        </span>
+                        <span id="eraserBtn">
+                            <input type="radio" class="btn-check" name="editor-tool" id="eraser" autocomplete="off" />
+                            <label class="btn btn-primary" for="eraser"><i class="bi bi-eraser-fill"></i></label>
+                        </span>
+                        <span>
+                            <input type="radio" class="btn-check" name="editor-tool" id="movement" autocomplete="off" />
+                            <label class="btn btn-primary" for="movement"><i class="bi bi-arrows-move"></i></label>
+                        </span>
+                    </div>
+
+                    <!-- Background -->
+                    <h5 class="card-title border-bottom pb-2 my-2">Background</h5>
+                    <div id="background-selector" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2"></div>
+                    
+                    <!-- Objects -->
+                    <h5 class="card-title border-bottom pb-2 my-2">Objects</h5>
+                    <div id="object-selector" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2"></div>
+                </div>
+                <div id="phaserDiv" class="col col-md-10 mh-100 p-0 position-relative">
+                    <canvas id="phaserCanvas"></canvas>
+                    <!-- <button id="selectorToggler" class="btn btn-primary position-absolute top-0 start-0" type="button" data-bs-toggle="collapse" data-bs-target="#selector" aria-expanded="false" aria-controls="selector">
+                              Toggle Selector
+                          </button> -->
+                    <button id="saveEditorLevel" class="btn btn-primary position-absolute top-0 end-0" type="button">
+                        Save Level
+                    </button>
+                </div>
             </div>
-          </div>`
+          </div>`;
 }
 
 /**
- * 
+ *
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
