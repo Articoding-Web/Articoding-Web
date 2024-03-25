@@ -1,164 +1,150 @@
 import * as Phaser from "phaser";
+import Board from "./Classes/EditorBoard";
+import config from "../../config";
 
-import { LevelData } from "./Classes/LevelData";
-
-import Board from "./Classes/Board";
-import TileObject from "./Classes/TileObject";
-import ArticodingObject from "./Classes/ArticodingObject";
-
-const TILE_SIZE = 100;
-const MIN_NUM_TILES = 2;
-const MAX_NUM_TILES = 10;
-const INITIAL_TILES = 5;
+// TODO: eliminar magic numbers
+const NUM_ROWS = 5;
+const NUM_COLS = 5;
 
 export default class LevelEditor extends Phaser.Scene {
-  resizeDialog = <HTMLDivElement>document.getElementById("gridResizeDialog");
-  numRowsInput = <HTMLInputElement>document.getElementById("numRowsInput");
-  numColsInput = <HTMLInputElement>document.getElementById("numColsInput");
-  rows: integer;
-  columns: integer;
-  tiles: TileObject[] = [];
-  frog: Phaser.GameObjects.Sprite;
-  chest: Phaser.GameObjects.Sprite;
-  level: LevelData;
+  selectedIcon: HTMLImageElement;
   board: Board;
-
-  objectX: integer;
-  objectY: integer;
 
   constructor() {
     super("LevelEditor");
   }
 
-  init(level?: LevelData): void {
-    if (level.rows !== undefined) {
-      this.level = level;
-    }
+  init(): void {
+    // TODO: get leveldata  (if passing from player to editor)
   }
 
   preload(): void {
-    this.resizeDialog.classList.remove("d-none");
-    this.rows = this.level ? this.level.rows : INITIAL_TILES;
-    this.columns = this.level ? this.level.columns : INITIAL_TILES;
-    this.setMinMaxNumTiles();
-    this.tiles = [];
-    this.objectX = this.cameras.main.width / 10;
-    this.objectY = this.cameras.main.height / 3;
+    const assetPath = `assets`;
+    const spritePath = `/sprites/default`;
 
-    // Load froggy
-    this.load.multiatlas(
-      "FrogSpriteSheet",
-      "assets/sprites/FrogSpriteSheet.json",
-      "assets/sprites/"
-    );
-    // Load chest
-    this.load.multiatlas(
-      "BigTreasureChest",
-      "assets/sprites/BigTreasureChest.json",
-      "assets/sprites/"
-    );
+    this.load.setBaseURL(assetPath);
+    this.load.multiatlas("player", "sprites/default/player.json", spritePath);
+    this.load.image("exit", "sprites/default/exit.png");
+    this.load.image("chest", "sprites/default/chest.png");
+    this.load.multiatlas("trap", "sprites/default/trap.json", spritePath);
+    this.load.image("wall", "sprites/default/wall.png");
+    this.load.multiatlas("enemy", "sprites/default/enemy.json", spritePath);
+    this.load.multiatlas("background", "sprites/default/background.json", spritePath);
 
-    this.load.image("tile", "assets/tiles/tile.png");
+    this.load.image("green", "ui/button_green.png");
+    this.load.image("green-pressed", "ui/button_green_pressed.png");
+    this.load.image("red", "ui/button_red.png");
+    this.load.image("red-pressed", "ui/button_red_pressed.png");
+    this.load.image("plus", "ui/plus.png");
+    this.load.image("plus-pressed", "ui/plus_pressed.png");
+    this.load.image("minus", "ui/minus.png");
+    this.load.image("minus-pressed", "ui/minus_pressed.png");
   }
 
   create(): void {
-    this.board = new Board();
-    this.frog = new ArticodingObject(
-      this,
-      this.objectX,
-      this.objectY,
-      "FrogSpriteSheet",
-      this.board,
-      "down/SpriteSheet-02.png"
-    );
-    this.chest = new ArticodingObject(
-      this,
-      this.objectX,
-      this.objectY + 100,
-      "BigTreasureChest",
-      this.board,
-      "BigTreasureChest-0.png",
-      true
-    );
+    this.board = new Board(this, NUM_ROWS, NUM_COLS);
 
-    this.createLevel();
-    this.zoom();
+    this.createBackgroundSelectors();
+    this.createObjectSelectors();
 
-    document
-      .getElementById("changeGridSize")
-      .addEventListener("click", (event) => {
-        if (
-          +this.numRowsInput.value > MIN_NUM_TILES ||
-          +this.numRowsInput.value < MAX_NUM_TILES
-        ) {
-          this.rows = +this.numRowsInput.value;
-          this.columns = +this.numColsInput.value;
-          this.board.removeAll();
-          this.createLevel();
+    document.querySelectorAll(".selector-icon").forEach(icon => {
+      icon.addEventListener("click", (e) => {
+        this.selectedIcon?.classList.remove("border");
+
+        if(this.selectedIcon?.id === (<HTMLImageElement>e.target).id)
+          this.selectedIcon = undefined;
+        else {
+          this.selectedIcon = <HTMLImageElement>e.target;
+          this.selectedIcon.classList.add("border");
+          (<HTMLInputElement>(document.getElementById('paintbrush'))).checked = true;
+          (<HTMLInputElement>(document.getElementById('eraser'))).checked = false;
         }
       });
+    }, this);
 
-    this.events.on("shutdown", (event) => {
-      this.resizeDialog.classList.add("d-none");
+    document.getElementById("eraserBtn").addEventListener("click", () => {
+      this.selectedIcon?.classList.remove("border");
     });
-  }
 
-  zoom(): void {
-    this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-      if (deltaY > 0) {
-        var zoom = this.cameras.main.zoom - 0.05;
-        if (zoom > 0.5) this.cameras.main.zoom -= 0.05;
-      }
-      if (deltaY < 0) {
-        var zoom = this.cameras.main.zoom + 0.05;
-        if (zoom < 1.5) this.cameras.main.zoom = zoom;
-      }
+    this.input.on('pointermove', (pointer) => {
+      if (!pointer.isDown) return;
+
+      const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
+      if(selectedTool !== "movement")
+        return;
+
+      this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+      this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
     });
+
+    // TODO: Remove magic number
+    this.cameras.main.setBounds(0, 0, this.cameras.main.width * 1.2, this.cameras.main.height * 1.2);
+
+    document.getElementById("saveEditorLevel").addEventListener("click", () => this.saveLevel())
   }
 
-  setMinMaxNumTiles(): void {
-    this.numColsInput.setAttribute("min", MIN_NUM_TILES.toString());
-    this.numColsInput.setAttribute("max", MAX_NUM_TILES.toString());
-    this.numColsInput.value = this.columns.toString();
-    this.numRowsInput.setAttribute("min", MIN_NUM_TILES.toString());
-    this.numRowsInput.setAttribute("max", MAX_NUM_TILES.toString());
-    this.numRowsInput.value = this.rows.toString();
+  createObjectImage(key, frame?): HTMLDivElement  {
+    let col = document.createElement('div');
+    col.classList.add("col", "text-center");
+
+    const url = this.textures.getBase64(key, frame);
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.width = 32 + "px"; // Set width
+    img.style.height = 32 + "px"; // Set height
+    img.id = `${key}-${frame}`;
+    img.classList.add(frame, "selector-icon", "border-primary", "border-3");
+
+    col.appendChild(img);
+    return col;
   }
 
-  createLevel(): void {
-    const SCREEN_WIDTH = this.cameras.main.width;
-    const SCREEN_HEIGHT = this.cameras.main.height;
-    let x = (SCREEN_WIDTH - this.rows * TILE_SIZE) / 2;
-    let y = (SCREEN_HEIGHT - this.columns * TILE_SIZE) / 2;
+  createBackgroundSelectors() {
+    let bgSelector = document.getElementById("background-selector");
 
-    let numTiles = this.rows * this.columns;
-
-    if (numTiles < this.tiles.length) {
-      this.frog.setPosition(this.objectX, this.objectY);
-      this.chest.setPosition(this.objectX, this.objectY + 100);
-
-      while (this.tiles.length > numTiles) {
-        this.tiles.pop()?.destroy();
-      }
-    } else if (numTiles > this.tiles.length) {
-      this.frog.setPosition(this.objectX, this.objectY);
-      this.chest.setPosition(this.objectX, this.objectY + 100);
-
-      while (this.tiles.length < numTiles) {
-        const tile = new TileObject(this, 0, 0, "tile");
-        this.tiles.push(tile);
-      }
+    let bgFrameNames = this.textures.get("background").getFrameNames();
+    for(let frame of bgFrameNames) {
+      bgSelector.appendChild(this.createObjectImage("background", frame));
     }
+  }
 
-    this.tiles = Phaser.Actions.GridAlign(this.tiles, {
-      width: this.rows,
-      height: this.columns,
-      cellWidth: TILE_SIZE,
-      cellHeight: TILE_SIZE,
-      x,
-      y,
-    });
+  createObjectSelectors() {
+    let objSelector = document.getElementById("object-selector");
 
-    this.board.setTiles(this.tiles);
+    // Player
+    objSelector.appendChild(this.createObjectImage("player"));
+
+    // Exit
+    objSelector.appendChild(this.createObjectImage("exit"));
+
+    // Chest
+    objSelector.appendChild(this.createObjectImage("chest"));
+
+    // Trap - disabled
+    objSelector.appendChild(this.createObjectImage("trap"));
+
+    // Trap - enabled
+    objSelector.appendChild(this.createObjectImage("trap", "3.png"));
+
+    // Wall
+    objSelector.appendChild(this.createObjectImage("wall"));
+
+    // Enemy
+    objSelector.appendChild(this.createObjectImage("enemy"));
+  }
+
+  getSelectedIcon(): {texture: string, frame: string | undefined } {
+    if(!this.selectedIcon) {
+      return {texture: undefined, frame: undefined};
+    }
+    let data = this.selectedIcon.id.split("-");
+    return {texture: data[0], frame: (data[1] === "undefined" ? undefined : data[1])};
+  }
+
+  saveLevel() {
+    console.log("saving level");
+    let levelJSON = this.board.toJSON();
+    console.log(levelJSON);
+    console.log(JSON.stringify(levelJSON));
   }
 }

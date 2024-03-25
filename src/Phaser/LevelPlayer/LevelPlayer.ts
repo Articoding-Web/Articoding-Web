@@ -113,7 +113,8 @@ export default class LevelPlayer extends Phaser.Scene {
     for (let y in this.backgroundLayerJson.objects) {
       const obj = this.backgroundLayerJson.objects[y];
       const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
-      tile.properties = obj.properties;
+      if(tile)
+        tile.properties = obj.properties;
     }
   }
 

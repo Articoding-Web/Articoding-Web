@@ -2,8 +2,7 @@ import PhaserController from "./Phaser/PhaserController";
 import BlocklyController from "./Blockly/BlocklyController";
 import LevelPlayer from "./Phaser/LevelPlayer/LevelPlayer";
 import LevelEditor from "./Phaser/LevelEditor/LevelEditor";
-// Temp
-import level from './baseLevel.json';
+
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let blocklyController: BlocklyController;
