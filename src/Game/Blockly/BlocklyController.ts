@@ -25,7 +25,7 @@ export default class BlocklyController {
 
   constructor(
     container: string | Element,
-    toolbox: string | ToolboxDefinition | Element,
+    toolbox?: string | ToolboxDefinition | Element,
     maxInstances?: { [blockType: string]: number },
     workspaceBlocks?: any
   ) {
@@ -96,7 +96,7 @@ export default class BlocklyController {
     runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
   }
 
-  
+
 
   highlightBlock(id: string | null) {
     this.workspace.highlightBlock(id);
@@ -122,7 +122,7 @@ export default class BlocklyController {
   }
 
   destroy() {
-        this.workspace.dispose();
+    this.workspace.dispose();
   }
 
   runCode() {

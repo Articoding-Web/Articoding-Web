@@ -26,7 +26,7 @@ export default {
                 {
                     "kind": "category",
                     "name": "Actions",
-                    "colour": "#a5a55b",
+                    "colour": "#745ba5",
                     "contents": [
                         {
                             "type": "movement",
@@ -59,7 +59,7 @@ export default {
                     "colour": "#0d44ba",
                     "contents": [
                         {
-                            "type": "numberSpecial",
+                            "type": "math_number",
                             "kind": "block"
                         }
                     ]
@@ -67,7 +67,7 @@ export default {
                 {
                     "kind": "category",
                     "name": "Loops",
-                    "colour": "#36e82a",
+                    "colour": "#5ba55b",
                     "contents": [
                         {
                             "type": "for_X_times",
@@ -81,8 +81,8 @@ export default {
                 },
                 {
                     "kind": "category",
-                    "name": "Conditions",
-                    "colour": "#0b6b0c",
+                    "name": "Logic",
+                    "colour": "#5b80a5",
                     "contents": [
                         {
                             "type": "if_do",
@@ -103,6 +103,9 @@ export default {
                     ]
                 }
             ]
+        },
+        "maxInstances": {
+            "start": 1,
         },
         "workspaceBlocks": []
     }

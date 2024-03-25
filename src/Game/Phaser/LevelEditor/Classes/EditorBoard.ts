@@ -214,8 +214,8 @@ export default class EditorBoard {
                         if (objSprite.texture.key === "player") {
                             // Add player
                             levelJson.phaser.layers.players.objects.push({
-                                "x": x,
-                                "y": y
+                                "x": parseInt(x),
+                                "y": parseInt(y)
                             });
                         }
                         else {

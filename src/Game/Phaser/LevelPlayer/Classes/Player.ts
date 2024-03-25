@@ -7,14 +7,10 @@ export class Player {
     private steps: number = 0;
     private playerDir: number = 0; //por defecto la ranita mira "abajo" down/left/up/right
     private isAlive = true;
-    private collectedChest = false;
+    private reachedExit = false;
+    private collectedChests:number = 0;
 
-    constructor(
-        private sprite: Phaser.GameObjects.Sprite,
-        private gridPhysics: GridPhysics,
-        private tilePos: Phaser.Math.Vector2,
-        private scaleFactor: number
-    ) {
+    constructor(private sprite: Phaser.GameObjects.Sprite, private gridPhysics: GridPhysics, private tilePos: Phaser.Math.Vector2, private scaleFactor: number) {
         this.addEventListeners();
     }
 
@@ -27,7 +23,7 @@ export class Player {
     }
 
     private movePlayer(direction: Direction): void {
-        if (this.steps == 0 || !this.isAlive || this.collectedChest)
+        if (this.steps == 0 || !this.isAlive || this.reachedExit)
             return;
 
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
@@ -109,7 +105,8 @@ export class Player {
     setTilePos(tilePosition: Phaser.Math.Vector2): void {
         this.tilePos = tilePosition.clone();
     }
-//TODO test @sanord8
+
+    //TODO test @sanord8
     die() {
         this.sprite.scene.tweens.add({
             targets: this.sprite,
@@ -118,18 +115,18 @@ export class Player {
             angle: 360,
             duration: 2500,
             onComplete: () => {
-             // nothing so far
+                // nothing so far
             }
-          });
+        });
 
-      }
+    }
 
     getIsAlive(): Boolean {
         return this.isAlive;
     }
 
-    hasCollectedChest(): Boolean {
-        return this.collectedChest;
+    getCollectedChest(): number {
+        return this.collectedChests;
     }
 
     kill() {
@@ -137,6 +134,15 @@ export class Player {
     }
 
     collectChest() {
-        this.collectedChest = true;
+        this.collectedChests++;
+    }
+
+    exit() {
+        console.log("reached exit");
+        this.reachedExit = true;
+    }
+
+    hasReachedExit() {
+        return this.reachedExit;
     }
 }

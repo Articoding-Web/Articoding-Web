@@ -7,6 +7,7 @@ import { Direction } from "./types/Direction.js";
 import ChestObject from "./Classes/ChestObject.js";
 import TrapObject from "./Classes/TrapObject.js";
 import ArticodingSprite from "./Classes/ArticodingSprite.js";
+import ExitObject from "./Classes/Exit.js";
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -131,9 +132,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
       // Add physics and create player object
       this.physics.add.existing(sprite);
-      this.players.push(
-        new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)), this.scaleFactor)
-      );
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)), this.scaleFactor));
     }
 
     this.cameras.main.roundPixels = true;
@@ -175,30 +174,33 @@ export default class LevelPlayer extends Phaser.Scene {
       for (let y in objects) {
         const obj = objects[y];
 
+        let createdObject;
         if (obj.type === "chest") {
-          const chest = new ChestObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
-          );
-          this.scaleSprite(chest, obj.x, obj.y);
-          chest.setDepth(objectJson.depth);
-          this.objects.push(chest);
+          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
         } else if (obj.type === "trap") {
           this.createTrapAnim();
-          const trap = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
-          this.scaleSprite(trap, obj.x, obj.y);
-          trap.setDepth(objectJson.depth);
+          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
           if (obj.properties.enabled)
-            trap.enable();
-          this.objects.push(trap);
+            createdObject.enable();
+        } else if (obj.type === "exit") {
+          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet);
+        } else if (obj.type === "wall") {
+          // TODO: add wall collisions
+          const wall = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
+          this.scaleSprite(wall, obj.x, obj.y);
+          wall.setDepth(objectJson.depth);
         }
         else {
-          // Create and scale sprite
-          const sprite = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
-          this.scaleSprite(sprite, obj.x, obj.y);
-          sprite.setDepth(objectJson.depth);
+          console.error("Object type not registered");
+          console.log(obj.type);
+          continue;
+        }
+
+        if(createdObject) {
+          // TODO: ver si el if se puede quitar al crear objeto WALL
+          this.scaleSprite(createdObject, obj.x, obj.y);
+          createdObject.setDepth(objectJson.depth);
+          this.objects.push(createdObject);
         }
       }
     }
@@ -248,7 +250,7 @@ export default class LevelPlayer extends Phaser.Scene {
   checkWinCondition(): void {
     for (let x in this.players) {
       const player = this.players[x];
-      if (!player.getIsAlive() || !player.hasCollectedChest()) {
+      if (!player.getIsAlive() || !player.hasReachedExit()) {
         player.die();
         const event = new CustomEvent("winConditionModal", { detail: { msg: "Lose", stars: 0, status: 0 } });
         document.dispatchEvent(event);
