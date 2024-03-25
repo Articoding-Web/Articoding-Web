@@ -37,30 +37,6 @@ export async function startLevelById(levelId: number) {
   }
 }
 
-export async function restartCurrentLevel() {
-  phaserController.destroy();
-  
-  const phaserJSON = currentLevelJSON.phaser;
-  phaserController = new PhaserController("LevelPlayer", LevelPlayer, phaserJSON);
-}
-
-//esta tiene que ser asincrona para poder hacer el fetch
-export async function startLevelById(levelId: number) {
-  try {
-    const response = await fetch(`http://localhost:3001/api/level/${levelId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const level = await response.json();
-    //TODO cambiarlo para que blockly salga tal y como estaba si has fracasado el nivel
-    blocklyController.destroy();
-    phaserController.destroy();
-    startLevel(level);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
 export async function restartCurrentLevel(levelId: number) {
   try {
     const response = await fetch(`http://localhost:3001/api/level/${levelId}`);
