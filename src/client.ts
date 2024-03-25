@@ -46,7 +46,7 @@ export async function restartCurrentLevel(levelId: number) {
     }
     const level = await response.json();
     let blocklyControllerRef = blocklyController;
-    blocklyController.destroy();//TODO no destruir blockly... mantenerlo igual.
+    //blocklyController.destroy();//TODO no destruir blockly... mantenerlo igual.
     phaserController.destroy();
     const levelJSON = JSON.parse(level.data);
 
@@ -57,6 +57,7 @@ export async function restartCurrentLevel(levelId: number) {
 
     phaserController = new PhaserController("LevelPlayer", LevelPlayer, phaserJSON);
     blocklyController = blocklyControllerRef;
+  //  blocklyController = new BlocklyController(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
     //blocklyController se mantiene en workspace.
     //blocklyController = new BlocklyController(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
   } catch (error) {

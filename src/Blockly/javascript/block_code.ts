@@ -110,7 +110,10 @@ export function defineAllBlocks() {
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-
+    if(repeats >= 25 || childBlockCode.length >= 25) {
+      console.log("You are trying to repeat too many times, this may cause performance issues.");
+      repeats = childBlockCode.length*15;
+    }
     let events = `[`;
     for(let x = 0; x < repeats; x++) {
       for(let y = 0; y < childBlockCode.length; y++) {

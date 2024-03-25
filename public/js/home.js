@@ -162,6 +162,7 @@ async function playLevel(event) {
   let level = await fetchRequest(`${API_ENDPOINT}/level/${levelId}`, "GET");
 
   document.getElementById("content").innerHTML = getLevelPlayerHTML();
+  document.getElementById("content").setAttribute("data-level-id", level.id);
   startLevel(level);
 }
 

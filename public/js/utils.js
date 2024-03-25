@@ -15,7 +15,11 @@ let defeatModalInstance;
     });
 
     const retryLevelButton = document.querySelector("#defeatModal .btn-primary");
-    retryLevelButton.addEventListener("click", () => restartCurrentLevel(currentLevelId));
+    retryLevelButton.addEventListener("click", () => {
+        let contentElement = document.getElementById("content");
+        let levelId = parseInt(contentElement.getAttribute("data-level-id"));
+        restartCurrentLevel(levelId);
+    });
 })();
 
 // Listen for the "winConditionModal" event
