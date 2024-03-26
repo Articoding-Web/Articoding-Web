@@ -82,7 +82,8 @@ export class GridPhysics {
 
     this.objects.forEach((obj) => {
       // If obj in same position, collide
-      if (obj.getPosition().equals(pos)) {
+      const objPos = obj.getPosition();
+      if (objPos.x == pos.x && objPos.y == pos.y) {
         obj.collide(player);
       }
     });

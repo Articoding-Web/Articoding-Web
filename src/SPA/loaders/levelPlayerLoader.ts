@@ -1,7 +1,12 @@
-import { startLevel } from "../../Game/client";
+import BlocklyController from "../../Game/LevelPlayer/Blockly/BlocklyController";
+import LevelPlayer from "../../Game/LevelPlayer/Phaser/LevelPlayer";
+import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
 
 const API_ENDPOINT = "http://localhost:3001/api";
+const BLOCKLY_DIV_ID = "blocklyDiv";
+
+let currentLevelJSON;
 
 /**
  *
@@ -27,14 +32,30 @@ function getLevelPlayerHTML() {
             </div>`;
 }
 
+export default async function loadLevelPlayer(id: string) {
+    document.getElementById("content").innerHTML = getLevelPlayerHTML();
+    playLevelById(id);
+}
+
 /**
  * Fetches a level by its ID and starts it
  * @param {String} id - The ID of the level to start
  */
-export default async function playLevelById(id: string) {
+export async function playLevelById(id: string) {
     let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
 
-    document.getElementById("content").innerHTML = getLevelPlayerHTML();
-    document.getElementById("content").setAttribute("data-level-id", id);
-    startLevel(level);
+    currentLevelJSON = JSON.parse(level.data);
+
+    const toolbox = currentLevelJSON.blockly.toolbox;
+    const maxInstances = currentLevelJSON.blockly.maxInstances;
+    const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
+    const phaserJSON = currentLevelJSON.phaser;
+
+    PhaserController.init("LevelPlayer", LevelPlayer, phaserJSON);
+    BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
+}
+
+export async function restartCurrentLevel() {
+    const phaserJSON = currentLevelJSON.phaser;
+    PhaserController.init("LevelPlayer", LevelPlayer, phaserJSON);
 }

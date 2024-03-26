@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import DropZoneTile from './DropZoneTile';
 import LevelEditor from '../LevelEditor';
-import config from '../../../config';
+import config from '../../config';
 import EmptyLevel from './EmptyLevel';
 
 export default class EditorBoard {
@@ -214,8 +214,8 @@ export default class EditorBoard {
                         if (objSprite.texture.key === "player") {
                             // Add player
                             levelJson.phaser.layers.players.objects.push({
-                                "x": x,
-                                "y": y
+                                "x": parseInt(x),
+                                "y": parseInt(y)
                             });
                         }
                         else {

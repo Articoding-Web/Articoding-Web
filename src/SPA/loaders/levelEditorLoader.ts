@@ -1,4 +1,5 @@
-import { editLevel } from "../../Game/client";
+import LevelEditor from "../../Game/LevelEditor/LevelEditor";
+import PhaserController from "../../Game/PhaserController";
 
 /**
  *
@@ -49,5 +50,5 @@ function getLevelEditorHTML() {
 export default function loadLevelEditor() {
     document.getElementById("content").innerHTML = getLevelEditorHTML();
 
-    editLevel();
+    PhaserController.init("LevelEditor", LevelEditor);
 }

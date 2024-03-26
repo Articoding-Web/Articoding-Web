@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import LevelEditor from '../LevelEditor';
-import config from '../../../config';
+import config from '../../config';
 
 export default class DropZoneTile extends Phaser.GameObjects.Zone {
   //owned sprite:

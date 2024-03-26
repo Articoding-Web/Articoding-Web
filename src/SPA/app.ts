@@ -1,7 +1,7 @@
-import loadCategoryById from "./loaders/category";
-import loadHome from "./loaders/home";
-import loadLevelEditor from "./loaders/levelEditor";
-import playLevelById from "./loaders/levelPlayer";
+import loadCategoryById from "./loaders/categoryLoader";
+import loadHome from "./loaders/homeLoader";
+import loadLevelEditor from "./loaders/levelEditorLoader";
+import loadLevelPlayer from "./loaders/levelPlayerLoader";
 
 export async function setPageHome() {
   loadHome();
@@ -12,7 +12,7 @@ export async function setPageOfficalCategoryById(params: URLSearchParams) {
 }
 
 export async function setPageLevelPlayer(params: URLSearchParams) {
-  playLevelById(params.get("id"));
+  loadLevelPlayer(params.get("id"));
 }
 
 export async function setPageLevelEditor(levelId?: number) {

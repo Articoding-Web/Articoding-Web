@@ -1,47 +1,39 @@
 import * as Blockly from "blockly";
 import { ZoomToFitControl } from "@blockly/zoom-to-fit";
-import * as block_code from "./javascript/block_code";
-
 import { javascriptGenerator } from "blockly/javascript";
-import blocks from "./Blocks/blocks";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { BlockCode } from "./types/BlockCode";
-import config from "../config";
+
+import * as block_code from "./javascript/block_code";
+import blocks from "./Blocks/blocks";
+
+import config from "../../config";
+
+// TODO: Eliminar numero magico
+const BLOCK_OFFSET = 50;
 
 export default class BlocklyController {
-  startBlock: Blockly.BlockSvg;
-  workspace: Blockly.WorkspaceSvg;
-  code: BlockCode[];
+  private static startBlock: Blockly.BlockSvg;
+  private static workspace: Blockly.WorkspaceSvg;
+  private static code: BlockCode[];
 
-  blocklyEvents = [
+  private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
     Blockly.Events.BLOCK_CREATE,
     Blockly.Events.BLOCK_DELETE,
     Blockly.Events.BLOCK_MOVE,
   ];
 
-  // TODO: Eliminar numero magico
-  blockOffset = 50;
+  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+    if(BlocklyController.workspace) {
+      BlocklyController.destroy();
+    }
 
-  constructor(
-    container: string | Element,
-    toolbox: string | ToolboxDefinition | Element,
-    maxInstances?: { [blockType: string]: number },
-    workspaceBlocks?: any
-  ) {
-    this.workspace = Blockly.inject(container, {
-      toolbox,
-      maxInstances,
-      zoom: {
-        controls: true,
-        wheel: true,
-        startScale: 1.0,
-        maxScale: 3,
-        minScale: 0.3,
-        scaleSpeed: 1.2,
-        pinch: true,
-      },
-    });
+    this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
+  }
+
+  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+    BlocklyController.workspace = Blockly.inject(container, { toolbox, maxInstances, zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2, pinch: true, }, });
 
     // Initialize plugin.
     const zoomToFit = new ZoomToFitControl(this.workspace);
@@ -65,17 +57,17 @@ export default class BlocklyController {
     this.startBlock.render();
     this.startBlock.setDeletable(false);
     this.startBlock;
-    this.startBlock.moveBy(this.blockOffset, this.blockOffset);
+    this.startBlock.moveBy(BLOCK_OFFSET, BLOCK_OFFSET);
 
-    let offset = this.blockOffset;
+    let offset = BLOCK_OFFSET;
     for (let workspaceBlock of workspaceBlocks) {
-      offset += this.blockOffset;
+      offset += BLOCK_OFFSET;
 
       // Create block
       const block = this.workspace.newBlock(workspaceBlock.id);
       block.initSvg();
       block.render();
-      block.moveBy(this.blockOffset, offset);
+      block.moveBy(BLOCK_OFFSET, offset);
 
       // Process block options
       if (workspaceBlock.opts?.isDeletable !== undefined)
@@ -96,13 +88,11 @@ export default class BlocklyController {
     runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
   }
 
-  
-
-  highlightBlock(id: string | null) {
+  static highlightBlock(id: string | null) {
     this.workspace.highlightBlock(id);
   }
 
-  generateCode(): BlockCode[] {
+  static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 
@@ -121,11 +111,11 @@ export default class BlocklyController {
     return code;
   }
 
-  destroy() {
-        this.workspace.dispose();
+  static destroy() {
+    this.workspace.dispose();
   }
 
-  runCode() {
+ static runCode() {
     let index = 0;
     const executeNextBlock = () => {
       if (index < this.code.length) {
@@ -138,12 +128,7 @@ export default class BlocklyController {
             const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
             times++;
-            setTimeout(
-              emitEvent,
-              config.MOVEMENT_ANIMDURATION,
-              eventName,
-              eventData
-            );
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION, eventName, eventData);
           } else {
             index++;
             executeNextBlock();
