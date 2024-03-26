@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import DropZoneTile from './DropZoneTile';
 import LevelEditor from '../LevelEditor';
-import config from '../../../config';
+import config from '../../config';
 import EmptyLevel from './EmptyLevel';
 
 export default class EditorBoard {

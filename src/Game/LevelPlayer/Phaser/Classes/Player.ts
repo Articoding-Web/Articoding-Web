@@ -11,15 +11,13 @@ export class Player {
     private collectedChests:number = 0;
 
     constructor(private sprite: Phaser.GameObjects.Sprite, private gridPhysics: GridPhysics, private tilePos: Phaser.Math.Vector2, private scaleFactor: number) {
-        this.addEventListeners();
+        document.addEventListener("move", this.handleMove);
     }
 
-    private addEventListeners() {
-        document.addEventListener("move", e => {
-            const data = (<CustomEvent>e).detail;
-            this.steps = 1;
-            this.movePlayer(Direction[data["direction"]]);
-        });
+    private handleMove = (e: Event) => {
+        const data = (e as CustomEvent).detail;
+        this.steps = 1;
+        this.movePlayer(Direction[data["direction"]]);
     }
 
     private movePlayer(direction: Direction): void {
@@ -144,5 +142,10 @@ export class Player {
 
     hasReachedExit() {
         return this.reachedExit;
+    }
+
+    destroy() {
+        document.removeEventListener("move", this.handleMove);
+        this.sprite.destroy();
     }
 }

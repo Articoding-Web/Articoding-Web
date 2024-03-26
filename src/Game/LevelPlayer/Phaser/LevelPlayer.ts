@@ -34,6 +34,9 @@ export default class LevelPlayer extends Phaser.Scene {
 
   init(...params) {
     const levelJson = params[0];
+
+    console.log(levelJson);
+
     this.theme = levelJson.theme;
     this.height = levelJson.height;
     this.width = levelJson.width;
@@ -72,14 +75,14 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   create() {
+    this.events.on('shutdown', this.shutdown, this);
+
     // this.zoom();
     this.createBackground(); // create un tilemap
     this.createPlayers(); // create sprites y obj jugadores
     this.createObjects(); // create sprites obj, incl. cofres
 
-    document.addEventListener("execution-finished", () => {
-      this.checkWinCondition();
-    })
+    document.addEventListener("execution-finished", this.checkWinCondition);
   }
 
   createBackground() {
@@ -130,8 +133,6 @@ export default class LevelPlayer extends Phaser.Scene {
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
-      // Add physics and create player object
-      this.physics.add.existing(sprite);
       this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)), this.scaleFactor));
     }
 
@@ -145,26 +146,30 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createPlayerAnimation(name: string) {
-    this.anims.create({
-      key: name,
-      frames: this.anims.generateFrameNames("player", {
-        start: 0,
-        end: 3,
-        prefix: `${name}/`,
-        suffix: ".png",
-      }),
-      frameRate: 8,
-      repeat: -1,
-      yoyo: true,
-    });
+    if (!this.anims.exists(name)) {
+      this.anims.create({
+        key: name,
+        frames: this.anims.generateFrameNames("player", {
+          start: 0,
+          end: 3,
+          prefix: `${name}/`,
+          suffix: ".png",
+        }),
+        frameRate: 8,
+        repeat: -1,
+        yoyo: true,
+      });
+    }
   }
 
   createDyingAnimation() {
-    this.anims.create({
-      key: 'dying',
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists('dying')) {
+      this.anims.create({
+        key: 'dying',
+        frameRate: 10,
+        repeat: -1
+      });
+    }
   }
 
   createObjects() {
@@ -196,7 +201,7 @@ export default class LevelPlayer extends Phaser.Scene {
           continue;
         }
 
-        if(createdObject) {
+        if (createdObject) {
           // TODO: ver si el if se puede quitar al crear objeto WALL
           this.scaleSprite(createdObject, obj.x, obj.y);
           createdObject.setDepth(objectJson.depth);
@@ -207,22 +212,20 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createTrapAnim() {
-    this.anims.create({
-      key: "trap",
-      frames: this.anims.generateFrameNames("trap", {
-        start: 0,
-        end: 3,
-        suffix: '.png',
-      }),
-      frameRate: 8,
-    });
+    if (!this.anims.exists('trap')) {
+      this.anims.create({
+        key: "trap",
+        frames: this.anims.generateFrameNames("trap", {
+          start: 0,
+          end: 3,
+          suffix: '.png',
+        }),
+        frameRate: 8,
+      });
+    }
   }
 
-  scaleSprite(
-    sprite: Phaser.GameObjects.Sprite,
-    gridXPosition: number,
-    gridYPosition: number
-  ) {
+  scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
     const offsetX = (config.TILE_SIZE / 2) * this.scaleFactor + this.mapCoordX;
     const offsetY = config.TILE_SIZE * this.scaleFactor + this.mapCoordY;
 
@@ -247,22 +250,36 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  checkWinCondition(): void {
+  private checkWinCondition = (e: Event) => {
+    let hasLost = false;
+
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
+        console.log(`player ${x}`);
         player.die();
-        const event = new CustomEvent("winConditionModal", { detail: { msg: "Lose", stars: 0, status: 0 } });
-        document.dispatchEvent(event);
-        return;
+        hasLost = true;
       }
     }
 
-    const event = new CustomEvent("winConditionModal", { detail: { msg: "Win", stars: 3, status: 1 } });
-    document.dispatchEvent(event);
+    if (hasLost) {
+      const event = new CustomEvent("lose");
+      document.dispatchEvent(event);
+    } else {
+      const event = new CustomEvent("win", { detail: { stars: 3 } });
+      document.dispatchEvent(event);
+    }
   }
 
   rotate(direction: string) {
     this.events.emit("rotateOrder", Direction[direction]);
+  }
+
+  shutdown() {
+    document.removeEventListener("execution-finished", this.checkWinCondition);
+
+    while (this.players.length) {
+      this.players.pop().destroy();
+    }
   }
 }

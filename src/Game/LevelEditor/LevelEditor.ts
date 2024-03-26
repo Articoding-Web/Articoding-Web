@@ -1,6 +1,5 @@
 import * as Phaser from "phaser";
 import Board from "./Classes/EditorBoard";
-import config from "../../config";
 
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
@@ -14,13 +13,16 @@ export default class LevelEditor extends Phaser.Scene {
     super("LevelEditor");
   }
 
+  // TODO: pasar nivel y cargarlo
   init(): void {
-    // TODO: get leveldata  (if passing from player to editor)
+    
   }
 
-  preload(): void {
+  preload(): void {   
     const assetPath = `assets`;
     const spritePath = `/sprites/default`;
+
+    // TODO: comprobar que la textura no esté impórtada antes de cargarla
 
     this.load.setBaseURL(assetPath);
     this.load.multiatlas("player", "sprites/default/player.json", spritePath);
