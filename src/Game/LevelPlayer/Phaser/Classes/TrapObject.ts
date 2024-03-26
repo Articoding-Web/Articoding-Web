@@ -32,7 +32,6 @@ export default class TrapObject extends ArticodingSprite {
 
   collide(player: Player): void {
     if (this.isOn) {
-      console.log("Player killed");
       player.kill();
     }
   }

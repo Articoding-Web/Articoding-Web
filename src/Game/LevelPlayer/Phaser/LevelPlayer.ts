@@ -35,8 +35,6 @@ export default class LevelPlayer extends Phaser.Scene {
   init(...params) {
     const levelJson = params[0];
 
-    console.log(levelJson);
-
     this.theme = levelJson.theme;
     this.height = levelJson.height;
     this.width = levelJson.width;
@@ -256,7 +254,6 @@ export default class LevelPlayer extends Phaser.Scene {
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
-        console.log(`player ${x}`);
         player.die();
         hasLost = true;
       }

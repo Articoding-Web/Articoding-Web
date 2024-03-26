@@ -136,7 +136,6 @@ export class Player {
     }
 
     exit() {
-        console.log("reached exit");
         this.reachedExit = true;
     }
 
