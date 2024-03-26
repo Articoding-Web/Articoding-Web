@@ -1,8 +1,12 @@
+import PhaserController from './Game/PhaserController';
 import initLoggin from './SPA/loggin';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
 
-export function route() {
+export async function route() {
+    // Always destroy phaser game
+    await PhaserController.destroyGame();
+
     const url = new URL(window.location.href);
 
     const setPageFunction = router[url.pathname];

@@ -1,5 +1,6 @@
 import * as bootstrap from 'bootstrap';
-import { playLevelById, restartCurrentLevel } from './loaders/levelPlayerLoader';
+import { restartCurrentLevel } from './loaders/levelPlayerLoader';
+import { route } from '../client';
 
 let victoryModalInstance;
 let defeatModalInstance;
@@ -13,8 +14,7 @@ export default async function registerModals() {
 
         // Change to new level
         history.pushState({ id }, "", `level?id=${id}`);
-        
-        playLevelById(id);
+        route();
     });
 
     const retryLevelButton = document.querySelector("#defeatModal .btn-primary");
