@@ -1,13 +1,14 @@
-import * as Phaser from "phaser";
-import config from "../../config.js";
+import * as Phaser from 'phaser';
 
-import { Player } from "./Classes/Player.js";
-import { GridPhysics } from "./Classes/GridPhysics.js";
-import { Direction } from "./types/Direction.js";
-import ChestObject from "./Classes/ChestObject.js";
-import TrapObject from "./Classes/TrapObject.js";
-import ArticodingSprite from "./Classes/ArticodingSprite.js";
-import ExitObject from "./Classes/Exit.js";
+import { sessionCookieValue } from '../../../../public/js/login.js';
+import config from '../../config.js';
+import ArticodingSprite from './Classes/ArticodingSprite.js';
+import ChestObject from './Classes/ChestObject.js';
+import ExitObject from './Classes/Exit.js';
+import { GridPhysics } from './Classes/GridPhysics.js';
+import { Player } from './Classes/Player.js';
+import TrapObject from './Classes/TrapObject.js';
+import { Direction } from './types/Direction.js';
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -265,6 +266,37 @@ export default class LevelPlayer extends Phaser.Scene {
     } else {
       const event = new CustomEvent("win", { detail: { stars: 3 } });
       document.dispatchEvent(event);
+
+      const cookie = sessionCookieValue();
+      if(cookie !== null){
+        const urlParams = new URLSearchParams(window.location.search);
+        const levelId = urlParams.get('id');
+        const postData = {
+          user: cookie.id,
+          level: levelId,
+          stars: 1,
+          attempts: 1,
+        };
+
+        fetch(config.API_ENDPOINT + "/play", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log("La petición se ha realizado correctamente.");
+          } else {
+            console.error("La petición falló con estado:", response.status);
+          }
+        })
+        .catch(error => {
+          console.error("Error al realizar la petición:", error);
+        });
+      }
+     
     }
   }
 
