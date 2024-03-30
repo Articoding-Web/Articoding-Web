@@ -42,7 +42,7 @@ async function setNavbarListeners() {
   document.getElementById("official").addEventListener("click", loadCategories);
 
   // Profile
-  // document.getElementById("profile").addEventListener("click", loadProfile);
+  document.getElementById("profile").addEventListener("click", loadProfile);
 
   // TODO: Manual
   document.getElementById("editor").addEventListener("click", loadLevelEditor);
@@ -100,15 +100,8 @@ async function loadCategories() {
 async function loadProfile() {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
-  /* const user = await fetchRequest(
-    `${API_ENDPOINT}/user/userById/:id`,
-    "GET"
-  ); */
-
-  const user = {
-    name: "Diego",
-    role: "Estudiante",
-  };
+  const id = 1;
+  const user = await fetchRequest(`${API_ENDPOINT}/user/${id}`, "GET");
 
   await fillContent(divElement, user, generateProfile);
 }
@@ -119,7 +112,16 @@ async function loadProfile() {
  * @returns String of HTMLDivElement
  */
 async function generateProfile(user) {
-  return ``;
+  return `<div class="col">
+              <div class="row">
+                <div class="col offset-1">
+                  <img src="./images/frog.png" alt="Usuario">
+                </div>
+                <div class="col col-4 offset-1">
+                  <strong>${user.name}</strong>
+                </div>
+              </div>
+          </div>`;
 }
 
 /**
