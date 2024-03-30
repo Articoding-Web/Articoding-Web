@@ -23,7 +23,8 @@ span.icon:hover, a:hover {
     z-index: 1;
     width: 100%;
     border-bottom-left-radius: 0.75rem;
-    box-shadow: 0rem 0rem 1rem black;
+    box-shadow: 0rem 0rem 0.5rem black;
+    opacity: 0.85;
 }
 
 .below {
@@ -42,12 +43,11 @@ span.icon:hover, a:hover {
     border-radius: 0.5rem;
 }
 
-.card:hover {
+#categories .card:hover {
     background-color: lavender;
 }
 
 .card-text {
     font-weight: 700;
     font-size: large;
-    text-align: right;
 }

@@ -1,68 +1,42 @@
-import PhaserController from "./Phaser/PhaserController";
-import BlocklyController from "./Blockly/BlocklyController";
-import LevelPlayer from "./Phaser/scenes/LevelPlayer";
-import LevelEditor from "./Phaser/scenes/LevelEditor";
+import registerModals from "./SPA/modals";
+import router from "./SPA/router";
 
-// Temp
-import level from './baseLevel.json';
+export function route() {
+    const url = new URL(window.location.href);
 
-globalThis.blocklyArea = document.getElementById("blocklyArea") as HTMLElement;
-globalThis.blocklyDiv = document.getElementById("blocklyDiv") as HTMLDivElement;
-globalThis.phaserDiv = document.getElementById("phaserDiv") as HTMLDivElement;
-
-let blocklyController: BlocklyController;
-let phaserController: PhaserController;
-let blocklyToggler = document.getElementById(
-  "blocklyToggler"
-) as HTMLButtonElement;
-
-window.addEventListener("load", (event) => {
-  addNavbarListeners();
-  blocklyToggler.addEventListener("click", (event) => toggleBlockly());
-});
-
-function toggleBlockly() {
-  if (blocklyController.isVisible) {
-    blocklyController.hideWorkspace();
-    globalThis.phaserDiv.classList.add("w-100");
-    globalThis.phaserDiv.classList.add("mx-auto");
-    globalThis.phaserDiv.classList.remove("col-lg-8");
-  } else {
-    blocklyController.showWorkspace();
-    globalThis.phaserDiv.classList.remove("w-100");
-    globalThis.phaserDiv.classList.remove("mx-auto");
-    globalThis.phaserDiv.classList.add("col-lg-8");
-    globalThis.phaserDiv.classList.add("col-lg-8");
-  }
+    const setPageFunction = router[url.pathname];
+    if(setPageFunction) {
+        setPageFunction(url.searchParams);
+    } else {
+        router["/"]();
+    }
 }
 
-function addNavbarListeners() {
-  let playBtn = document.getElementById("playBtn");
-  playBtn.addEventListener("click", (event) => playLevel());
-  let buildBtn = document.getElementById("buildBtn");
-  buildBtn.addEventListener("click", (event) => editLevel());
+function routeIfNewPath(newRoute: string) {
+    const url = new URL(window.location.href);
+    if(url.pathname != newRoute) {
+        history.pushState({}, "", newRoute);
+        route();
+    }
 }
 
-function playLevel() {
-  const toolbox = level.blockly.toolbox;
-  const maxInstances = level.blockly.maxInstances;
-  const workspaceBlocks = level.blockly.workspaceBlocks;
-  const levelJSON = level.phaser;
-  phaserController = new PhaserController("LevelPlayer", LevelPlayer, levelJSON);
-  blocklyController = new BlocklyController(toolbox, maxInstances, workspaceBlocks);
+function setNavbarListeners() {
+    // Official Levels
+  document.getElementById("official").addEventListener("click", () => routeIfNewPath("/"));
 
-  globalThis.phaserController = phaserController;
-  globalThis.blocklyController = blocklyController;
+  // TODO: Manual
+  document.getElementById("editor").addEventListener("click", () => routeIfNewPath("/editor"));
 
-  blocklyController.showWorkspace();
-  blocklyToggler.classList.remove("d-none");
+  // Community Levels
+  document.getElementById("community").addEventListener("click", () => routeIfNewPath("/community"));
 }
 
-function editLevel() {
-  blocklyToggler.classList.add("d-none");
+(function (){
+    window.addEventListener("popstate", route);
 
-  blocklyController.destroy();
-  phaserController.destroy();
-  phaserController = new PhaserController("LevelEditor", LevelEditor);
-  globalThis.phaserController = phaserController;
-}
+    setNavbarListeners();
+
+    route();
+
+    registerModals();
+})()
