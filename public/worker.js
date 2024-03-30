@@ -1,17 +1,24 @@
+var version = "1.0.1";
+
+var static = version + "_static";
+var dinamic;
+
+var store = [static, dinamic];
+
 const addResourcesToCache = async (resources) => {
   console.log("Add resources to cache");
-  const cache = await caches.open("v1");
-  await cache.addAll(resources);
+  const static = await caches.open(store[0]);
+  await static.addAll(resources);
 };
 
 const putInCache = async (request, response) => {
   console.log("Put in cache");
-  const cache = await caches.open("v1");
+  const cache = await caches.open(store[1]);
   await cache.put(request, response);
 };
 
 const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
-  // First try to get the resource from the cache
+  // first try to get the resource from the cache
   console.log("Cache first");
   const responseFromCache = await caches.match(request);
   if (responseFromCache) {
@@ -21,7 +28,7 @@ const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
   // Next try to use the preloaded response, if it's there
   const preloadResponse = await preloadResponsePromise;
   if (preloadResponse) {
-    console.info("using preload response", preloadResponse);
+    console.info("Using preload response", preloadResponse);
     putInCache(request, preloadResponse.clone());
     return preloadResponse;
   }
@@ -49,16 +56,58 @@ const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
   }
 };
 
+/**
+ * Remove cached items over a certain number
+ * @param  {String}  key The cache key
+ * @param  {Integer} maximum The maximum number of items allowed
+ */
+var trimCache = function (key, maximum) {
+  caches.open(key).then(function (cache) {
+    cache.keys().then(function (keys) {
+      if (keys.length <= maximum) return;
+      cache.delete(keys[0]).then(function () {
+        trimCache(key, maximum);
+        console.log("Elimino el nivel", keys[0]);
+      });
+    });
+  });
+};
+
+// Trim caches over a certain size
+self.addEventListener("message", function (event) {
+  if (event.data !== "clean") return;
+  trimCache(store[1], 2);
+});
+
 const enableNavigationPreload = async () => {
   console.log("Cache first");
   if (self.registration.navigationPreload) {
-    // Enable navigation preloads!
     await self.registration.navigationPreload.enable();
   }
 };
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(enableNavigationPreload());
+  // remove old caches
+  event.waitUntil(
+    caches
+      .keys()
+      .then(function (keys) {
+        return Promise.all(
+          keys
+            .filter(function (key) {
+              return !store[0].includes(key);
+            })
+            .map(function (key) {
+              console.log("Elimino la cache:", key);
+              return caches.delete(key);
+            })
+        );
+      })
+      .then(function () {
+        return self.clients.claim();
+      })
+  );
 });
 
 self.addEventListener("install", (event) => {
@@ -66,7 +115,11 @@ self.addEventListener("install", (event) => {
     addResourcesToCache([
       "./",
       "./index.html",
+      "./client.js",
+      "./js/bootstrap.min.js",
+      "./js/home.js",
       "./css/style.css",
+      "./css/bootstrap.min.css",
       "./images/logo.png",
       "./assets/sprites/default/background.json",
       "./assets/sprites/default/background.png",

@@ -14,6 +14,9 @@ const registerServiceWorker = async () => {
           scope: "../",
         }
       );
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.controller.postMessage("clean");
+      });
       if (registration.installing) {
         console.log("Service worker installing");
       } else if (registration.waiting) {
