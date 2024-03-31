@@ -232,14 +232,24 @@ export default class EditorBoard {
                                 };
                             }
 
+                            if(objSprite.texture.key !== "exit") {
+                                object["id"] = `${objSprite.texture.key.toUpperCase()}-`
+                            }
+
                             // Check if spritesheet exists
                             const dataIndex = levelJson.phaser.layers.objects.findIndex(obj => obj.spriteSheet === objSprite.texture.key);
                             if (dataIndex !== -1) {
+                                if(objSprite.texture.key !== "exit")
+                                    object["id"] += (levelJson.phaser.layers.objects[dataIndex].objects.length + 1);
+
                                 // Already registerd, add object
                                 levelJson.phaser.layers.objects[dataIndex].objects.push(object);
                             } else {
                                 // Not registered, create and add
                                 const spriteSheetType = (objSprite.texture.getFrameNames().length > 1 ? "multi" : "img");
+
+                                if(objSprite.texture.key !== "exit")
+                                    object["id"] += "1";
 
                                 levelJson.phaser.layers.objects.push({
                                     "spriteSheet": objSprite.texture.key,

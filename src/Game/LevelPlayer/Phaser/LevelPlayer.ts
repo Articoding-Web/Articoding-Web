@@ -97,18 +97,11 @@ export default class LevelPlayer extends Phaser.Scene {
 
     this.scaleFactor = Math.floor(this.cameras.main.height / layerHeight / 2);
 
-    this.mapCoordX =
-      (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
-    this.mapCoordY =
-      (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
+    this.mapCoordX = (this.cameras.main.width - layerWidth * this.scaleFactor) / 2;
+    this.mapCoordY = (this.cameras.main.height - layerHeight * this.scaleFactor) / 2;
 
     this.tilemap.addTilesetImage(this.backgroundLayerJson.spriteSheet);
-    const layer = this.tilemap.createBlankLayer(
-      this.backgroundLayerJson.spriteSheet,
-      this.tilemap.tilesets,
-      this.mapCoordX,
-      this.mapCoordY
-    );
+    const layer = this.tilemap.createBlankLayer(this.backgroundLayerJson.spriteSheet, this.tilemap.tilesets, this.mapCoordX, this.mapCoordY);
     layer.scale = this.scaleFactor;
     layer.depth = this.backgroundLayerJson.depth || layer.depth;
 
@@ -180,14 +173,14 @@ export default class LevelPlayer extends Phaser.Scene {
 
         let createdObject;
         if (obj.type === "chest") {
-          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet, obj.id);
         } else if (obj.type === "trap") {
           this.createTrapAnim();
-          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet, obj.id);
           if (obj.properties.enabled)
             createdObject.enable();
         } else if (obj.type === "exit") {
-          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet, obj.id);
         } else if (obj.type === "wall") {
           // TODO: add wall collisions
           const wall = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
@@ -224,16 +217,17 @@ export default class LevelPlayer extends Phaser.Scene {
     }
   }
 
-  scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
+  scaleSprite(sprite: Phaser.GameObjects.Sprite | ArticodingSprite, gridXPosition: number, gridYPosition: number) {
     const offsetX = (config.TILE_SIZE / 2) * this.scaleFactor + this.mapCoordX;
     const offsetY = config.TILE_SIZE * this.scaleFactor + this.mapCoordY;
 
     sprite.setOrigin(0.5, 1);
-    sprite.setPosition(
-      gridXPosition * config.TILE_SIZE * this.scaleFactor + offsetX,
-      gridYPosition * config.TILE_SIZE * this.scaleFactor + offsetY
-    );
+    sprite.setPosition(gridXPosition * config.TILE_SIZE * this.scaleFactor + offsetX,gridYPosition * config.TILE_SIZE * this.scaleFactor + offsetY);
     sprite.scale = this.scaleFactor;
+
+    if(sprite instanceof ArticodingSprite) {
+      sprite.scaleIdText();
+    }
   }
 
   zoom(): void {

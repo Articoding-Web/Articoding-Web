@@ -6,13 +6,8 @@ import config from "../../../config";
 export default class TrapObject extends ArticodingSprite {
   isOn = false;
 
-  constructor(
-    scene: Phaser.Scene,
-    tileX: number,
-    tileY: number,
-    texture: string | Phaser.Textures.Texture
-  ) {
-    super(scene, tileX, tileY, texture);
+  constructor(scene: Phaser.Scene, tileX: number, tileY: number, texture: string | Phaser.Textures.Texture, id: string) {
+    super(scene, tileX, tileY, texture, id);
     this.scene = scene;
     this.scene.add.existing(this);
 

@@ -19,11 +19,7 @@ export class GridPhysics {
 
   private speedPixelsPerSecond: number;
 
-  constructor(
-    private tileMap: Phaser.Tilemaps.Tilemap,
-    private scaleFactor: number,
-    private objects: ArticodingSprite[]
-  ) {
+  constructor(private tileMap: Phaser.Tilemaps.Tilemap, private scaleFactor: number, private objects: ArticodingSprite[]) {
     this.speedPixelsPerSecond = config.TILE_SIZE * this.scaleFactor;
   }
 
@@ -31,10 +27,7 @@ export class GridPhysics {
     return this.movementDirectionVectors[movementDirection]!.clone();
   }
 
-  getMovementDistance(
-    movementDirection: Direction,
-    pixelsToMove: number
-  ): Phaser.Math.Vector2 {
+  getMovementDistance(movementDirection: Direction, pixelsToMove: number): Phaser.Math.Vector2 {
     const directionVec = this.getMovementVector(movementDirection);
     return directionVec.multiply(new Vector2(pixelsToMove));
   }
@@ -44,19 +37,13 @@ export class GridPhysics {
     return this.speedPixelsPerSecond * deltaInSeconds;
   }
 
-  isBlockingDirection(
-    sourceTilePos: Phaser.Math.Vector2,
-    direction: Direction
-  ): boolean {
+  isBlockingDirection(sourceTilePos: Phaser.Math.Vector2, direction: Direction): boolean {
     return this.hasBlockingTile(
       this.tilePosInDirection(sourceTilePos, direction)
     );
   }
 
-  tilePosInDirection(
-    sourceTilePos: Phaser.Math.Vector2,
-    direction: Direction
-  ): Vector2 {
+  tilePosInDirection(sourceTilePos: Phaser.Math.Vector2, direction: Direction): Vector2 {
     return sourceTilePos.add(this.movementDirectionVectors[direction]);
   }
 
