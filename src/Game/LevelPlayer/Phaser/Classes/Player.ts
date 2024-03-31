@@ -14,7 +14,6 @@ export class Player {
     }
 
     private handleMove = (e: Event) => {
-        console.log("received move order");
         const data = (e as CustomEvent).detail;
         this.movePlayer(Direction[data["direction"]]);
     }
@@ -37,14 +36,9 @@ export class Player {
         const pixelsToMove = config.TILE_SIZE * this.scaleFactor;
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = this.getPosition().add(movementDistance);
-
-        console.log(this.getPosition());
-        console.log(movementDistance);
-        console.log(newPlayerPos);
-
+        
         this.updatePlayerTilePos(direction);
 
-        console.log("Launching tween")
         this.sprite.scene.tweens.add({
             targets: this.sprite,
             x: newPlayerPos.x,
@@ -72,7 +66,6 @@ export class Player {
     }
 
     private startRunningAnimation(direction: Direction) {
-        console.log(`starting animation ${direction}`);
         this.sprite.anims.play(direction);
     }
 
@@ -86,7 +79,6 @@ export class Player {
     }
 
     private stopMoving(): void {
-        console.log("stopping anim")
         this.stopAnimation();
     }
 
@@ -143,7 +135,6 @@ export class Player {
     }
 
     exit() {
-        console.log("reached exit");
         this.reachedExit = true;
     }
 

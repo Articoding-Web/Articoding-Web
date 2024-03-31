@@ -40,7 +40,6 @@ export default class PhaserController {
         });
 
         // Flags the game instance as needing to be destroyed
-        console.log("destroying game");
         PhaserController.game.destroy(false);
       } else {
         resolve();
