@@ -1,5 +1,9 @@
-import { route } from "../../client";
-import { fetchRequest, fillContent } from "../utils";
+import { sessionCookieValue } from '../../../public/js/login.js';
+import { route } from '../../client';
+import {
+  fetchRequest,
+  fillContent,
+} from '../utils';
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
@@ -19,12 +23,18 @@ function getRowHTML() {
 async function generateLevelDiv(level) {
     return `<div class="col">
               <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-                <div class="card border-dark">
-                  <div class="card-header">
+                <div class="card border-dark d-flex flex-column h-100">
+                  <h5 class="card-header card-title text-dark">
                     ${level.title}
-                  </div>
-                  <div class="card-body">
-                    Miniatura: 
+                  </h5>
+                  <div class="card-body text-dark">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      Estrellas: ${level.statistics.stars}
+                    </h6>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      Intentos: ${level.statistics.attempts}
+                    </h6>
+                    <p>Miniatura: </p> 
                   </div>
                 </div>
               </a>
@@ -51,8 +61,30 @@ export default async function loadCategoryById(id: string) {
         `${API_ENDPOINT}/level/levelsByCategory/${id}`,
         "GET"
     );
+    const cookie = sessionCookieValue();
+    let statistics : any;
+    if(cookie !== null){
+      statistics = await fetchRequest( `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,"GET");
+    };
+    // Convertir array de estadísticas a un mapa con clave igual al nivel
+    const statisticsMap = statistics.reduce((map, statistic) => {
+      map[statistic.level] = {stars: statistic.stars, attempts:statistic.attempts};
+      return map;
+    }, {});
+
+    // Mapear los niveles para agregar las estadísticas
+    const levelsWithStatistics = levels.map(level => {
+      const levelId = level.id;
+      const statistic = statisticsMap[levelId]; // Obtener la estadística correspondiente al nivel
+      return {
+          ...level,
+          statistics: statistic || { stars: 0, attempts: 0 } // Asignar estadísticas o objeto vacío si no hay estadísticas disponibles
+      };
+    });
+
+
     const divElement = document.getElementById("categories");
-    await fillContent(divElement, levels, generateLevelDiv);
+    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
     // Add getLevel event listener
     document.querySelectorAll("a.getLevel").forEach((level) => {

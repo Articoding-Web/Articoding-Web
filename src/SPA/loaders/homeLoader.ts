@@ -1,5 +1,8 @@
-import { route } from "../../client";
-import { fetchRequest, fillContent } from "../utils";
+import { route } from '../../client';
+import {
+  fetchRequest,
+  fillContent,
+} from '../utils';
 
 const API_ENDPOINT = "http://localhost:3001/api";
 
@@ -87,6 +90,7 @@ export default async function loadHome() {
         `${API_ENDPOINT}/level/categories`,
         "GET"
     );
+    
     await fillContent(divElement, categories, generateCategoryDiv);
 
     document.querySelectorAll("a.category").forEach((anchorTag) => {
