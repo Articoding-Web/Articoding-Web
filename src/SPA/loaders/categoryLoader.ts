@@ -61,24 +61,23 @@ export default async function loadCategoryById(id: string) {
         `${API_ENDPOINT}/level/levelsByCategory/${id}`,
         "GET"
     );
+    
     const cookie = sessionCookieValue();
-    let statistics : any;
+    let statistics = [];
     if(cookie !== null){
       statistics = await fetchRequest( `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,"GET");
     };
-    // Convertir array de estadísticas a un mapa con clave igual al nivel
     const statisticsMap = statistics.reduce((map, statistic) => {
       map[statistic.level] = {stars: statistic.stars, attempts:statistic.attempts};
       return map;
     }, {});
 
-    // Mapear los niveles para agregar las estadísticas
     const levelsWithStatistics = levels.map(level => {
       const levelId = level.id;
-      const statistic = statisticsMap[levelId]; // Obtener la estadística correspondiente al nivel
+      const statistic = statisticsMap[levelId]; 
       return {
           ...level,
-          statistics: statistic || { stars: 0, attempts: 0 } // Asignar estadísticas o objeto vacío si no hay estadísticas disponibles
+          statistics: statistic || { stars: 0, attempts: 0 } 
       };
     });
 
