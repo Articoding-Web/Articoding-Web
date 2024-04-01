@@ -1,4 +1,20 @@
-function sessionCookieValue() {
+import { fetchRequest, fillContent } from "../utils";
+import * as bootstrap from "bootstrap";
+
+const API_ENDPOINT = "http://localhost:3001/api";
+
+// Variable para controlar si el evento click ya se agregó al botón
+let registerSubmitBtnAdded = false;
+
+/**
+ *
+ * @returns String of HTMLDivElement for showing levels/categories
+ */
+function getRowHTML() {
+  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+}
+
+export function sessionCookieValue() {
   const sessionInfo = getCookieValue("session");
   if (sessionInfo) {
     const cleanedSessionInfo = sessionInfo.substring(2);
@@ -27,56 +43,40 @@ function checkSessionCookie() {
 }
 
 function userLogin() {
-  const userId = document.getElementById("userId").value;
-  const password = document.getElementById("password").value;
+  const userId = (document.getElementById("userId") as HTMLInputElement).value;
+  const password = (document.getElementById("password") as HTMLInputElement)
+    .value;
+
   const postData = {
     id: userId,
     password: password,
   };
-  fetch("http://localhost:3001/api/user/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(postData),
-  })
-    .then((response) => {
-      console.log("Respuesta completa del servidor:", response);
 
-      return response.json();
-    })
-    .then((data) => {
-      console.log("Respuesta JSON del servidor:", data);
-    })
-    .catch((error) => {
-      console.error("Error al realizar la petición:", error);
-    });
+  fetchRequest(
+    `${API_ENDPOINT}/user/login`,
+    "POST",
+    JSON.stringify(postData),
+    "include"
+  );
 }
 
 function useRegister() {
-  const userName = document.getElementById("userName").value;
-  const userPassword = document.getElementById("userPassword").value;
+  const userName = (document.getElementById("userName") as HTMLInputElement)
+    .value;
+  const userPassword = (
+    document.getElementById("userPassword") as HTMLInputElement
+  ).value;
 
   const postData = {
     userName: userName,
     userPassword: userPassword,
   };
 
-  fetch("http://localhost:3001/api/user/registro", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(postData),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Respuesta del servidor:", data);
-    })
-    .catch((error) => {
-      console.error("Error al realizar la petición:", error);
-    });
+  fetchRequest(
+    `${API_ENDPOINT}/user/registro`,
+    "POST",
+    JSON.stringify(postData)
+  );
 }
 
 function appendLoginModal() {
@@ -102,7 +102,7 @@ function appendLoginModal() {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
-                        <button type="button" class="btn btn-secondary" id="registerBtn" >¿No tienes cuenta?</button>
+                        <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
                     </div>
                 </div>
             </div>
@@ -161,7 +161,7 @@ function appendRegisterModal() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" id="registerSubmitBtn" >Registrarse</button>
+                        <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </div>
                 </div>
@@ -183,26 +183,56 @@ function appendRegisterModal() {
   registerModalInstance.show();
 
   let registerSubmitBtn = document.getElementById("registerSubmitBtn");
-  if (registerSubmitBtn) {
+  // Agregar event listener solo si no se ha agregado antes
+  if (!registerSubmitBtnAdded) {
     registerSubmitBtn.addEventListener("click", function (event) {
       event.preventDefault();
       useRegister();
       registerModalInstance.hide();
     });
+    registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  let loginBtn = document.getElementById("profile");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", function (event) {
-      event.preventDefault();
-      //Comprueba si ya hay sesion
-      if (checkSessionCookie()) {
-        console.log("🚀 ~ sessionCookieValue:", sessionCookieValue());
-      } else {
-        appendLoginModal();
-      }
-    });
-  }
-});
+/**
+ *
+ * @returns String of HTMLDivElement of a category placeholder
+ */
+function generateProfilePlaceholder() {}
+
+/**
+ *
+ * @param {Object} user with id, name and role
+ * @returns String of HTMLDivElement
+ */
+async function generateProfileDiv(user) {
+  console.log("En el generate");
+  return `<div class="col">
+            <div class="card border-dark">
+              <div class="card-header">
+                ${user.name}
+              </div>
+              <div class="card-body">
+                Miniatura: 
+              </div>
+            </div>
+          </div>`;
+}
+
+export default async function loadProfile() {
+  if (checkSessionCookie()) {
+    console.log("🚀 ~ sessionCookieValue:", sessionCookieValue());
+    document.getElementById("content").innerHTML = getRowHTML();
+    const divElement = document.getElementById("categories");
+
+    // Load placeholders
+    /* await fillContent(
+      divElement,
+      new Array(10),
+      generateProfileDivPlaceholder
+    ); */
+
+    const user = sessionCookieValue();
+    await fillContent(divElement, user, generateProfileDiv);
+  } else appendLoginModal();
+}
