@@ -54,7 +54,7 @@ async function generateCategoryDiv(category) {
                     </h5>
                     <div class="card-body text-dark">
                       <h6 class="card-subtitle mb-2 text-muted">
-                        Niveles: ${category.count}
+                        Levels: ${category.count}
                       </h6>
                       ${category.description}
                     </div>

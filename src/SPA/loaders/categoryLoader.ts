@@ -29,12 +29,12 @@ async function generateLevelDiv(level) {
                   </h5>
                   <div class="card-body text-dark">
                     <h6 class="card-subtitle mb-2 text-muted">
-                      Estrellas: ${level.statistics.stars}
+                      Stars: ${level.statistics.stars}
                     </h6>
                     <h6 class="card-subtitle mb-2 text-muted">
-                      Intentos: ${level.statistics.attempts}
+                      Attempts: ${level.statistics.attempts}
                     </h6>
-                    <p>Miniatura: </p> 
+                    <p>Miniature: </p> 
                   </div>
                 </div>
               </a>
