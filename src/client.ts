@@ -7,6 +7,7 @@ export async function route() {
     // Always destroy phaser game
     await PhaserController.destroyGame();
 
+
     const url = new URL(window.location.href);
 
     const setPageFunction = router[url.pathname];
