@@ -1,4 +1,4 @@
-import { fetchRequest, fillContent } from "../utils";
+import { fetchRequest } from "../utils";
 import * as bootstrap from "bootstrap";
 
 const API_ENDPOINT = "http://localhost:3001/api";
@@ -11,7 +11,7 @@ let registerSubmitBtnAdded = false;
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 w-75 mx-auto" id="categories"></div>';
 }
 
 export function sessionCookieValue() {
@@ -205,15 +205,16 @@ function generateProfilePlaceholder() {}
  * @param {Object} user with id, name and role
  * @returns String of HTMLDivElement
  */
-async function generateProfileDiv(user) {
-  console.log("En el generate");
-  return `<div class="col">
-            <div class="card border-dark">
-              <div class="card-header">
-                ${user.name}
-              </div>
-              <div class="card-body">
-                Miniatura: 
+function generateProfileDiv(user) {
+  return `<div class="row">
+            <div class="col col-12">
+              <div class="row tag">
+                <div class="col col-3 offset-1 m-auto">
+                  <img src="./images/profile.png" class="rounded-circle">
+                </div>
+                <div class="col col-6 offset-1 mx-auto my-auto">
+                  <p class="username">${user.name}</p>
+                </div>
               </div>
             </div>
           </div>`;
@@ -221,18 +222,13 @@ async function generateProfileDiv(user) {
 
 export default async function loadProfile() {
   if (checkSessionCookie()) {
-    console.log("🚀 ~ sessionCookieValue:", sessionCookieValue());
     document.getElementById("content").innerHTML = getRowHTML();
     const divElement = document.getElementById("categories");
 
     // Load placeholders
-    /* await fillContent(
-      divElement,
-      new Array(10),
-      generateProfileDivPlaceholder
-    ); */
+    // divElement.innerHTML = generateProfilePlaceholder();
 
     const user = sessionCookieValue();
-    await fillContent(divElement, user, generateProfileDiv);
+    divElement.innerHTML = generateProfileDiv(user);
   } else appendLoginModal();
 }

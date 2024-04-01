@@ -23,14 +23,15 @@ function generateCategoryDivPlaceholder() {
                   </h5>
                   <div class="card-body text-dark">
                       <h6 class="card-subtitle mb-2 text-muted">
-                          Niveles: <span class="placeholder col-1 bg-secondary"></span>
+                        <span class="placeholder col-3 bg-secondary"></span>
+                        <span class="placeholder col-1 bg-secondary"></span>
                       </h6>
                       <p class="card-text placeholder-glow">
-                          <span class="placeholder col-7 bg-secondary"></span>
-                          <span class="placeholder col-4 bg-secondary"></span>
-                          <span class="placeholder col-4 bg-secondary"></span>
-                          <span class="placeholder col-6 bg-secondary"></span>
-                          <span class="placeholder col-8 bg-secondary"></span>
+                        <span class="placeholder col-7 bg-secondary"></span>
+                        <span class="placeholder col-4 bg-secondary"></span>
+                        <span class="placeholder col-4 bg-secondary"></span>
+                        <span class="placeholder col-6 bg-secondary"></span>
+                        <span class="placeholder col-8 bg-secondary"></span>
                       </p>
                   </div>
               </div>
