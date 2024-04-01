@@ -1,5 +1,6 @@
-import registerModals from "./SPA/modals";
-import router from "./SPA/router";
+import initLoggin from './SPA/loggin';
+import registerModals from './SPA/modals';
+import router from './SPA/router';
 
 export function route() {
     const url = new URL(window.location.href);
@@ -39,4 +40,6 @@ function setNavbarListeners() {
     route();
 
     registerModals();
+    
+    initLoggin();
 })()

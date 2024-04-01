@@ -1,3 +1,5 @@
+let registerSubmitBtnAdded = false;
+
 function sessionCookieValue() {
   const sessionInfo = getCookieValue("session");
   if (sessionInfo) {
@@ -182,13 +184,13 @@ function appendRegisterModal() {
 
   registerModalInstance.show();
 
-  let registerSubmitBtn = document.getElementById("registerSubmitBtn");
-  if (registerSubmitBtn) {
+  if (!registerSubmitBtnAdded) {
     registerSubmitBtn.addEventListener("click", function (event) {
       event.preventDefault();
       useRegister();
       registerModalInstance.hide();
     });
+    registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
   }
 }
 
