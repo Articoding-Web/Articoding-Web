@@ -1,9 +1,10 @@
 var version = "1.0.1";
 
 var static = version + "_static";
-var dinamic;
+var levels;
+var pages;
 
-var store = [static, dinamic];
+var store = [static, levels, pages];
 
 const addResourcesToCache = async (resources) => {
   console.log("Add resources to cache");
@@ -13,7 +14,14 @@ const addResourcesToCache = async (resources) => {
 
 const putInCache = async (request, response) => {
   console.log("Put in cache");
-  const cache = await caches.open(store[1]);
+  let actual;
+  let substring = "http://localhost:3001/api/level/";
+  if (request.url.startsWith(substring)) {
+    const id = request.url.replace(substring, "");
+    if (!isNaN(id)) actual = store[1];
+    else actual = store[2];
+  } else actual = await caches.open(store[2]);
+  const cache = actual;
   await cache.put(request, response);
 };
 
@@ -67,7 +75,7 @@ var trimCache = function (key, maximum) {
       if (keys.length <= maximum) return;
       cache.delete(keys[0]).then(function () {
         trimCache(key, maximum);
-        console.log("Elimino el nivel", keys[0]);
+        console.log("Borro el nivel:", keys[0]);
       });
     });
   });
