@@ -41,13 +41,18 @@ img {
 }
 
 .tag {
-    background-color: black;
+    background-color: #37474F;
     border-radius: 0.5rem;
 }
 
 .username {
     color: white;
     font-size: 6vw;
+}
+
+.role {
+    color: white;
+    font-size: 3vw;
 }
 
 .card-container {
@@ -59,7 +64,6 @@ img {
     background-color: white;
     border-style: none;
     margin: 1.5rem;
-    border-radius: 0.5rem;
 }
 
 #categories .card:hover {
