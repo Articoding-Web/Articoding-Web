@@ -1,13 +1,13 @@
-import * as Phaser from "phaser";
-import config from "../../config.js";
+import * as Phaser from 'phaser';
 
-import { Player } from "./Classes/Player.js";
-import { GridPhysics } from "./Classes/GridPhysics.js";
-import { Direction } from "./types/Direction.js";
-import ChestObject from "./Classes/ChestObject.js";
-import TrapObject from "./Classes/TrapObject.js";
-import ArticodingSprite from "./Classes/ArticodingSprite.js";
-import ExitObject from "./Classes/Exit.js";
+import config from '../../config.js';
+import ArticodingSprite from './Classes/ArticodingSprite.js';
+import ChestObject from './Classes/ChestObject.js';
+import ExitObject from './Classes/Exit.js';
+import { GridPhysics } from './Classes/GridPhysics.js';
+import { Player } from './Classes/Player.js';
+import TrapObject from './Classes/TrapObject.js';
+import { Direction } from './types/Direction.js';
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -265,7 +265,7 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(event);
     } else {
       const event = new CustomEvent("win", { detail: { stars: 3 } });
-      document.dispatchEvent(event);
+      document.dispatchEvent(event);     
     }
   }
 
