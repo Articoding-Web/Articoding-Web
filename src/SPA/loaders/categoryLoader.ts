@@ -4,8 +4,8 @@ import {
   fetchRequest,
   fillContent,
 } from '../utils';
-require('dotenv').config();
-const API_ENDPOINT = `http://${process.env.API_SERVER_URL}:${process.env.API_PORT}/api`;
+import config from '../../Game/config.js';
+const API_ENDPOINT = config.API_ENDPOINT;
 
 /**
  *

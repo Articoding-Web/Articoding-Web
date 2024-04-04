@@ -1,6 +1,6 @@
 import { sessionCookieValue } from '../../public/js/login.js';
 import config from '../Game/config.js';
-
+const API_ENDPOINT = config.API_ENDPOINT;
 export default async function initLoggin() {
 
   document.addEventListener("win", event => {
@@ -14,7 +14,7 @@ export default async function initLoggin() {
         stars: 1,
       };
       
-      fetch(config.API_ENDPOINT + "/play", {
+      fetch(API_ENDPOINT + "/play", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,8 +2,8 @@ import BlocklyController from "../../Game/LevelPlayer/Blockly/BlocklyController"
 import LevelPlayer from "../../Game/LevelPlayer/Phaser/LevelPlayer";
 import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
-require("dotenv").config();
-const API_ENDPOINT = `http://${process.env.API_SERVER_URL}:${process.env.API_PORT}/api`
+import  config from "../../Game/config";
+const API_ENDPOINT = config.API_ENDPOINT;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let currentLevelJSON;
