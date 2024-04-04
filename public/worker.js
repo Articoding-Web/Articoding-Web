@@ -1,14 +1,20 @@
 var version = "1.0.0";
 
-var static = version + "_static";
-var levels;
-var pages;
+// FALTA
 
-var store = { static, levels };
+// Actualizar offline.js y offline.html con el navbar
+// Hacer npm run build antes de verlo en acción
+
+var static = version + "_static";
+var levels = version + "_levels";
+
+var store = [static, levels];
+
+var limit = 10;
 
 const addResourcesToCache = async (resources) => {
   console.log("Add resources to cache");
-  const static = await caches.open(store.static);
+  const static = await caches.open(store[0]);
   await static.addAll(resources);
 };
 
@@ -18,21 +24,25 @@ const putInCache = async (request, response) => {
   if (request.url.startsWith(substring)) {
     const id = request.url.replace(substring, "");
     if (!isNaN(id)) {
-      const cache = store.levels;
+      const cache = await caches.open(store[1]);
       await cache.put(request, response);
+      trimCache(store[1], limit);
     }
   }
 };
 
 const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
-  // first try to get the resource from the cache
   console.log("Cache first");
+  if (request.cache === "only-if-cached" && request.mode !== "same-origin")
+    return;
+
+  // first try to get the resource from the cache
   const responseFromCache = await caches.match(request);
   if (responseFromCache) {
     return responseFromCache;
   }
 
-  // Next try to use the preloaded response, if it's there
+  // next try to use the preloaded response, if it's there
   const preloadResponse = await preloadResponsePromise;
   if (preloadResponse) {
     console.info("Using preload response", preloadResponse);
@@ -40,7 +50,7 @@ const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
     return preloadResponse;
   }
 
-  // Next try to get the resource from the network
+  // next try to get the resource from the network
   try {
     const responseFromNetwork = await fetch(request);
     // response may be used only once
@@ -74,20 +84,19 @@ var trimCache = function (key, maximum) {
       if (keys.length <= maximum) return;
       cache.delete(keys[0]).then(function () {
         trimCache(key, maximum);
-        console.log("Borro el nivel:", keys[0]);
+        console.log("Deleted level:", keys[0]);
       });
     });
   });
 };
 
-// Trim caches over a certain size
+// Trim caches when clean message is posted
 self.addEventListener("message", function (event) {
   if (event.data !== "clean") return;
-  trimCache(store.levels, 2);
+  trimCache(store[1], 2);
 });
 
 const enableNavigationPreload = async () => {
-  console.log("Cache first");
   if (self.registration.navigationPreload) {
     await self.registration.navigationPreload.enable();
   }
@@ -106,7 +115,7 @@ self.addEventListener("activate", (event) => {
               return !store.includes(key);
             })
             .map(function (key) {
-              console.log("Elimino la cache:", key);
+              console.log("Cache deleted:", key);
               return caches.delete(key);
             })
         );
@@ -118,38 +127,41 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("install", (event) => {
+  // activate right away
+  self.skipWaiting();
   event.waitUntil(
     addResourcesToCache([
       "./",
-      "./public/index.html",
-      "./public/client.js",
-      "./public/js/bootstrap.min.js",
-      "./public/css/style.css",
-      "./public/css/bootstrap.min.css",
-      "./public/images/logo.png",
-      "./public/images/logo.ico",
-      "./public/images/profile.png",
-      "./public/assets/sprites/default/background.json",
-      "./public/assets/sprites/default/background.png",
-      "./public/assets/sprites/default/chest.png",
-      "./public/assets/sprites/default/door.json",
-      "./public/assets/sprites/default/door.png",
-      "./public/assets/sprites/default/enemy.json",
-      "./public/assets/sprites/default/enemy.png",
-      "./public/assets/sprites/default/exit.png",
-      "./public/assets/sprites/default/player.json",
-      "./public/assets/sprites/default/player.png",
-      "./public/assets/sprites/default/trap.json",
-      "./public/assets/sprites/default/trap.png",
-      "./public/assets/sprites/default/wall.png",
-      "./public/assets/ui/button_green_pressed.png",
-      "./public/assets/ui/button_green.png",
-      "./public/assets/ui/button_red_preseed.png",
-      "./public/assets/ui/button_red.png",
-      "./public/assets/ui/minus_pressed.png",
-      "./public/assets/ui/minus.png",
-      "./public/assets/ui/plus_pressed.png",
-      "./public/assets/ui/plus.png",
+      "./index.html",
+      "./offline.html",
+      "./client.js",
+      "./js/bootstrap.min.js",
+      "./css/style.css",
+      "./css/bootstrap.min.css",
+      "./images/logo.png",
+      "./images/logo.ico",
+      "./images/profile.png",
+      "./assets/sprites/default/background.json",
+      "./assets/sprites/default/background.png",
+      "./assets/sprites/default/chest.png",
+      "./assets/sprites/default/door.json",
+      "./assets/sprites/default/door.png",
+      "./assets/sprites/default/enemy.json",
+      "./assets/sprites/default/enemy.png",
+      "./assets/sprites/default/exit.png",
+      "./assets/sprites/default/player.json",
+      "./assets/sprites/default/player.png",
+      "./assets/sprites/default/trap.json",
+      "./assets/sprites/default/trap.png",
+      "./assets/sprites/default/wall.png",
+      "./assets/ui/button_green_pressed.png",
+      "./assets/ui/button_green.png",
+      "./assets/ui/button_red_preseed.png",
+      "./assets/ui/button_red.png",
+      "./assets/ui/minus_pressed.png",
+      "./assets/ui/minus.png",
+      "./assets/ui/plus_pressed.png",
+      "./assets/ui/plus.png",
     ])
   );
 });
@@ -159,7 +171,7 @@ self.addEventListener("fetch", (event) => {
     cacheFirst({
       request: event.request,
       preloadResponsePromise: event.preloadResponse,
-      fallbackUrl: "./images/logo.png",
+      fallbackUrl: "./offline.html",
     })
   );
 });

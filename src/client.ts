@@ -1,32 +1,6 @@
 import registerModals from "./SPA/modals";
 import router from "./SPA/router";
 
-const registerServiceWorker = async () => {
-  if ("serviceWorker" in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.register(
-        "../public/worker.js",
-        {
-          scope: "../",
-        }
-      );
-      window.addEventListener("load", function () {
-        console.log("Loading page");
-        navigator.serviceWorker.controller.postMessage("clean");
-      });
-      if (registration.installing) {
-        console.log("Service worker installing");
-      } else if (registration.waiting) {
-        console.log("Service worker installed");
-      } else if (registration.active) {
-        console.log("Service worker active");
-      }
-    } catch (error) {
-      console.error(`Registration failed with ${error}`);
-    }
-  }
-};
-
 export function route() {
   const url = new URL(window.location.href);
 
@@ -73,7 +47,6 @@ function setNavbarListeners() {
 (function () {
   window.addEventListener("popstate", route);
 
-  registerServiceWorker();
   setNavbarListeners();
   route();
   registerModals();
