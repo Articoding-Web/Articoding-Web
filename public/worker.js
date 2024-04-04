@@ -4,25 +4,24 @@ var static = version + "_static";
 var levels;
 var pages;
 
-var store = [static, levels, pages];
+var store = { static, levels };
 
 const addResourcesToCache = async (resources) => {
   console.log("Add resources to cache");
-  const static = await caches.open(store[0]);
+  const static = await caches.open(store.static);
   await static.addAll(resources);
 };
 
 const putInCache = async (request, response) => {
   console.log("Put in cache");
-  let actual;
   let substring = "http://localhost:3001/api/level/";
   if (request.url.startsWith(substring)) {
     const id = request.url.replace(substring, "");
-    if (!isNaN(id)) actual = store[1];
-    else actual = store[2];
-  } else actual = await caches.open(store[2]);
-  const cache = actual;
-  await cache.put(request, response);
+    if (!isNaN(id)) {
+      const cache = store.levels;
+      await cache.put(request, response);
+    }
+  }
 };
 
 const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
@@ -84,7 +83,7 @@ var trimCache = function (key, maximum) {
 // Trim caches over a certain size
 self.addEventListener("message", function (event) {
   if (event.data !== "clean") return;
-  trimCache(store[1], 2);
+  trimCache(store.levels, 2);
 });
 
 const enableNavigationPreload = async () => {
@@ -104,7 +103,7 @@ self.addEventListener("activate", (event) => {
         return Promise.all(
           keys
             .filter(function (key) {
-              return !store[0].includes(key);
+              return !store.includes(key);
             })
             .map(function (key) {
               console.log("Elimino la cache:", key);
