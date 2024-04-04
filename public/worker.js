@@ -1,4 +1,4 @@
-var version = "1.0.1";
+var version = "1.0.0";
 
 var static = version + "_static";
 var levels;
@@ -122,25 +122,35 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     addResourcesToCache([
       "./",
-      "./index.html",
-      "./client.js",
-      "./js/bootstrap.min.js",
-      "./js/home.js",
-      "./css/style.css",
-      "./css/bootstrap.min.css",
-      "./images/logo.png",
-      "./assets/sprites/default/background.json",
-      "./assets/sprites/default/background.png",
-      "./assets/sprites/default/chest.png",
-      "./assets/sprites/default/door.json",
-      "./assets/sprites/default/door.png",
-      "./assets/sprites/default/enemy.json",
-      "./assets/sprites/default/enemy.png",
-      "./assets/sprites/default/player.json",
-      "./assets/sprites/default/player.png",
-      "./assets/sprites/default/trap.json",
-      "./assets/sprites/default/trap.png",
-      "./assets/sprites/default/wall.png",
+      "./public/index.html",
+      "./public/client.js",
+      "./public/js/bootstrap.min.js",
+      "./public/css/style.css",
+      "./public/css/bootstrap.min.css",
+      "./public/images/logo.png",
+      "./public/images/logo.ico",
+      "./public/images/profile.png",
+      "./public/assets/sprites/default/background.json",
+      "./public/assets/sprites/default/background.png",
+      "./public/assets/sprites/default/chest.png",
+      "./public/assets/sprites/default/door.json",
+      "./public/assets/sprites/default/door.png",
+      "./public/assets/sprites/default/enemy.json",
+      "./public/assets/sprites/default/enemy.png",
+      "./public/assets/sprites/default/exit.png",
+      "./public/assets/sprites/default/player.json",
+      "./public/assets/sprites/default/player.png",
+      "./public/assets/sprites/default/trap.json",
+      "./public/assets/sprites/default/trap.png",
+      "./public/assets/sprites/default/wall.png",
+      "./public/assets/ui/button_green_pressed.png",
+      "./public/assets/ui/button_green.png",
+      "./public/assets/ui/button_red_preseed.png",
+      "./public/assets/ui/button_red.png",
+      "./public/assets/ui/minus_pressed.png",
+      "./public/assets/ui/minus.png",
+      "./public/assets/ui/plus_pressed.png",
+      "./public/assets/ui/plus.png",
     ])
   );
 });
