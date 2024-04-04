@@ -5,6 +5,7 @@
  * @returns json response
  */
 export async function fetchRequest(endpoint, method) {
+    console.log(endpoint);
     const response = fetch(endpoint, {
         method,
         headers: {

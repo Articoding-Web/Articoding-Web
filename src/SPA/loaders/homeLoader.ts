@@ -4,7 +4,7 @@ import {
   fillContent,
 } from '../utils';
 import config from '../../Game/config.js';
-const API_ENDPOINT = config.API_ENDPOINT;
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 /**
  *

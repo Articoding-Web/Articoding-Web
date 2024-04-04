@@ -1,5 +1,5 @@
 import PhaserController from './Game/PhaserController';
-import initLoggin from './SPA/loggin';
+import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
 
@@ -46,5 +46,5 @@ function setNavbarListeners() {
 
     registerModals();
     
-    initLoggin();
+    initLogger();
 })()

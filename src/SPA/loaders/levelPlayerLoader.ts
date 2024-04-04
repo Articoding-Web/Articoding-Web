@@ -3,7 +3,7 @@ import LevelPlayer from "../../Game/LevelPlayer/Phaser/LevelPlayer";
 import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
 import  config from "../../Game/config";
-const API_ENDPOINT = config.API_ENDPOINT;
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let currentLevelJSON;
