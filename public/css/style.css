@@ -3,12 +3,12 @@
     width: 100%;
 }
 
-a, span {
+a, span.icon {
     color: white;
     text-decoration: none;
 }
 
-span:hover, a:hover {
+span.icon:hover, a:hover {
     color: white;
     text-decoration: none;
     cursor: pointer;
@@ -28,7 +28,31 @@ span:hover, a:hover {
 }
 
 .below {
-    padding-top: 5rem;
+    padding-top: 6rem;
+}
+
+.b {
+    border: 2px solid white;
+}
+
+img {
+    width: 100%;
+    height: auto;
+}
+
+.tag {
+    background-color: #37474F;
+    border-radius: 0.5rem;
+}
+
+.username {
+    color: white;
+    font-size: 6vw;
+}
+
+.role {
+    color: white;
+    font-size: 3vw;
 }
 
 .card-container {
@@ -37,14 +61,13 @@ span:hover, a:hover {
 }
 
 .card {
-    background-color: whitesmoke;
+    background-color: white;
     border-style: none;
     margin: 1.5rem;
-    border-radius: 0.5rem;
 }
 
 #categories .card:hover {
-    background-color: lavender;
+    background-color: #e9ecef;
 }
 
 .card-text {
