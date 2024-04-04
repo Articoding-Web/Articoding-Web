@@ -3,8 +3,8 @@ import {
   fetchRequest,
   fillContent,
 } from '../utils';
-
-const API_ENDPOINT = "http://localhost:3001/api";
+import config from '../../Game/config.js';
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 /**
  *
