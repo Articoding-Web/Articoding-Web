@@ -1,50 +1,42 @@
-import PhaserController from "./Phaser/PhaserController";
-import BlocklyController from "./Blockly/BlocklyController";
-import LevelPlayer from "./Phaser/LevelPlayer/LevelPlayer";
-import LevelEditor from "./Phaser/LevelEditor/LevelEditor";
-// Temp
-import level from './baseLevel.json';
-const BLOCKLY_DIV_ID = "blocklyDiv";
+import registerModals from "./SPA/modals";
+import router from "./SPA/router";
 
-let blocklyController: BlocklyController;
-let phaserController: PhaserController;
-let currentLevelJSON;
+export function route() {
+    const url = new URL(window.location.href);
 
-export function startLevel(level) {
-  currentLevelJSON = JSON.parse(level.data);
-
-  const toolbox = currentLevelJSON.blockly.toolbox;
-  const maxInstances = currentLevelJSON.blockly.maxInstances;
-  const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
-  const phaserJSON = currentLevelJSON.phaser;
-
-  phaserController = new PhaserController("LevelPlayer", LevelPlayer, phaserJSON);
-  blocklyController = new BlocklyController(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
-}
-
-//esta tiene que ser asincrona para poder hacer el fetch
-export async function startLevelById(levelId: number) {
-  try {
-    const response = await fetch(`http://localhost:3001/api/level/${levelId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const setPageFunction = router[url.pathname];
+    if(setPageFunction) {
+        setPageFunction(url.searchParams);
+    } else {
+        router["/"]();
     }
-    const level = await response.json();
-    blocklyController.destroy();
-    phaserController.destroy();
-    startLevel(level);
-  } catch (error) {
-    console.error('Error:', error);
-  }
 }
 
-export async function restartCurrentLevel() {
-  phaserController.destroy();
-  
-  const phaserJSON = currentLevelJSON.phaser;
-  phaserController = new PhaserController("LevelPlayer", LevelPlayer, phaserJSON);
+function routeIfNewPath(newRoute: string) {
+    const url = new URL(window.location.href);
+    if(url.pathname != newRoute) {
+        history.pushState({}, "", newRoute);
+        route();
+    }
 }
 
-export function editLevel() {
-  phaserController = new PhaserController("LevelEditor", LevelEditor);
+function setNavbarListeners() {
+    // Official Levels
+  document.getElementById("official").addEventListener("click", () => routeIfNewPath("/"));
+
+  // TODO: Manual
+  document.getElementById("editor").addEventListener("click", () => routeIfNewPath("/editor"));
+
+  // Community Levels
+  document.getElementById("community").addEventListener("click", () => routeIfNewPath("/community"));
 }
+
+(function (){
+    window.addEventListener("popstate", route);
+
+    setNavbarListeners();
+
+    route();
+
+    registerModals();
+})()
