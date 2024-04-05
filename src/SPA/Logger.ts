@@ -1,5 +1,6 @@
-import { sessionCookieValue } from '../../public/js/login.js';
 import config from '../Game/config.js';
+import { sessionCookieValue } from './loaders/profileLoader';
+
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 export default async function initLogger() {

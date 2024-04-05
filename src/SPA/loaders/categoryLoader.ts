@@ -1,10 +1,11 @@
-import { sessionCookieValue } from '../../../public/js/login.js';
 import { route } from '../../client';
+import config from '../../Game/config.js';
 import {
   fetchRequest,
   fillContent,
 } from '../utils';
-import config from '../../Game/config.js';
+import { sessionCookieValue } from './profileLoader';
+
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 /**
@@ -12,7 +13,7 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-    return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
 }
 
 /**
@@ -46,16 +47,16 @@ async function generateLevelDiv(level) {
  * @param {Event} event - click event of <a> to href with level id
  */
 async function playLevel(event) {
-    event.preventDefault();
-    const anchorTag = event.target.closest("a.getLevel");
-    const id = anchorTag.href.split("level/")[1];
-    history.pushState({ id }, "", `level?id=${id}`);
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.getLevel");
+  const id = anchorTag.href.split("level/")[1];
+  history.pushState({ id }, "", `level?id=${id}`);
 
-    route();
+  route();
 }
 
 export default async function loadCategoryById(id: string) {
-    document.getElementById("content").innerHTML = getRowHTML();
+  document.getElementById("content").innerHTML = getRowHTML();
 
     const levels = await fetchRequest(
         `${API_ENDPOINT}/level/levelsByCategory/${id}`,
@@ -85,8 +86,8 @@ export default async function loadCategoryById(id: string) {
     const divElement = document.getElementById("categories");
     await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
-    // Add getLevel event listener
-    document.querySelectorAll("a.getLevel").forEach((level) => {
-        level.addEventListener("click", playLevel);
-    });
+  // Add getLevel event listener
+  document.querySelectorAll("a.getLevel").forEach((level) => {
+    level.addEventListener("click", playLevel);
+  });
 }
