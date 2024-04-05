@@ -44,7 +44,7 @@ function checkSessionCookie() {
   return sessionCookie !== undefined;
 }
 
-function userLogin() {
+async function userLogin() {
   const userId = (document.getElementById("userId") as HTMLInputElement).value;
   const password = (document.getElementById("password") as HTMLInputElement)
     .value;
@@ -54,15 +54,24 @@ function userLogin() {
     password: password,
   };
 
-  fetchRequest(
-    `${API_ENDPOINT}/user/login`,
-    "POST",
-    JSON.stringify(postData),
-    "include"
-  );
+  try {
+    const responseData = await fetchRequest(
+      `${API_ENDPOINT}/user/login`,
+      "POST",
+      JSON.stringify(postData)
+    );
+  } catch (error) {
+      if (error.status === 401 || error.status === 404) {
+        const errorElement = document.getElementById("text-error");
+        errorElement.innerText = "Error con el username o contraseña";
+        errorElement.style.color = "red";
+      } else {
+      console.error('Error general:', error);
+    }
+  }
 }
 
-function useRegister() {
+async function useRegister() {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
   const userPassword = (
@@ -74,7 +83,7 @@ function useRegister() {
     userPassword: userPassword,
   };
 
-  fetchRequest(
+  await fetchRequest(
     `${API_ENDPOINT}/user/registro`,
     "POST",
     JSON.stringify(postData)
@@ -105,6 +114,7 @@ function appendLoginModal() {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
                         <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
+                        <span id="text-error"></span>
                     </div>
                 </div>
             </div>
@@ -134,9 +144,9 @@ function appendLoginModal() {
 
   let loginBtn = document.getElementById("loginReq");
   if (loginBtn) {
-    loginBtn.addEventListener("click", function (event) {
+    loginBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      userLogin();
+      await userLogin();
     });
   }
 }
@@ -187,9 +197,9 @@ function appendRegisterModal() {
   let registerSubmitBtn = document.getElementById("registerSubmitBtn");
   // Agregar event listener solo si no se ha agregado antes
   if (!registerSubmitBtnAdded) {
-    registerSubmitBtn.addEventListener("click", function (event) {
+    registerSubmitBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      useRegister();
+      await useRegister();
       registerModalInstance.hide();
     });
     registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
