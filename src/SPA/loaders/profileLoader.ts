@@ -44,7 +44,7 @@ function checkSessionCookie() {
   return sessionCookie !== undefined;
 }
 
-async function userLogin() {
+async function userLogin(modal : bootstrap.Modal) {
   const username = (document.getElementById("username") as HTMLInputElement).value;
   const password = (document.getElementById("password") as HTMLInputElement)
     .value;
@@ -61,6 +61,8 @@ async function userLogin() {
       JSON.stringify(postData),
       'include',
     );
+    modal.hide();
+    window.location.href = "/"; 
   } catch (error) {
       if (error.status === 401 || error.status === 404) {
         const errorElement = document.getElementById("text-error-login");
@@ -72,7 +74,7 @@ async function userLogin() {
   }
 }
 
-async function useRegister() {
+async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
   const userPassword = (
@@ -90,6 +92,8 @@ async function useRegister() {
       "POST",
       JSON.stringify(postData)
     );
+    modal.hide();
+    window.location.href = "/"; 
   }
   catch(error){
     if (error.status === 409) {
@@ -158,7 +162,7 @@ function appendLoginModal() {
   if (loginBtn) {
     loginBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      await userLogin();
+      await userLogin(loginModalInstance);
     });
   }
 }
@@ -208,12 +212,11 @@ function appendRegisterModal() {
   registerModalInstance.show();
 
   let registerSubmitBtn = document.getElementById("registerSubmitBtn");
-  // Agregar event listener solo si no se ha agregado antes
   if (!registerSubmitBtnAdded) {
     registerSubmitBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      await useRegister();
-      //registerModalInstance.hide();
+      console.log("Dentro")
+      await useRegister(registerModalInstance);
     });
     registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
   }
