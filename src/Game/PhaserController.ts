@@ -15,7 +15,7 @@ function createPhaserConfig(): Phaser.Types.Core.GameConfig {
       zoom: Phaser.Scale.ZOOM_2X,
     },
     banner: false,
-    scene: [LevelPlayer, LevelEditor]
+    scene: [(new Phaser.Scene), LevelPlayer, LevelEditor]
   };
 }
 
@@ -23,26 +23,27 @@ export default class PhaserController {
   private static game: Phaser.Game;
 
   static async init(key: string, scene: Phaser.Types.Scenes.SceneType, data?: object) {
-    // if(PhaserController.game) {
-    //   await PhaserController.destroyGame();
-    // }
-
-    if(!PhaserController.game) {
+    if (!PhaserController.game) {
       PhaserController.game = new Phaser.Game(createPhaserConfig());
     }
 
     PhaserController.game.scene.start(key, data);
   }
 
-  private static destroyGame(): Promise<void> {
+  static async destroyGame(): Promise<void> {
     return new Promise<void>((resolve) => {
+      if (PhaserController.game) {
         // Listen for the DESTROY event
         PhaserController.game.events.once(Phaser.Core.Events.DESTROY, () => {
-            resolve();
+          PhaserController.game = undefined;
+          resolve();
         });
-  
+
         // Flags the game instance as needing to be destroyed
         PhaserController.game.destroy(false);
+      } else {
+        resolve();
+      }
     });
   }
 }
