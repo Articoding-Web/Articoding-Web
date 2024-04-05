@@ -1,38 +1,46 @@
-var version = "1.0.0";
+"use strict";
+
+const config = require("../src/Game/config");
+
+var version = "1.0.6";
+
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 // FALTA
 
+// Darle una vuelta para ver como puedo importar el config
 // Actualizar offline.js y offline.html con el navbar
 // Hacer npm run build antes de verlo en acción
 
-var static = version + "_static";
+var steady = version + "_steady";
 var levels = version + "_levels";
 
-var store = [static, levels];
+var store = [steady, levels];
 
-var limit = 10;
+var limit = 2;
 
 const addResourcesToCache = async (resources) => {
   console.log("Add resources to cache");
-  const static = await caches.open(store[0]);
-  await static.addAll(resources);
+  const cache = await caches.open(steady);
+  await cache.addAll(resources);
 };
 
 const putInCache = async (request, response) => {
   console.log("Put in cache");
-  let substring = "http://localhost:3001/api/level/";
+  let substring = API_ENDPOINT + "/level/";
   if (request.url.startsWith(substring)) {
     const id = request.url.replace(substring, "");
     if (!isNaN(id)) {
-      const cache = await caches.open(store[1]);
+      const cache = await caches.open(levels);
       await cache.put(request, response);
-      trimCache(store[1], limit);
+      trimCache(levels, limit);
     }
   }
 };
 
 const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
   console.log("Cache first");
+
   if (request.cache === "only-if-cached" && request.mode !== "same-origin")
     return;
 
@@ -93,7 +101,7 @@ var trimCache = function (key, maximum) {
 // Trim caches when clean message is posted
 self.addEventListener("message", function (event) {
   if (event.data !== "clean") return;
-  trimCache(store[1], 2);
+  trimCache(levels, 2);
 });
 
 const enableNavigationPreload = async () => {
@@ -132,10 +140,9 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     addResourcesToCache([
       "./",
+      "./client.js",
       "./index.html",
       "./offline.html",
-      "./client.js",
-      "./js/bootstrap.min.js",
       "./css/style.css",
       "./css/bootstrap.min.css",
       "./images/logo.png",
@@ -162,6 +169,9 @@ self.addEventListener("install", (event) => {
       "./assets/ui/minus.png",
       "./assets/ui/plus_pressed.png",
       "./assets/ui/plus.png",
+      "./js/bootstrap.min.js",
+      "./js/offline.js",
+      "./js/service.js",
     ])
   );
 });
