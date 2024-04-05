@@ -45,12 +45,12 @@ function checkSessionCookie() {
 }
 
 async function userLogin() {
-  const userId = (document.getElementById("userId") as HTMLInputElement).value;
+  const username = (document.getElementById("username") as HTMLInputElement).value;
   const password = (document.getElementById("password") as HTMLInputElement)
     .value;
 
   const postData = {
-    id: userId,
+    username,
     password: password,
   };
 
@@ -58,11 +58,12 @@ async function userLogin() {
     const responseData = await fetchRequest(
       `${API_ENDPOINT}/user/login`,
       "POST",
-      JSON.stringify(postData)
+      JSON.stringify(postData),
+      'include',
     );
   } catch (error) {
       if (error.status === 401 || error.status === 404) {
-        const errorElement = document.getElementById("text-error");
+        const errorElement = document.getElementById("text-error-login");
         errorElement.innerText = "Error con el username o contraseña";
         errorElement.style.color = "red";
       } else {
@@ -83,11 +84,22 @@ async function useRegister() {
     userPassword: userPassword,
   };
 
-  await fetchRequest(
-    `${API_ENDPOINT}/user/registro`,
-    "POST",
-    JSON.stringify(postData)
-  );
+  try{
+    await fetchRequest(
+      `${API_ENDPOINT}/user/registro`,
+      "POST",
+      JSON.stringify(postData)
+    );
+  }
+  catch(error){
+    if (error.status === 409) {
+      const errorElement = document.getElementById("text-error-register");
+      errorElement.innerText = "El username ya existe";
+      errorElement.style.color = "red";
+    } else {
+    console.error('Error general:', error);
+    }
+  }
 }
 
 function appendLoginModal() {
@@ -102,8 +114,8 @@ function appendLoginModal() {
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
-                                <label for="userId" class="form-label">ID Numérico</label>
-                                <input type="number" class="form-control" id="userId" required>
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Contraseña</label>
@@ -114,7 +126,7 @@ function appendLoginModal() {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
                         <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
-                        <span id="text-error"></span>
+                        <span id="text-error-login"></span>
                     </div>
                 </div>
             </div>
@@ -175,6 +187,7 @@ function appendRegisterModal() {
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <span id="text-error-register"></span>
                     </div>
                 </div>
             </div>
@@ -200,7 +213,7 @@ function appendRegisterModal() {
     registerSubmitBtn.addEventListener("click", async function (event) {
       event.preventDefault();
       await useRegister();
-      registerModalInstance.hide();
+      //registerModalInstance.hide();
     });
     registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
   }
