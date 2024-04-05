@@ -1,14 +1,13 @@
-import * as Phaser from "phaser";
+import * as Phaser from 'phaser';
 
-import { sessionCookieValue } from "../../../SPA/loaders/profileLoader";
-import config from "../../config.js";
-import ArticodingSprite from "./Classes/ArticodingSprite.js";
-import ChestObject from "./Classes/ChestObject.js";
-import ExitObject from "./Classes/Exit.js";
-import { GridPhysics } from "./Classes/GridPhysics.js";
-import { Player } from "./Classes/Player.js";
-import TrapObject from "./Classes/TrapObject.js";
-import { Direction } from "./types/Direction.js";
+import config from '../../config.js';
+import ArticodingSprite from './Classes/ArticodingSprite.js';
+import ChestObject from './Classes/ChestObject.js';
+import ExitObject from './Classes/Exit.js';
+import { GridPhysics } from './Classes/GridPhysics.js';
+import { Player } from './Classes/Player.js';
+import TrapObject from './Classes/TrapObject.js';
+import { Direction } from './types/Direction.js';
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -74,7 +73,8 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   create() {
-    this.events.on("shutdown", this.shutdown, this);
+    this.events.on('shutdown', this.shutdown, this);
+    this.events.on('destroy', this.shutdown, this);
 
     // this.zoom();
     this.createBackground(); // create un tilemap
@@ -296,37 +296,7 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(event);
     } else {
       const event = new CustomEvent("win", { detail: { stars: 3 } });
-      document.dispatchEvent(event);
-
-      const cookie = sessionCookieValue();
-      if (cookie !== null) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const levelId = urlParams.get("id");
-        const postData = {
-          user: cookie.id,
-          level: levelId,
-          stars: 1,
-          attempts: 1,
-        };
-
-        fetch(config.API_ENDPOINT + "/play", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postData),
-        })
-          .then((response) => {
-            if (response.ok) {
-              console.log("La petición se ha realizado correctamente.");
-            } else {
-              console.error("La petición falló con estado:", response.status);
-            }
-          })
-          .catch((error) => {
-            console.error("Error al realizar la petición:", error);
-          });
-      }
+      document.dispatchEvent(event);     
     }
   };
 
@@ -335,6 +305,7 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   shutdown() {
+    console.log("clearing scene");
     document.removeEventListener("execution-finished", this.checkWinCondition);
 
     while (this.players.length) {

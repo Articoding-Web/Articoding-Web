@@ -27,9 +27,24 @@ by default).
 * Edit the file `rollup.config.dev.js` to edit the development build.
 * Edit the file `rollup.config.dist.js` to edit the distribution build.
 
-You will find lots of comments inside the rollup config files to help you do this.
+### Deployment Config
 
-Note that due to the build process involved, it can take around 20 seconds to build the initial bundle. Times will vary based on CPU and local drive speeds. The development config does not minify the code in order to save build time, but it does generate source maps. If you do not require these, disable them in the config to speed it up further.
+Both `rollup.config.dev.js` and `rollup.config.dist.js` allow you to configure the API Server protocol, domain and port.
+
+Replace the values defined:
+
+```
+// API Config
+replace({
+    preventAssignment: true,
+    include: ['src/Game/config.ts'],
+    values: {
+        'ENV_API_PROTOCOL': 'http',
+        'ENV_API_DOMAIN': 'localhost',
+        'ENV_API_PORT': '3001'
+    }
+}),
+```
 
 ## Versions Used
 

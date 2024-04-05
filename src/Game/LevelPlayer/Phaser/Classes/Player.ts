@@ -4,11 +4,10 @@ import config from "../../../config";
 
 export class Player {
     private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
-    private steps: number = 0;
     private playerDir: number = 0; //por defecto la ranita mira "abajo" down/left/up/right
     private isAlive = true;
     private reachedExit = false;
-    private collectedChests:number = 0;
+    private collectedChests: number = 0;
 
     constructor(private sprite: Phaser.GameObjects.Sprite, private gridPhysics: GridPhysics, private tilePos: Phaser.Math.Vector2, private scaleFactor: number) {
         document.addEventListener("move", this.handleMove);
@@ -16,12 +15,11 @@ export class Player {
 
     private handleMove = (e: Event) => {
         const data = (e as CustomEvent).detail;
-        this.steps = 1;
         this.movePlayer(Direction[data["direction"]]);
     }
 
     private movePlayer(direction: Direction): void {
-        if (this.steps == 0 || !this.isAlive || this.reachedExit)
+        if (!this.isAlive || this.reachedExit)
             return;
 
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
@@ -38,6 +36,7 @@ export class Player {
         const pixelsToMove = config.TILE_SIZE * this.scaleFactor;
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = this.getPosition().add(movementDistance);
+        
         this.updatePlayerTilePos(direction);
 
         this.sprite.scene.tweens.add({

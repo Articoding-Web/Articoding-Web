@@ -1,5 +1,6 @@
 import { Order, javascriptGenerator } from "blockly/javascript";
 import type { Block } from "blockly/core/block";
+import Blockly from "blockly";
 //Here we define all block behaviour
 
 //Here we define all block behaviour
@@ -69,7 +70,7 @@ export function defineAllBlocks() {
   };
 
   //number block:
-  javascriptGenerator.forBlock["math_block"] = function(block: Block, generator: any): [string, Order] {
+  javascriptGenerator.forBlock["math_block"] = function (block: Block, generator: any): [string, Order] {
     // Numeric value.
     const number = Number(block.getFieldValue('NUM'));
     const order = number >= 0 ? Order.ATOMIC : Order.UNARY_NEGATION;
@@ -97,31 +98,31 @@ export function defineAllBlocks() {
 
     repeats = generator.valueToCode(block, "TIMES", Order.ASSIGNMENT) || "0";
     let childBlock;
-    if(children.length === 1 && children[0].type != "math_number")
+    if (children.length === 1 && children[0].type != "math_number")
       childBlock = children[0];
-    else if(children.length > 1) {
+    else if (children.length > 1) {
       childBlock = children[1]
     }
 
     let childBlockCode = [];
 
-    while(childBlock) {
+    while (childBlock) {
       const blockCode = generator.blockToCode(childBlock, true);
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-    if(repeats >= 25 || childBlockCode.length >= 25) {
+    if (repeats >= 25 || childBlockCode.length >= 25) {
       console.log("You are trying to repeat too many times, this may cause performance issues.");
-      repeats = childBlockCode.length*15;
+      repeats = childBlockCode.length * 15;
     }
     let events = `[`;
-    for(let x = 0; x < repeats; x++) {
-      for(let y = 0; y < childBlockCode.length; y++) {
+    for (let x = 0; x < repeats; x++) {
+      for (let y = 0; y < childBlockCode.length; y++) {
         events += childBlockCode[y];
-        if(y < childBlockCode.length - 1)
+        if (y < childBlockCode.length - 1)
           events += ","
       }
-      if(x < repeats - 1)
+      if (x < repeats - 1)
         events += ","
     }
     events += "]"
@@ -135,27 +136,27 @@ export function defineAllBlocks() {
     let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
     let children = block.getChildren(true);
     let childBlock;
-    if(children.length === 1 && children[0].type != "math_number")
+    if (children.length === 1 && children[0].type != "math_number")
       childBlock = children[0];
-    else if(children.length > 1) {
+    else if (children.length > 1) {
       childBlock = children[1]
     }
     let childBlockCode = [];
-    while(childBlock) {
+    while (childBlock) {
       const blockCode = generator.blockToCode(childBlock, true);
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-  
+
     // Create the event code.
     let events = `[`;
-    for(let y = 0; y < childBlockCode.length; y++) {
+    for (let y = 0; y < childBlockCode.length; y++) {
       events += childBlockCode[y];
-      if(y < childBlockCode.length - 1)
+      if (y < childBlockCode.length - 1)
         events += ","
     }
     events += "]"
-  
+
     // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
     let code = {
       blockId: block.id,
@@ -165,7 +166,21 @@ export function defineAllBlocks() {
         events: events
       }
     };
-  
+
+    return JSON.stringify(code);
+  };
+  //set block, sets the value of a variable with a block input
+  javascriptGenerator.forBlock["set"] = function (block: Block, generator: any) {
+    let variableName = block.getFieldValue("VAR_NAME");
+    let value = generator.valueToCode(block, "VALUE", Order.ASSIGNMENT) || "0";
+    let code = {
+      blockId: block.id,
+      eventName: "set_var",
+      data: {
+        variableName: variableName,
+        value: value,
+      },
+    };
     return JSON.stringify(code);
   };
 }

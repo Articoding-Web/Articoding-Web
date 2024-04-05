@@ -30,6 +30,7 @@ export default class BlocklyController {
     }
 
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
+
   }
 
   private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
@@ -86,6 +87,43 @@ export default class BlocklyController {
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
     runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+
+    // Custom flyout callback
+    const customFlyoutCallback = (workspace: Blockly.Workspace) => {
+      const blockList = [];
+
+      // Add the getter block
+      blockList.push({
+        kind: "block",
+        type: "variables_get_panda",
+        fields: {
+          VAR: "panda",
+        },
+      });
+
+      // Add the setter block
+      blockList.push({
+        kind: "block",
+        type: "variables_set_panda",
+        fields: {
+          VAR: "panda",
+        },
+      });
+
+      // Add a button to create a new variable
+      blockList.push({
+        kind: "button",
+        text: "Create variable",
+        callbackKey: "CREATE_VARIABLE",
+      });
+
+      return blockList;
+    };
+
+    BlocklyController.workspace.registerToolboxCategoryCallback("VARIABLE", customFlyoutCallback);
+    BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function(button) {
+      Blockly.Variables.createVariableButtonHandler(button.getTargetWorkspace(), null, 'Panda');
+    });
   }
 
   static highlightBlock(id: string | null) {
@@ -128,7 +166,7 @@ export default class BlocklyController {
             const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
             times++;
-            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION, eventName, eventData);
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
           } else {
             index++;
             executeNextBlock();

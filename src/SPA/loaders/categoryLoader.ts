@@ -1,7 +1,12 @@
-import { route } from "../../client";
-import { fetchRequest, fillContent } from "../utils";
+import { route } from '../../client';
+import config from '../../Game/config.js';
+import {
+  fetchRequest,
+  fillContent,
+} from '../utils';
+import { sessionCookieValue } from './profileLoader';
 
-const API_ENDPOINT = "http://localhost:3001/api";
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 /**
  *
@@ -17,18 +22,24 @@ function getRowHTML() {
  * @returns String of HTMLDivElement
  */
 async function generateLevelDiv(level) {
-  return `<div class="col">
-            <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-              <div class="card border-dark">
-                <div class="card-header">
-                  ${level.title}
+    return `<div class="col">
+              <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
+                <div class="card border-dark d-flex flex-column h-100">
+                  <h5 class="card-header card-title text-dark">
+                    ${level.title}
+                  </h5>
+                  <div class="card-body text-dark">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      Stars: ${level.statistics.stars}
+                    </h6>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      Attempts: ${level.statistics.attempts}
+                    </h6>
+                    <p>Miniature: </p> 
+                  </div>
                 </div>
-                <div class="card-body">
-                  Miniatura: 
-                </div>
-              </div>
-            </a>
-          </div>`;
+              </a>
+            </div>`;
 }
 
 /**
@@ -47,12 +58,33 @@ async function playLevel(event) {
 export default async function loadCategoryById(id: string) {
   document.getElementById("content").innerHTML = getRowHTML();
 
-  const levels = await fetchRequest(
-    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
-    "GET"
-  );
-  const divElement = document.getElementById("categories");
-  await fillContent(divElement, levels, generateLevelDiv);
+    const levels = await fetchRequest(
+        `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+        "GET"
+    );
+    
+    const cookie = sessionCookieValue();
+    let statistics = [];
+    if(cookie !== null){
+      statistics = await fetchRequest( `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,"GET");
+    };
+    const statisticsMap = statistics.reduce((map, statistic) => {
+      map[statistic.level] = {stars: statistic.stars, attempts:statistic.attempts};
+      return map;
+    }, {});
+
+    const levelsWithStatistics = levels.map(level => {
+      const levelId = level.id;
+      const statistic = statisticsMap[levelId]; 
+      return {
+          ...level,
+          statistics: statistic || { stars: 0, attempts: 0 } 
+      };
+    });
+
+
+    const divElement = document.getElementById("categories");
+    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
   // Add getLevel event listener
   document.querySelectorAll("a.getLevel").forEach((level) => {
