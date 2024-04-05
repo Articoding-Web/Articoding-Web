@@ -246,10 +246,28 @@ function generateProfileDiv(user) {
                   <div class="row mx-auto my-auto">
                     <p class="role">${user.role}</p>
                   </div>
+                  <button type="submit" class="btn btn-danger" id="logoutBtn">
+                    Cerrar Sesion
+                  </button>
                 </div>
               </div>
             </div>
           </div>`;
+  
+}
+
+function logout(){
+  let logoutSubmitBtn = document.getElementById("logoutBtn");
+  logoutSubmitBtn.addEventListener("click", async function (event) {
+    event.preventDefault();
+    await fetchRequest(
+      `${API_ENDPOINT}/user/logout`,
+      "DELETE",
+      null,
+      'include'
+    );
+    window.location.href = "/"; 
+  });
 }
 
 export default async function loadProfile() {
@@ -262,5 +280,6 @@ export default async function loadProfile() {
 
     const user = sessionCookieValue();
     divElement.innerHTML = generateProfileDiv(user);
+    logout();
   } else appendLoginModal();
 }
