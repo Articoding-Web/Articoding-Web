@@ -1,8 +1,9 @@
 import * as bootstrap from 'bootstrap';
 
+import config from '../../Game/config.js';
 import { fetchRequest } from '../utils';
 
-const API_ENDPOINT = "http://localhost:3001/api";
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 // Variable para controlar si el evento click ya se agregó al botón
 let registerSubmitBtnAdded = false;
