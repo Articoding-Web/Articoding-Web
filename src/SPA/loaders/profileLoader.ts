@@ -1,5 +1,6 @@
-import { fetchRequest } from "../utils";
-import * as bootstrap from "bootstrap";
+import * as bootstrap from 'bootstrap';
+
+import { fetchRequest } from '../utils';
 
 const API_ENDPOINT = "http://localhost:3001/api";
 

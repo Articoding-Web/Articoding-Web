@@ -1,10 +1,12 @@
 import PhaserController from './Game/PhaserController';
+import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
 
 export async function route() {
     // Always destroy phaser game
     await PhaserController.destroyGame();
+
 
     const url = new URL(window.location.href);
 
@@ -51,7 +53,11 @@ function setNavbarListeners() {
 (function () {
   window.addEventListener("popstate", route);
 
-  setNavbarListeners();
-  route();
-  registerModals();
-})();
+    setNavbarListeners();
+
+    route();
+
+    registerModals();
+    
+    initLogger();
+})()

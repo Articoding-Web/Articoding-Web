@@ -1,7 +1,11 @@
-import { route } from "../../client";
-import { fetchRequest, fillContent } from "../utils";
+import { route } from '../../client';
+import config from '../../Game/config.js';
+import {
+  fetchRequest,
+  fillContent,
+} from '../utils';
 
-const API_ENDPOINT = "http://localhost:3001/api";
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 /**
  *
@@ -52,7 +56,7 @@ async function generateCategoryDiv(category) {
                     </h5>
                     <div class="card-body text-dark">
                       <h6 class="card-subtitle mb-2 text-muted">
-                        Niveles: ${category.count}
+                        Levels: ${category.count}
                       </h6>
                       ${category.description}
                     </div>
@@ -84,11 +88,12 @@ export default async function loadHome() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
-  const categories = await fetchRequest(
-    `${API_ENDPOINT}/level/categories`,
-    "GET"
-  );
-  await fillContent(divElement, categories, generateCategoryDiv);
+    const categories = await fetchRequest(
+        `${API_ENDPOINT}/level/categories`,
+        "GET"
+    );
+    
+    await fillContent(divElement, categories, generateCategoryDiv);
 
   document.querySelectorAll("a.category").forEach((anchorTag) => {
     anchorTag.addEventListener("click", loadCategoryLevels);
