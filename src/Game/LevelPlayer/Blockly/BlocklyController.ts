@@ -8,6 +8,7 @@ import * as block_code from "./javascript/block_code";
 import blocks from "./Blocks/blocks";
 
 import config from "../../config";
+import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -16,6 +17,8 @@ export default class BlocklyController {
   private static startBlock: Blockly.BlockSvg;
   private static workspace: Blockly.WorkspaceSvg;
   private static code: BlockCode[];
+  private static isRunningCode: boolean = false;
+  private static shouldAbort: boolean = false;
 
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
@@ -25,12 +28,7 @@ export default class BlocklyController {
   ];
 
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
-    if(BlocklyController.workspace) {
-      BlocklyController.destroy();
-    }
-
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
-
   }
 
   private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
@@ -121,7 +119,7 @@ export default class BlocklyController {
     };
 
     BlocklyController.workspace.registerToolboxCategoryCallback("VARIABLE", customFlyoutCallback);
-    BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function(button) {
+    BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function (button) {
       Blockly.Variables.createVariableButtonHandler(button.getTargetWorkspace(), null, 'Panda');
     });
   }
@@ -149,19 +147,34 @@ export default class BlocklyController {
     return code;
   }
 
-  static destroy() {
-    this.workspace.dispose();
-  }
+  static runCode() {
+    if(BlocklyController.isRunningCode)
+      return;
 
- static runCode() {
+    // Restart level  
+    restartCurrentLevel();
+
     let index = 0;
     const executeNextBlock = () => {
+      if (this.shouldAbort) {
+        this.isRunningCode = false; // Reset flag
+        this.shouldAbort = false; // Reset flag
+        return; // Abort execution
+      }
+
       if (index < this.code.length) {
+        BlocklyController.isRunningCode = true;
         let code = this.code[index];
         this.highlightBlock(code.blockId);
 
         let times = 0;
         const emitEvent = (eventName: string, eventData) => {
+          if (this.shouldAbort) {
+            this.isRunningCode = false; // Reset flag
+            this.shouldAbort = false; // Reset flag
+            return; // Abort execution
+          }
+
           if (times < (code.times || 1)) {
             const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
@@ -174,6 +187,7 @@ export default class BlocklyController {
         };
         emitEvent(code.eventName, code.data);
       } else {
+        BlocklyController.isRunningCode = true;
         // Finished code execution
         this.highlightBlock(null);
         const event = new CustomEvent("execution-finished");
@@ -181,5 +195,14 @@ export default class BlocklyController {
       }
     };
     executeNextBlock();
+  }
+
+  static destroyWorkspace() {
+    if (BlocklyController.workspace) {
+      BlocklyController.shouldAbort = true;
+      window.removeEventListener("resize", onresize, false);
+      BlocklyController.workspace.dispose();
+      BlocklyController.workspace = undefined;
+    }
   }
 }
