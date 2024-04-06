@@ -44,25 +44,37 @@ function checkSessionCookie() {
   return sessionCookie !== undefined;
 }
 
-function userLogin() {
-  const userId = (document.getElementById("userId") as HTMLInputElement).value;
+async function userLogin(modal : bootstrap.Modal) {
+  const username = (document.getElementById("username") as HTMLInputElement).value;
   const password = (document.getElementById("password") as HTMLInputElement)
     .value;
 
   const postData = {
-    id: userId,
+    username,
     password: password,
   };
 
-  fetchRequest(
-    `${API_ENDPOINT}/user/login`,
-    "POST",
-    JSON.stringify(postData),
-    "include"
-  );
+  try {
+    const responseData = await fetchRequest(
+      `${API_ENDPOINT}/user/login`,
+      "POST",
+      JSON.stringify(postData),
+      'include',
+    );
+    modal.hide();
+    window.location.href = "/"; 
+  } catch (error) {
+      if (error.status === 401 || error.status === 404) {
+        const errorElement = document.getElementById("text-error-login");
+        errorElement.innerText = "Error con el username o contraseña";
+        errorElement.style.color = "red";
+      } else {
+      console.error('Error general:', error);
+    }
+  }
 }
 
-function useRegister() {
+async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
   const userPassword = (
@@ -74,11 +86,24 @@ function useRegister() {
     userPassword: userPassword,
   };
 
-  fetchRequest(
-    `${API_ENDPOINT}/user/registro`,
-    "POST",
-    JSON.stringify(postData)
-  );
+  try{
+    await fetchRequest(
+      `${API_ENDPOINT}/user/registro`,
+      "POST",
+      JSON.stringify(postData)
+    );
+    modal.hide();
+    window.location.href = "/"; 
+  }
+  catch(error){
+    if (error.status === 409) {
+      const errorElement = document.getElementById("text-error-register");
+      errorElement.innerText = "El username ya existe";
+      errorElement.style.color = "red";
+    } else {
+    console.error('Error general:', error);
+    }
+  }
 }
 
 function appendLoginModal() {
@@ -93,8 +118,8 @@ function appendLoginModal() {
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
-                                <label for="userId" class="form-label">ID Numérico</label>
-                                <input type="number" class="form-control" id="userId" required>
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Contraseña</label>
@@ -105,6 +130,7 @@ function appendLoginModal() {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
                         <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
+                        <span id="text-error-login"></span>
                     </div>
                 </div>
             </div>
@@ -134,9 +160,9 @@ function appendLoginModal() {
 
   let loginBtn = document.getElementById("loginReq");
   if (loginBtn) {
-    loginBtn.addEventListener("click", function (event) {
+    loginBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      userLogin();
+      await userLogin(loginModalInstance);
     });
   }
 }
@@ -165,6 +191,7 @@ function appendRegisterModal() {
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <span id="text-error-register"></span>
                     </div>
                 </div>
             </div>
@@ -185,12 +212,11 @@ function appendRegisterModal() {
   registerModalInstance.show();
 
   let registerSubmitBtn = document.getElementById("registerSubmitBtn");
-  // Agregar event listener solo si no se ha agregado antes
   if (!registerSubmitBtnAdded) {
-    registerSubmitBtn.addEventListener("click", function (event) {
+    registerSubmitBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      useRegister();
-      registerModalInstance.hide();
+      console.log("Dentro")
+      await useRegister(registerModalInstance);
     });
     registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
   }
@@ -223,10 +249,28 @@ function generateProfileDiv(user) {
                   <div class="row mx-auto my-auto">
                     <p class="role">${user.role}</p>
                   </div>
+                  <button type="submit" class="btn btn-danger" id="logoutBtn">
+                    Cerrar Sesion
+                  </button>
                 </div>
               </div>
             </div>
           </div>`;
+  
+}
+
+function logout(){
+  let logoutSubmitBtn = document.getElementById("logoutBtn");
+  logoutSubmitBtn.addEventListener("click", async function (event) {
+    event.preventDefault();
+    await fetchRequest(
+      `${API_ENDPOINT}/user/logout`,
+      "DELETE",
+      null,
+      'include'
+    );
+    window.location.href = "/"; 
+  });
 }
 
 export default async function loadProfile() {
@@ -239,5 +283,6 @@ export default async function loadProfile() {
 
     const user = sessionCookieValue();
     divElement.innerHTML = generateProfileDiv(user);
+    logout();
   } else appendLoginModal();
 }
