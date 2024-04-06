@@ -8,6 +8,7 @@ import * as block_code from "./javascript/block_code";
 import blocks from "./Blocks/blocks";
 
 import config from "../../config";
+import { toolbox } from "blockly/core/utils";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -25,7 +26,7 @@ export default class BlocklyController {
   ];
 
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
-    if(BlocklyController.workspace) {
+    if (BlocklyController.workspace) {
       BlocklyController.destroy();
     }
 
@@ -80,8 +81,12 @@ export default class BlocklyController {
     this.workspace.addChangeListener((event) => {
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
+      let toolboxRef = (this.workspace.getToolbox() as Blockly.Toolbox);
+
+      console.log(toolboxRef.HtmlDiv);
       this.code = this.generateCode();
     });
+
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
@@ -93,6 +98,7 @@ export default class BlocklyController {
   }
 
   static generateCode(): BlockCode[] {
+    console.log(BlocklyController.workspace.getAllVariables());
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 
@@ -115,7 +121,7 @@ export default class BlocklyController {
     this.workspace.dispose();
   }
 
- static runCode() {
+  static runCode() {
     let index = 0;
     const executeNextBlock = () => {
       if (index < this.code.length) {

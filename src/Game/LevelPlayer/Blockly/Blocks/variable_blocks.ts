@@ -13,7 +13,9 @@ export default [
                 defaultType: "Panda"
             }
         ],
-        output: "Panda"
+        colour: "#a55b80",
+        output: "Panda",
+        onchange: "updateBlock"
     },
     {
         type: "variables_set_panda",
@@ -34,7 +36,9 @@ export default [
                 check: "Panda"
             }
         ],
+        colour: "#a55b80",
         previousStatement: null,
-        nextStatement: null
+        nextStatement: null,
+        onchange: "updateBlock"
     }
 ];
