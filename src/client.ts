@@ -1,11 +1,13 @@
+import BlocklyController from "./Game/LevelPlayer/Blockly/BlocklyController";
 import PhaserController from "./Game/PhaserController";
-import initLogger from "./SPA/logger";
+import initLogger from "./SPA/Logger";
 import registerModals from "./SPA/modals";
 import router from "./SPA/router";
 
 export async function route() {
   // Always destroy phaser game
   await PhaserController.destroyGame();
+  BlocklyController.destroyWorkspace();
 
   const url = new URL(window.location.href);
 
