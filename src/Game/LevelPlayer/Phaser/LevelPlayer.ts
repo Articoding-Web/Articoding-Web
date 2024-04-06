@@ -1,13 +1,13 @@
-import * as Phaser from 'phaser';
+import * as Phaser from "phaser";
 
-import config from '../../config.js';
-import ArticodingSprite from './Classes/ArticodingSprite.js';
-import ChestObject from './Classes/ChestObject.js';
-import ExitObject from './Classes/Exit.js';
-import { GridPhysics } from './Classes/GridPhysics.js';
-import { Player } from './Classes/Player.js';
-import TrapObject from './Classes/TrapObject.js';
-import { Direction } from './types/Direction.js';
+import config from "../../config.js";
+import ArticodingSprite from "./Classes/ArticodingSprite.js";
+import ChestObject from "./Classes/ChestObject.js";
+import ExitObject from "./Classes/Exit.js";
+import { GridPhysics } from "./Classes/GridPhysics.js";
+import { Player } from "./Classes/Player.js";
+import TrapObject from "./Classes/TrapObject.js";
+import { Direction } from "./types/Direction.js";
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -73,8 +73,8 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   create() {
-    this.events.on('shutdown', this.shutdown, this);
-    this.events.on('destroy', this.shutdown, this);
+    this.events.on("shutdown", this.shutdown, this);
+    this.events.on("destroy", this.shutdown, this);
 
     // this.zoom();
     this.createBackground(); // create un tilemap
@@ -296,7 +296,7 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(event);
     } else {
       const event = new CustomEvent("win", { detail: { stars: 3 } });
-      document.dispatchEvent(event);     
+      document.dispatchEvent(event);
     }
   };
 
@@ -305,7 +305,7 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   shutdown() {
-    console.log("clearing scene");
+    console.log("Clearing scene");
     document.removeEventListener("execution-finished", this.checkWinCondition);
 
     while (this.players.length) {

@@ -1,16 +1,12 @@
 "use strict";
 
-const config = require("../src/Game/config");
+const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.6";
-
-const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
+var version = "1.0.2";
 
 // FALTA
 
-// Darle una vuelta para ver como puedo importar el config
 // Actualizar offline.js y offline.html con el navbar
-// Hacer npm run build antes de verlo en acción
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -27,7 +23,7 @@ const addResourcesToCache = async (resources) => {
 
 const putInCache = async (request, response) => {
   console.log("Put in cache");
-  let substring = API_ENDPOINT + "/level/";
+  let substring = API_ENDPOINT + "level/";
   if (request.url.startsWith(substring)) {
     const id = request.url.replace(substring, "");
     if (!isNaN(id)) {
@@ -67,6 +63,7 @@ const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
     putInCache(request, responseFromNetwork.clone());
     return responseFromNetwork;
   } catch (error) {
+    console.log("Intento cargar el offline");
     const fallbackResponse = await caches.match(fallbackUrl);
     if (fallbackResponse) {
       return fallbackResponse;
