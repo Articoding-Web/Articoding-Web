@@ -1,14 +1,14 @@
-import * as Blockly from "blockly";
-import { ZoomToFitControl } from "@blockly/zoom-to-fit";
-import { javascriptGenerator } from "blockly/javascript";
-import { ToolboxDefinition } from "blockly/core/utils/toolbox";
-import { BlockCode } from "./types/BlockCode";
+import * as Blockly from 'blockly';
+import { ToolboxDefinition } from 'blockly/core/utils/toolbox';
+import { javascriptGenerator } from 'blockly/javascript';
 
-import * as block_code from "./javascript/block_code";
-import blocks from "./Blocks/blocks";
+import { ZoomToFitControl } from '@blockly/zoom-to-fit';
 
-import config from "../../config";
-import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
+import { restartCurrentLevel } from '../../../SPA/loaders/levelPlayerLoader';
+import config from '../../config';
+import blocks from './Blocks/blocks';
+import * as block_code from './javascript/block_code';
+import { BlockCode } from './types/BlockCode';
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -28,6 +28,10 @@ export default class BlocklyController {
   ];
 
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+    if (BlocklyController.workspace) {
+      BlocklyController.destroy();
+    }
+
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
@@ -88,6 +92,9 @@ export default class BlocklyController {
     this.workspace.addChangeListener((event) => {
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
+      let toolboxRef = (this.workspace.getToolbox() as Blockly.Toolbox);
+
+      console.log(toolboxRef.HtmlDiv);
       this.code = this.generateCode();
     });
 
@@ -127,6 +134,10 @@ export default class BlocklyController {
     BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function (button) {
       Blockly.Variables.createVariableButtonHandler(button.getTargetWorkspace(), null, 'Panda');
     });
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
   }
 
   static highlightBlock(id: string | null) {
@@ -135,6 +146,7 @@ export default class BlocklyController {
   }
 
   private  static generateCode(): BlockCode[] {
+    console.log(BlocklyController.workspace.getAllVariables());
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 

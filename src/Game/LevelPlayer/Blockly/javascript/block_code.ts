@@ -1,10 +1,15 @@
-import { Order, javascriptGenerator } from "blockly/javascript";
-import type { Block } from "blockly/core/block";
-import Blockly from "blockly";
+import type { Block } from 'blockly/core/block';
+import {
+  javascriptGenerator,
+  Order,
+} from 'blockly/javascript';
+
 //Here we define all block behaviour
 
 //Here we define all block behaviour
 export function defineAllBlocks() {
+  let variables: Record<string, string | number> = {}; // variable[name] = value;
+
   //Some functions don't need generator, but others will, so it's been left innerCoderpose.
   //generic movement block (movement steps in parsed direction)
   javascriptGenerator.forBlock["movement"] = function (
@@ -182,5 +187,20 @@ export function defineAllBlocks() {
       },
     };
     return JSON.stringify(code);
+  };
+
+  // Variable blocks
+  javascriptGenerator.forBlock["variables_set"] = function (block: Block, generator: any) {
+    // Variable setter.
+    const argument0 = generator.valueToCode(block, 'VALUE', Order.ASSIGNMENT) || '0';
+    const varName = block.getFieldValue('VAR');
+    variables[varName] = argument0;
+    return [];
+  };
+
+  javascriptGenerator.forBlock["variables_get"] = function (block: Block, generator: any) {
+    // Variable getter.
+    const varName = block.getFieldValue('VAR');
+    return [variables[varName], Order.ATOMIC];
   };
 }
