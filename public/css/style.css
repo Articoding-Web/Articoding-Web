@@ -24,7 +24,7 @@
 /* Navbar END */
 
 /* General START */
-a {
+a, .card a {
     text-decoration: none;
 }
 

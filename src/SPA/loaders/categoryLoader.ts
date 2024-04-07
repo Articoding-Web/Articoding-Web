@@ -23,9 +23,9 @@ function getRowHTML() {
  */
 async function generateLevelDiv(level) {
   return `<div class="col">
-            <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-              <div class="card mx-auto">
-                <div class="row g-0">
+            <div class="card mx-auto border-dark ">
+              <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
+                <div class="row g-0 text-dark">
                   <div class="col-md-3">
                     <img src="..." class="img-fluid rounded-start" alt="Miniature">
                   </div>
@@ -48,8 +48,8 @@ async function generateLevelDiv(level) {
                     </div>
                   </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>`;
     // return `<div class="col">
     //           <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">

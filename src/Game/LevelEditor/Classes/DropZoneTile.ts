@@ -34,7 +34,7 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
     const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked'))).id;
     if (selectedTool === "paintbrush") {
       this.paintIcon();
-    } else {
+    } else if(selectedTool === "eraser"){
       this.deleteIcon();
     }
   }

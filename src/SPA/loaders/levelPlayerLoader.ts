@@ -16,18 +16,17 @@ function getLevelPlayerHTML() {
     return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
               <div id="blocklyArea" class="col col-lg-4 h-100 position-relative collapse collapse-horizontal show">
                   <div id="blocklyDiv" class="position-absolute"></div>
-                  <div class="position-absolute top-0 end-0 me-3">
-                      <button class="btn btn-primary" id="runCodeBtn">
-                          Run Code
+                  <div class="position-absolute top-0 end-0 mt-2 me-2">
+                      <button class="btn btn-success" id="runCodeBtn">
+                        <i class="bi bi-play-fill"></i>
+                      </button>
+                      <button class="btn btn-danger" id="stopCodeBtn">
+                        <i class="bi bi-stop-fill"></i>
                       </button>
                   </div>
               </div>
               <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
                   <canvas id="phaserCanvas"></canvas>
-                  
-                  <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0" type="button" data-bs-toggle="collapse" data-bs-target="#blocklyArea" aria-expanded="false" aria-controls="blocklyArea">
-                      Toggle Blockly
-                  </button>
               </div>
             </div>`;
 }

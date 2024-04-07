@@ -49,8 +49,8 @@ function generateCategoryDivPlaceholder() {
  */
 async function generateCategoryDiv(category) {
   return `<div class="col">
-              <a class="category" href="category/${category.id}">
-                <div class="card mx-auto border-dark d-flex flex-column h-100">
+              <div class="card mx-auto border-dark d-flex flex-column h-100">
+                <a class="category" href="category/${category.id}">
                     <h5 class="card-header card-title text-dark">
                       ${category.name}
                     </h5>
@@ -60,8 +60,8 @@ async function generateCategoryDiv(category) {
                       </h6>
                       ${category.description}
                     </div>
-                </div>
-              </a>
+                </a>
+              </div>
             </div>`;
 }
 
