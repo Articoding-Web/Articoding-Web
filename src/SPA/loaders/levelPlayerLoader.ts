@@ -55,7 +55,7 @@ export async function playLevelById(id: string) {
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 
-export async function restartCurrentLevel() {
+export function restartCurrentLevel() {
     const phaserJSON = currentLevelJSON.phaser;
     PhaserController.init("LevelPlayer", LevelPlayer, phaserJSON);
 }

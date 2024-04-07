@@ -151,12 +151,10 @@ export default class BlocklyController {
     if(BlocklyController.isRunningCode)
       return;
 
-    // Restart level  
-    restartCurrentLevel();
-
     let index = 0;
     const executeNextBlock = () => {
       if (this.shouldAbort) {
+        console.log("aborting 1");
         this.isRunningCode = false; // Reset flag
         this.shouldAbort = false; // Reset flag
         return; // Abort execution

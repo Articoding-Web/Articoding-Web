@@ -13,7 +13,7 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
 }
 
 /**
@@ -22,24 +22,53 @@ function getRowHTML() {
  * @returns String of HTMLDivElement
  */
 async function generateLevelDiv(level) {
-    return `<div class="col">
-              <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-                <div class="card border-dark d-flex flex-column h-100">
-                  <h5 class="card-header card-title text-dark">
-                    ${level.title}
-                  </h5>
-                  <div class="card-body text-dark">
-                    <h6 class="card-subtitle mb-2 text-muted">
-                      Stars: ${level.statistics.stars}
-                    </h6>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                      Attempts: ${level.statistics.attempts}
-                    </h6>
-                    <p>Miniature: </p> 
+  return `<div class="col">
+            <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
+              <div class="card mx-auto">
+                <div class="row g-0">
+                  <div class="col-md-3">
+                    <img src="..." class="img-fluid rounded-start" alt="Miniature">
+                  </div>
+                  <div class="col-md-9">
+                    <div class="card-body">
+                      <div class="row row-cols-1 row-cols-md-2">
+                        <div class="col">
+                          <h5 class="card-title">${level.title}</h5>
+                          <p class="card-text">Level description</p>
+                        </div>
+                        <div class="col align-self-center text-md-end">
+                          <h5>
+                            <span>
+                              ${level.statistics.stars} <i class="bi bi-star-fill gold-star"></i>
+                              ${level.statistics.attempts} <i class="bi bi-play-fill"></i>
+                            </span>
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </a>
-            </div>`;
+              </div>
+            </a>
+          </div>`;
+    // return `<div class="col">
+    //           <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
+    //             <div class="card border-dark d-flex flex-column h-100">
+    //               <h5 class="card-header card-title text-dark">
+    //                 ${level.title}
+    //               </h5>
+    //               <div class="card-body text-dark">
+    //                 <h6 class="card-subtitle mb-2 text-muted">
+    //                   Stars: ${level.statistics.stars}
+    //                 </h6>
+    //                 <h6 class="card-subtitle mb-2 text-muted">
+    //                   Attempts: ${level.statistics.attempts}
+    //                 </h6>
+    //                 <p>Miniature: </p> 
+    //               </div>
+    //             </div>
+    //           </a>
+    //         </div>`;
 }
 
 /**
