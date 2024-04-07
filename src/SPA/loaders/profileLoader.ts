@@ -38,7 +38,7 @@ function getCookieValue(cookieName) {
   return null;
 }
 
-function checkSessionCookie() {
+export function checkSessionCookie() {
   const cookies = document.cookie.split("; ");
   const sessionCookie = cookies.find((cookie) => cookie.startsWith("session="));
   return sessionCookie !== undefined;
@@ -106,7 +106,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   }
 }
 
-function appendLoginModal() {
+export function appendLoginModal() {
   let loginModalHtml = `
         <div id="loginModal" class="modal fade" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -191,6 +191,7 @@ function appendRegisterModal() {
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <span >Tras registrarte, deberás hacer login</span>
                         <span id="text-error-register"></span>
                     </div>
                 </div>
@@ -274,7 +275,6 @@ function logout(){
 }
 
 export default async function loadProfile() {
-  if (checkSessionCookie()) {
     document.getElementById("content").innerHTML = getRowHTML();
     const divElement = document.getElementById("categories");
 
@@ -284,5 +284,4 @@ export default async function loadProfile() {
     const user = sessionCookieValue();
     divElement.innerHTML = generateProfileDiv(user);
     logout();
-  } else appendLoginModal();
 }
