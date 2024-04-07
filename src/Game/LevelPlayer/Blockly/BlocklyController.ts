@@ -29,6 +29,15 @@ export default class BlocklyController {
 
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+    runCodeBtn.addEventListener("click", () => this.runCode());
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
+    stopCodeBtn.onclick = (ev: MouseEvent) => this.abortAndReset();
   }
 
   private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
@@ -82,10 +91,6 @@ export default class BlocklyController {
       this.code = this.generateCode();
     });
 
-    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
-    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
-    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
-
     // Custom flyout callback
     const customFlyoutCallback = (workspace: Blockly.Workspace) => {
       const blockList = [];
@@ -125,10 +130,11 @@ export default class BlocklyController {
   }
 
   static highlightBlock(id: string | null) {
-    this.workspace.highlightBlock(id);
+    if(this.workspace)
+      this.workspace.highlightBlock(id);
   }
 
-  static generateCode(): BlockCode[] {
+  private  static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 
@@ -147,16 +153,14 @@ export default class BlocklyController {
     return code;
   }
 
-  static runCode() {
-    if(BlocklyController.isRunningCode)
+  private static runCode() {
+    if (BlocklyController.isRunningCode)
       return;
-
-    // Restart level  
-    restartCurrentLevel();
 
     let index = 0;
     const executeNextBlock = () => {
       if (this.shouldAbort) {
+        this.highlightBlock(null);
         this.isRunningCode = false; // Reset flag
         this.shouldAbort = false; // Reset flag
         return; // Abort execution
@@ -170,6 +174,7 @@ export default class BlocklyController {
         let times = 0;
         const emitEvent = (eventName: string, eventData) => {
           if (this.shouldAbort) {
+            this.highlightBlock(null);
             this.isRunningCode = false; // Reset flag
             this.shouldAbort = false; // Reset flag
             return; // Abort execution
@@ -187,7 +192,7 @@ export default class BlocklyController {
         };
         emitEvent(code.eventName, code.data);
       } else {
-        BlocklyController.isRunningCode = true;
+        BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
         const event = new CustomEvent("execution-finished");
@@ -195,6 +200,11 @@ export default class BlocklyController {
       }
     };
     executeNextBlock();
+  }
+
+  private static abortAndReset() {
+    this.shouldAbort = true;
+    restartCurrentLevel();
   }
 
   static destroyWorkspace() {

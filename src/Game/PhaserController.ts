@@ -22,7 +22,7 @@ function createPhaserConfig(): Phaser.Types.Core.GameConfig {
 export default class PhaserController {
   private static game: Phaser.Game;
 
-  static async init(key: string, scene: Phaser.Types.Scenes.SceneType, data?: object) {
+  static init(key: string, scene: Phaser.Types.Scenes.SceneType, data?: object) {
     if (!PhaserController.game) {
       PhaserController.game = new Phaser.Game(createPhaserConfig());
     }

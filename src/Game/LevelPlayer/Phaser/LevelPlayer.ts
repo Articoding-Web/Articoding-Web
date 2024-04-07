@@ -194,27 +194,15 @@ export default class LevelPlayer extends Phaser.Scene {
 
         let createdObject;
         if (obj.type === "chest") {
-          createdObject = new ChestObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
+          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet
           );
         } else if (obj.type === "trap") {
           this.createTrapAnim();
-          createdObject = new TrapObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
+          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet
           );
           if (obj.properties.enabled) createdObject.enable();
         } else if (obj.type === "exit") {
-          createdObject = new ExitObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
+          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet
           );
         } else if (obj.type === "wall") {
           // TODO: add wall collisions
@@ -251,11 +239,7 @@ export default class LevelPlayer extends Phaser.Scene {
     }
   }
 
-  scaleSprite(
-    sprite: Phaser.GameObjects.Sprite,
-    gridXPosition: number,
-    gridYPosition: number
-  ) {
+  scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
     const offsetX = (config.TILE_SIZE / 2) * this.scaleFactor + this.mapCoordX;
     const offsetY = config.TILE_SIZE * this.scaleFactor + this.mapCoordY;
 
@@ -296,9 +280,9 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(event);
     } else {
       const event = new CustomEvent("win", { detail: { stars: 3 } });
-      document.dispatchEvent(event);     
+      document.dispatchEvent(event);
     }
-        
+
     const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost } });
     document.dispatchEvent(statisticEvent);
   };

@@ -12,7 +12,7 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="categories"></div>';
+  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
 }
 
 /**
@@ -21,7 +21,7 @@ function getRowHTML() {
  */
 function generateCategoryDivPlaceholder() {
   return `<div class="col placeholder-col">
-              <div class="card border-dark d-flex flex-column h-100">
+              <div class="card mx-auto border-dark d-flex flex-column h-100">
                   <h5 class="card-header card-title text-dark">
                       <span class="placeholder col-6 bg-secondary"></span>
                   </h5>
@@ -49,8 +49,8 @@ function generateCategoryDivPlaceholder() {
  */
 async function generateCategoryDiv(category) {
   return `<div class="col">
-              <a class="category" href="category/${category.id}">
-                <div class="card border-dark d-flex flex-column h-100">
+              <div class="card mx-auto border-dark d-flex flex-column h-100">
+                <a class="category" href="category/${category.id}">
                     <h5 class="card-header card-title text-dark">
                       ${category.name}
                     </h5>
@@ -60,8 +60,8 @@ async function generateCategoryDiv(category) {
                       </h6>
                       ${category.description}
                     </div>
-                </div>
-              </a>
+                </a>
+              </div>
             </div>`;
 }
 

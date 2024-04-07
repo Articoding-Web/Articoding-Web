@@ -8,7 +8,7 @@ import PhaserController from "../../Game/PhaserController";
 function getLevelEditorHTML() {
     return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
               <div class="row row-cols-1 row-cols-md-2 h-100 g-0">
-                  <div id="selector" class="col col-md-2 h-100">
+                  <div id="selector" class="col col-md-2 h-100 mt-2 px-2">
                       <!-- Tools -->
                       <h5 class="card-title border-bottom pb-2 mb-2">Tool</h5>
                       <div class="d-flex justify-content-around">
@@ -39,9 +39,11 @@ function getLevelEditorHTML() {
                       <!-- <button id="selectorToggler" class="btn btn-primary position-absolute top-0 start-0" type="button" data-bs-toggle="collapse" data-bs-target="#selector" aria-expanded="false" aria-controls="selector">
                                 Toggle Selector
                             </button> -->
-                      <button id="saveEditorLevel" class="btn btn-primary position-absolute top-0 end-0" type="button">
-                          Save Level
-                      </button>
+                      <div class="position-absolute top-0 end-0 me-2 mt-2">
+                        <button class="btn btn-primary" id="saveEditorLevel">
+                            <i class="bi bi-cloud-upload-fill"></i>
+                        </button>
+                      </div>
                   </div>
               </div>
             </div>`;
