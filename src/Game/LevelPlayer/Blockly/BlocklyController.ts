@@ -32,7 +32,8 @@ export default class BlocklyController {
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
-    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+    // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+    runCodeBtn.addEventListener("click", () => this.runCode());
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
@@ -191,7 +192,7 @@ export default class BlocklyController {
         };
         emitEvent(code.eventName, code.data);
       } else {
-        BlocklyController.isRunningCode = true;
+        BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
         const event = new CustomEvent("execution-finished");
