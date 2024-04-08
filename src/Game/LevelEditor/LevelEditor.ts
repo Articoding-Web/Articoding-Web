@@ -168,20 +168,22 @@ export default class LevelEditor extends Phaser.Scene {
     };
   }
 
-  saveLevel() {
+  async saveLevel() {
     let levelJSON = this.board.toJSON();
     console.log(JSON.stringify(levelJSON));
     const object = sessionCookieValue();
-    console.log("Objeto:", object);
-    const levelData = {
-      user: object.id,
-      category: 8,
-      self: null,
-      title: "Editor",
-      data: JSON.stringify(levelJSON),
-    };
-    console.log("Nivel:", levelData);
-    // fetchRequest(`${API_ENDPOINT}/level/create`, "POST", levelData);
+    if (object !== null) {
+      const levelData = {
+        user: object.id,
+        category: 8,
+        self: null,
+        title: "Editor",
+        data: JSON.stringify(levelJSON),
+      };
+      console.log("Nivel:", levelData);
+      await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", levelData);
+      // alert("Nivel creado");
+    } else alert("Necesitas iniciar sesión");
   }
 
   cameraZoom(pointer, gameObjects, deltaX, deltaY, deltaZ) {

@@ -1,7 +1,7 @@
-import * as bootstrap from 'bootstrap';
+import * as bootstrap from "bootstrap";
 
-import config from '../../Game/config.js';
-import { fetchRequest } from '../utils';
+import config from "../../Game/config.js";
+import { fetchRequest } from "../utils";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
@@ -45,8 +45,9 @@ export function checkSessionCookie() {
   return sessionCookie !== undefined;
 }
 
-async function userLogin(modal : bootstrap.Modal) {
-  const username = (document.getElementById("username") as HTMLInputElement).value;
+async function userLogin(modal: bootstrap.Modal) {
+  const username = (document.getElementById("username") as HTMLInputElement)
+    .value;
   const password = (document.getElementById("password") as HTMLInputElement)
     .value;
 
@@ -60,31 +61,32 @@ async function userLogin(modal : bootstrap.Modal) {
       `${API_ENDPOINT}/user/login`,
       "POST",
       JSON.stringify(postData),
-      'include',
+      "include"
     );
     modal.hide();
-    alert("Inicio de sesión exitoso")
-    window.location.href = "/"; 
+    alert("Inicio de sesión exitoso");
+    window.location.href = "/";
   } catch (error) {
-      if (error.status === 401 || error.status === 404) {
-        const errorElement = document.getElementById("text-error-login");
-        errorElement.innerText = "Error con el username o contraseña";
-        errorElement.style.color = "red";
-      } else {
-      console.error('Error general:', error);
+    if (error.status === 401 || error.status === 404) {
+      const errorElement = document.getElementById("text-error-login");
+      errorElement.innerText = "Error con el username o contraseña";
+      errorElement.style.color = "red";
+    } else {
+      console.error("Error general:", error);
     }
   }
 }
 
-async function useRegister(modal : bootstrap.Modal):Promise<any> {
+async function useRegister(modal: bootstrap.Modal): Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
-    console.log("🚀 ~ useRegister ~ userName.length:", userName.length)  
+  console.log("🚀 ~ useRegister ~ userName.length:", userName.length);
   if (userName.length < 3) {
     const errorElement = document.getElementById("text-error-register");
-    errorElement.innerText = "El nombre de usuario debe tener al menos 3 letras";
+    errorElement.innerText =
+      "El nombre de usuario debe tener al menos 3 letras";
     errorElement.style.color = "red";
-    return; 
+    return;
   }
 
   const userPassword = (
@@ -93,38 +95,40 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
 
   if (!PASSWORD_REGEX.test(userPassword)) {
     const errorElement = document.getElementById("text-error-register");
-    errorElement.innerText = "La contraseña debe contener al menos 1 mayúscula, 1 número y tener más de 5 letras";
+    errorElement.innerText =
+      "La contraseña debe contener al menos 1 mayúscula, 1 número y tener más de 5 letras";
     errorElement.style.color = "red";
-    return; 
+    return;
   }
-  const confirmPassword = (document.getElementById("confirmPassword") as HTMLInputElement).value;
+  const confirmPassword = (
+    document.getElementById("confirmPassword") as HTMLInputElement
+  ).value;
   if (userPassword !== confirmPassword) {
     const errorElement = document.getElementById("text-error-register");
     errorElement.innerText = "Las contraseñas no coinciden";
     errorElement.style.color = "red";
-    return; 
+    return;
   }
   const postData = {
     userName: userName,
     userPassword: userPassword,
   };
 
-  try{
+  try {
     await fetchRequest(
       `${API_ENDPOINT}/user/registro`,
       "POST",
       JSON.stringify(postData)
     );
     modal.hide();
-    window.location.href = "/"; 
-  }
-  catch(error){
+    window.location.href = "/";
+  } catch (error) {
     if (error.status === 409) {
       const errorElement = document.getElementById("text-error-register");
       errorElement.innerText = "El username ya existe";
       errorElement.style.color = "red";
     } else {
-    console.error('Error general:', error);
+      console.error("Error general:", error);
     }
   }
 }
@@ -284,10 +288,9 @@ function generateProfileDiv(user) {
               </div>
             </div>
           </div>`;
-  
 }
 
-function logout(){
+function logout() {
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();
@@ -295,20 +298,20 @@ function logout(){
       `${API_ENDPOINT}/user/logout`,
       "DELETE",
       null,
-      'include'
+      "include"
     );
-    window.location.href = "/"; 
+    window.location.href = "/";
   });
 }
 
 export default async function loadProfile() {
-    document.getElementById("content").innerHTML = getRowHTML();
-    const divElement = document.getElementById("categories");
+  document.getElementById("content").innerHTML = getRowHTML();
+  const divElement = document.getElementById("categories");
 
-    // Load placeholders
-    // divElement.innerHTML = generateProfilePlaceholder();
+  // Load placeholders
+  // divElement.innerHTML = generateProfilePlaceholder();
 
-    const user = sessionCookieValue();
-    divElement.innerHTML = generateProfileDiv(user);
-    logout();
+  const user = sessionCookieValue();
+  divElement.innerHTML = generateProfileDiv(user);
+  logout();
 }
