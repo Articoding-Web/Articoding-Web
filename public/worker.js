@@ -2,11 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.2";
-
-// FALTA
-
-// Actualizar offline.js y offline.html con el navbar
+var version = "1.0.9";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
