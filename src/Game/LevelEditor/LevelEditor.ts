@@ -1,5 +1,10 @@
 import * as Phaser from "phaser";
 import Board from "./Classes/EditorBoard";
+import config from "../config";
+import { fetchRequest } from "../../SPA/utils";
+import { sessionCookieValue } from "../../SPA/loaders/profileLoader";
+
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
@@ -17,11 +22,9 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   // TODO: pasar nivel y cargarlo
-  init(): void {
-    
-  }
+  init(): void {}
 
-  preload(): void {   
+  preload(): void {
     const assetPath = `assets`;
     const spritePath = `/sprites/default`;
 
@@ -34,7 +37,11 @@ export default class LevelEditor extends Phaser.Scene {
     this.load.multiatlas("trap", "sprites/default/trap.json", spritePath);
     this.load.image("wall", "sprites/default/wall.png");
     this.load.multiatlas("enemy", "sprites/default/enemy.json", spritePath);
-    this.load.multiatlas("background", "sprites/default/background.json", spritePath);
+    this.load.multiatlas(
+      "background",
+      "sprites/default/background.json",
+      spritePath
+    );
 
     this.load.image("green", "ui/button_green.png");
     this.load.image("green-pressed", "ui/button_green_pressed.png");
@@ -52,17 +59,18 @@ export default class LevelEditor extends Phaser.Scene {
     this.createBackgroundSelectors();
     this.createObjectSelectors();
 
-    document.querySelectorAll(".selector-icon").forEach(icon => {
+    document.querySelectorAll(".selector-icon").forEach((icon) => {
       icon.addEventListener("click", (e) => {
         this.selectedIcon?.classList.remove("border");
 
-        if(this.selectedIcon?.id === (<HTMLImageElement>e.target).id)
+        if (this.selectedIcon?.id === (<HTMLImageElement>e.target).id)
           this.selectedIcon = undefined;
         else {
           this.selectedIcon = <HTMLImageElement>e.target;
           this.selectedIcon.classList.add("border");
-          (<HTMLInputElement>(document.getElementById('paintbrush'))).checked = true;
-          (<HTMLInputElement>(document.getElementById('eraser'))).checked = false;
+          (<HTMLInputElement>document.getElementById("paintbrush")).checked =
+            true;
+          (<HTMLInputElement>document.getElementById("eraser")).checked = false;
         }
       });
     }, this);
@@ -71,30 +79,40 @@ export default class LevelEditor extends Phaser.Scene {
       this.selectedIcon?.classList.remove("border");
     });
 
-    this.input.on('pointermove', (pointer) => {
+    this.input.on("pointermove", (pointer) => {
       if (!pointer.isDown) return;
 
-      const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
-      if(selectedTool !== "movement")
-        return;
+      const selectedTool = (<HTMLInputElement>(
+        document.querySelector('input[name="editor-tool"]:checked')
+      ))?.id;
+      if (selectedTool !== "movement") return;
 
-      this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-      this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+      this.cameras.main.scrollX -=
+        (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+      this.cameras.main.scrollY -=
+        (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
     });
 
-    this.input.on('wheel', this.cameraZoom, this);
+    this.input.on("wheel", this.cameraZoom, this);
     // TODO: Remove magic number
-    this.cameras.main.setBounds(0, 0, this.cameras.main.width * 1.2, this.cameras.main.height * 1.2);
+    this.cameras.main.setBounds(
+      0,
+      0,
+      this.cameras.main.width * 1.2,
+      this.cameras.main.height * 1.2
+    );
 
-    document.getElementById("saveEditorLevel").addEventListener("click", () => this.saveLevel())
+    document
+      .getElementById("saveEditorLevel")
+      .addEventListener("click", () => this.saveLevel());
   }
 
-  createObjectImage(key, frame?): HTMLDivElement  {
-    let col = document.createElement('div');
+  createObjectImage(key, frame?): HTMLDivElement {
+    let col = document.createElement("div");
     col.classList.add("col", "text-center");
 
     const url = this.textures.getBase64(key, frame);
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = url;
     img.style.width = 32 + "px"; // Set width
     img.style.height = 32 + "px"; // Set height
@@ -109,7 +127,7 @@ export default class LevelEditor extends Phaser.Scene {
     let bgSelector = document.getElementById("background-selector");
 
     let bgFrameNames = this.textures.get("background").getFrameNames();
-    for(let frame of bgFrameNames) {
+    for (let frame of bgFrameNames) {
       bgSelector.appendChild(this.createObjectImage("background", frame));
     }
   }
@@ -139,30 +157,52 @@ export default class LevelEditor extends Phaser.Scene {
     objSelector.appendChild(this.createObjectImage("enemy"));
   }
 
-  getSelectedIcon(): {texture: string, frame: string | undefined } {
-    if(!this.selectedIcon) {
-      return {texture: undefined, frame: undefined};
+  getSelectedIcon(): { texture: string; frame: string | undefined } {
+    if (!this.selectedIcon) {
+      return { texture: undefined, frame: undefined };
     }
     let data = this.selectedIcon.id.split("-");
-    return {texture: data[0], frame: (data[1] === "undefined" ? undefined : data[1])};
+    return {
+      texture: data[0],
+      frame: data[1] === "undefined" ? undefined : data[1],
+    };
   }
 
   saveLevel() {
     let levelJSON = this.board.toJSON();
-    console.log(levelJSON);
     console.log(JSON.stringify(levelJSON));
+    const object = sessionCookieValue();
+    console.log("Objeto:", object);
+    const levelData = {
+      user: object.id,
+      category: 8,
+      self: null,
+      title: "Editor",
+      data: JSON.stringify(levelJSON),
+    };
+    console.log("Nivel:", levelData);
+    // fetchRequest(`${API_ENDPOINT}/level/create`, "POST", levelData);
   }
 
   cameraZoom(pointer, gameObjects, deltaX, deltaY, deltaZ) {
-    const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
-    if(selectedTool !== "movement")
-      return;
+    const selectedTool = (<HTMLInputElement>(
+      document.querySelector('input[name="editor-tool"]:checked')
+    ))?.id;
+    if (selectedTool !== "movement") return;
 
     if (deltaY > 0) {
-      this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom - ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
+      this.cameras.main.zoom = Phaser.Math.Clamp(
+        this.cameras.main.zoom - ZOOM_AMOUNT,
+        MIN_ZOOM,
+        MAX_ZOOM
+      );
     }
     if (deltaY < 0) {
-      this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom + ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
+      this.cameras.main.zoom = Phaser.Math.Clamp(
+        this.cameras.main.zoom + ZOOM_AMOUNT,
+        MIN_ZOOM,
+        MAX_ZOOM
+      );
     }
   }
 }
