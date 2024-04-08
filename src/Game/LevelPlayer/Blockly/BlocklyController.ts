@@ -98,14 +98,14 @@ export default class BlocklyController {
   }
 
   static generateCode(): BlockCode[] {
-    console.log(BlocklyController.workspace.getAllVariables());
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 
     while (nextBlock) {
-      const blockCode = JSON.parse(
-        javascriptGenerator.blockToCode(nextBlock, true)
-      );
+      let preparsedCode = javascriptGenerator.blockToCode(nextBlock, true);
+      console.log("preparesed code is:")
+      console.log(preparsedCode);
+      const blockCode = JSON.parse(preparsedCode);
 
       if (Array.isArray(blockCode)) {
         for (let innerBlockCode of blockCode)
