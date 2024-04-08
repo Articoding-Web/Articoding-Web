@@ -69,17 +69,13 @@ export class Player {
         this.sprite.anims.play(direction);
     }
 
-    private stopAnimation() {
+    private stopMoving(): void {
         this.sprite.anims.stop();
 
         // Set new idle frame
         const animationManager = this.sprite.anims.animationManager;
         const standingFrame = animationManager.get(this.facingDirections[this.playerDir]).frames[0].frame.name;
         this.sprite.setFrame(standingFrame);
-    }
-
-    private stopMoving(): void {
-        this.stopAnimation();
     }
 
     private updatePlayerTilePos(direction: Direction) {
