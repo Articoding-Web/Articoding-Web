@@ -65,7 +65,6 @@ export function defineAllBlocks() {
 
   //number block:
   javascriptGenerator.forBlock["math_block"] = function (block: Block, generator: any): [string, Order] {
-  javascriptGenerator.forBlock["math_block"] = function (block: Block, generator: any): [string, Order] {
     // Numeric value.
     const number = Number(block.getFieldValue('NUM'));
     const order = number >= 0 ? Order.ATOMIC : Order.UNARY_NEGATION;

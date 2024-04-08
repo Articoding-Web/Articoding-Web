@@ -65,7 +65,6 @@ export default class BlocklyController {
     this.startBlock.initSvg();
     this.startBlock.render();
     this.startBlock.setDeletable(false);
-    this.startBlock;
     this.startBlock.moveBy(BLOCK_OFFSET, BLOCK_OFFSET);
 
     let offset = BLOCK_OFFSET;
