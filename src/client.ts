@@ -1,5 +1,9 @@
 import BlocklyController from './Game/LevelPlayer/Blockly/BlocklyController';
 import PhaserController from './Game/PhaserController';
+import {
+  appendLoginModal,
+  checkSessionCookie,
+} from './SPA/loaders/profileLoader';
 import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
@@ -48,7 +52,13 @@ function setNavbarListeners() {
   // Profile
   document
     .getElementById("profile")
-    .addEventListener("click", () => routeIfNewPath("/profile"));
+    .addEventListener("click", () => {
+      if(!checkSessionCookie()){
+        appendLoginModal();
+      }else{
+        routeIfNewPath("/profile")
+      }
+    });
 }
 
 (function () {

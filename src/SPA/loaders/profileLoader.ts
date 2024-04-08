@@ -4,6 +4,7 @@ import config from '../../Game/config.js';
 import { fetchRequest } from '../utils';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
 
 // Variable para controlar si el evento click ya se agregó al botón
 let registerSubmitBtnAdded = false;
@@ -38,7 +39,7 @@ function getCookieValue(cookieName) {
   return null;
 }
 
-function checkSessionCookie() {
+export function checkSessionCookie() {
   const cookies = document.cookie.split("; ");
   const sessionCookie = cookies.find((cookie) => cookie.startsWith("session="));
   return sessionCookie !== undefined;
@@ -77,10 +78,31 @@ async function userLogin(modal : bootstrap.Modal) {
 async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
+    console.log("🚀 ~ useRegister ~ userName.length:", userName.length)  
+  if (userName.length < 3) {
+    const errorElement = document.getElementById("text-error-register");
+    errorElement.innerText = "El nombre de usuario debe tener al menos 3 letras";
+    errorElement.style.color = "red";
+    return; 
+  }
+
   const userPassword = (
     document.getElementById("userPassword") as HTMLInputElement
   ).value;
 
+  if (!PASSWORD_REGEX.test(userPassword)) {
+    const errorElement = document.getElementById("text-error-register");
+    errorElement.innerText = "La contraseña debe contener al menos 1 mayúscula, 1 número y tener más de 5 letras";
+    errorElement.style.color = "red";
+    return; 
+  }
+  const confirmPassword = (document.getElementById("confirmPassword") as HTMLInputElement).value;
+  if (userPassword !== confirmPassword) {
+    const errorElement = document.getElementById("text-error-register");
+    errorElement.innerText = "Las contraseñas no coinciden";
+    errorElement.style.color = "red";
+    return; 
+  }
   const postData = {
     userName: userName,
     userPassword: userPassword,
@@ -106,7 +128,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   }
 }
 
-function appendLoginModal() {
+export function appendLoginModal() {
   let loginModalHtml = `
         <div id="loginModal" class="modal fade" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -186,11 +208,16 @@ function appendRegisterModal() {
                                 <label for="userPassword" class="form-label">Contraseña</label>
                                 <input type="password" class="form-control" id="userPassword" required>
                             </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                                <input type="password" class="form-control" id="confirmPassword" required>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <span >Tras registrarte, deberás hacer login</span>
                         <span id="text-error-register"></span>
                     </div>
                 </div>
@@ -215,7 +242,6 @@ function appendRegisterModal() {
   if (!registerSubmitBtnAdded) {
     registerSubmitBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      console.log("Dentro")
       await useRegister(registerModalInstance);
     });
     registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
@@ -274,7 +300,6 @@ function logout(){
 }
 
 export default async function loadProfile() {
-  if (checkSessionCookie()) {
     document.getElementById("content").innerHTML = getRowHTML();
     const divElement = document.getElementById("categories");
 
@@ -284,5 +309,4 @@ export default async function loadProfile() {
     const user = sessionCookieValue();
     divElement.innerHTML = generateProfileDiv(user);
     logout();
-  } else appendLoginModal();
 }
