@@ -8,7 +8,6 @@ import * as block_code from "./javascript/block_code";
 import blocks from "./Blocks/blocks";
 
 import config from "../../config";
-import { toolbox } from "blockly/core/utils";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 
 // TODO: Eliminar numero magico
@@ -88,9 +87,6 @@ export default class BlocklyController {
     this.workspace.addChangeListener((event) => {
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
-      let toolboxRef = (this.workspace.getToolbox() as Blockly.Toolbox);
-
-      console.log(toolboxRef.HtmlDiv);
       this.code = this.generateCode();
     });
   }
@@ -105,11 +101,8 @@ export default class BlocklyController {
     let code = [];
 
     while (nextBlock) {
-      let preparsedCode = javascriptGenerator.blockToCode(nextBlock, true);
-      console.log("preparesed code is:")
-      console.log(preparsedCode);
-      const blockCode = JSON.parse(preparsedCode);
-
+      
+      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
       if (Array.isArray(blockCode)) {
         for (let innerBlockCode of blockCode)
           code.push(<BlockCode>innerBlockCode);
