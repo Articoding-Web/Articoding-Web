@@ -33,9 +33,7 @@ export default class BlocklyController {
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
     // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
-    //asynchronous execution prevented this from registering the first event upon being loaded. This is a workaround.
-    // (we can work with browser ticks, but for now it works fine)
-    runCodeBtn.addEventListener("click", () => setTimeout(() => this.runCode(), 500));
+    runCodeBtn.addEventListener("click", () => this.runCode());
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
@@ -116,7 +114,7 @@ export default class BlocklyController {
   }
 
   private static runCode() {
-    if (BlocklyController.isRunningCode === true)
+    if (BlocklyController.isRunningCode)
       return;
 
     let index = 0;
