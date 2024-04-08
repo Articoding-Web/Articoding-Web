@@ -96,8 +96,7 @@ export default class EnemyObject extends ArticodingSprite {
         return new Phaser.Math.Vector2(this.tileX, this.tileY);
     }
 
-    destroy() {
+    shutdown() {
         document.removeEventListener("move", this.move);
-        super.destroy();
     }
 }
