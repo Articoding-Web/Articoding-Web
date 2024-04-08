@@ -126,25 +126,25 @@ export function defineAllBlocks() {
     let childBlock;
     if (children.length === 1 && children[0].type != "math_number")
       childBlock = children[0];
-    else if (children.length > 1) {
+    else if(children.length > 1) {
       childBlock = children[1]
     }
     let childBlockCode = [];
-    while (childBlock) {
+    while(childBlock) {
       const blockCode = generator.blockToCode(childBlock, true);
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-
+  
     // Create the event code.
     let events = `[`;
-    for (let y = 0; y < childBlockCode.length; y++) {
+    for(let y = 0; y < childBlockCode.length; y++) {
       events += childBlockCode[y];
-      if (y < childBlockCode.length - 1)
+      if(y < childBlockCode.length - 1)
         events += ","
     }
     events += "]"
-
+  
     // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
     let code = {
       blockId: block.id,
@@ -154,21 +154,7 @@ export function defineAllBlocks() {
         events: events
       }
     };
-
-    return JSON.stringify(code);
-  };
-  //set block, sets the value of a variable with a block input
-  javascriptGenerator.forBlock["set"] = function (block: Block, generator: any) {
-    let variableName = block.getFieldValue("VAR_NAME");
-    let value = generator.valueToCode(block, "VALUE", Order.ASSIGNMENT) || "0";
-    let code = {
-      blockId: block.id,
-      eventName: "set_var",
-      data: {
-        variableName: variableName,
-        value: value,
-      },
-    };
+  
     return JSON.stringify(code);
   };
 
