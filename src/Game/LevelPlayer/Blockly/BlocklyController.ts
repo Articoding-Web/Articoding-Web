@@ -28,10 +28,6 @@ export default class BlocklyController {
   ];
 
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
-    if (BlocklyController.workspace) {
-      BlocklyController.destroy();
-    }
-
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
@@ -91,52 +87,8 @@ export default class BlocklyController {
     this.workspace.addChangeListener((event) => {
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
-      let toolboxRef = (this.workspace.getToolbox() as Blockly.Toolbox);
-
-      console.log(toolboxRef.HtmlDiv);
       this.code = this.generateCode();
     });
-
-    // Custom flyout callback
-    const customFlyoutCallback = (workspace: Blockly.Workspace) => {
-      const blockList = [];
-
-      // Add the getter block
-      blockList.push({
-        kind: "block",
-        type: "variables_get_panda",
-        fields: {
-          VAR: "panda",
-        },
-      });
-
-      // Add the setter block
-      blockList.push({
-        kind: "block",
-        type: "variables_set_panda",
-        fields: {
-          VAR: "panda",
-        },
-      });
-
-      // Add a button to create a new variable
-      blockList.push({
-        kind: "button",
-        text: "Create variable",
-        callbackKey: "CREATE_VARIABLE",
-      });
-
-      return blockList;
-    };
-
-    BlocklyController.workspace.registerToolboxCategoryCallback("VARIABLE", customFlyoutCallback);
-    BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function (button) {
-      Blockly.Variables.createVariableButtonHandler(button.getTargetWorkspace(), null, 'Panda');
-    });
-
-    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
-    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
-    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
   }
 
   static highlightBlock(id: string | null) {
@@ -144,16 +96,13 @@ export default class BlocklyController {
       this.workspace.highlightBlock(id);
   }
 
-  static generateCode(): BlockCode[] {
+  private  static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 
     while (nextBlock) {
-      let preparsedCode = javascriptGenerator.blockToCode(nextBlock, true);
-      console.log("preparesed code is:")
-      console.log(preparsedCode);
-      const blockCode = JSON.parse(preparsedCode);
-
+      
+      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
       if (Array.isArray(blockCode)) {
         for (let innerBlockCode of blockCode)
           code.push(<BlockCode>innerBlockCode);
