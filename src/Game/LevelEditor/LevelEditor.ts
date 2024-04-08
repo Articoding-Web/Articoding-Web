@@ -1,8 +1,9 @@
-import * as Phaser from "phaser";
-import Board from "./Classes/EditorBoard";
-import config from "../config";
-import { fetchRequest } from "../../SPA/utils";
-import { sessionCookieValue } from "../../SPA/loaders/profileLoader";
+import * as Phaser from 'phaser';
+
+import { sessionCookieValue } from '../../SPA/loaders/profileLoader';
+import { fetchRequest } from '../../SPA/utils';
+import config from '../config';
+import Board from './Classes/EditorBoard';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -181,8 +182,8 @@ export default class LevelEditor extends Phaser.Scene {
         data: JSON.stringify(levelJSON),
       };
       console.log("Nivel:", levelData);
-      await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", levelData);
-      // alert("Nivel creado");
+      await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
+      alert("Nivel creado");
     } else alert("Necesitas iniciar sesión");
   }
 

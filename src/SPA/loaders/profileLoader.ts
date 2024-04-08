@@ -1,7 +1,7 @@
-import * as bootstrap from "bootstrap";
+import * as bootstrap from 'bootstrap';
 
-import config from "../../Game/config.js";
-import { fetchRequest } from "../utils";
+import config from '../../Game/config.js';
+import { fetchRequest } from '../utils';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
@@ -80,7 +80,6 @@ async function userLogin(modal: bootstrap.Modal) {
 async function useRegister(modal: bootstrap.Modal): Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
-  console.log("🚀 ~ useRegister ~ userName.length:", userName.length);
   if (userName.length < 3) {
     const errorElement = document.getElementById("text-error-register");
     errorElement.innerText =
