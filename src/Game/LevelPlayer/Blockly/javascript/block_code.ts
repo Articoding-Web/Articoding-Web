@@ -16,15 +16,22 @@ export function defineAllBlocks() {
     block: Block,
     generator: any
   ) {
-    let repeats;
+    let repeats: string | number = "0";
     if (block.getField("TIMES")) {
       // Internal number.
       repeats = String(Number(block.getFieldValue("TIMES")));
-    } else {
-      // External number.
-      repeats = generator.valueToCode(block, "TIMES", Order.ASSIGNMENT) || "0";
     }
+    // Internal number.
+    console.log("repeats is:", repeats);
+    //overrided....
     let dropdown_direction = block.getFieldValue("DIRECTION");
+    let possiblyVar = generator.valueToCode(block, 'TIMES', Order.ASSIGNMENT) || '0';
+    console.log('possiblyVar is:', possiblyVar);
+    if (possiblyVar in variables){
+      // if(variables[possiblyVar]){
+      repeats = possiblyVar;
+      console.log('repeats changed due to variable now is:', repeats);
+    }
     let code = {
       blockId: block.id,
       eventName: "move",
@@ -193,14 +200,38 @@ export function defineAllBlocks() {
   javascriptGenerator.forBlock["variables_set"] = function (block: Block, generator: any) {
     // Variable setter.
     const argument0 = generator.valueToCode(block, 'VALUE', Order.ASSIGNMENT) || '0';
-    const varName = block.getFieldValue('VAR');
+    let varName = block.getFieldValue('VAR');
+    block.getFieldValue('VAR');
+    console.log(block.getVars());
     variables[varName] = argument0;
-    return [];
+    console.log(variables, 'setter just set this');
+    let code = {
+      blockId: block.id,
+      eventName: "variables_set",
+      data: {
+        varName: varName,
+        value: argument0
+      }
+    };
+  //TESTING
+    return JSON.stringify(code);
+    
   };
 
   javascriptGenerator.forBlock["variables_get"] = function (block: Block, generator: any) {
     // Variable getter.
     const varName = block.getFieldValue('VAR');
-    return [variables[varName], Order.ATOMIC];
+    console.log(variables[varName], 'getter just returned this');
+  
+    let code = {
+      blockId: block.id,
+      eventName: "variables_get",
+      data: {
+        varName: varName,
+        value: variables[varName]
+      }
+    };
+  
+    return JSON.stringify(code);
   };
 }
