@@ -22,53 +22,43 @@ function getRowHTML() {
  * @returns String of HTMLDivElement
  */
 async function generateLevelDiv(level) {
-  return `<div class="col">
-            <div class="card mx-auto border-dark ">
-              <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-                <div class="row g-0 text-dark">
-                  <div class="col-md-3">
-                    <img src="..." class="img-fluid rounded-start" alt="Miniature">
+  if (!level || !level.statistics) {
+    throw new Error('Invalid level data');
+  }
+
+  const { id, miniature, title, description = 'Blockleap level'} = level;
+  const { stars, attempts } = level.statistics;
+
+  return `
+    <div class="col">
+      <div class="card mx-auto border-dark ">
+        <a class="getLevel" href="${API_ENDPOINT}/level/${id}">
+          <div class="row g-0 text-dark">
+            <div class="col-md-3">
+              ${miniature ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">` : ''}
+            </div>
+            <div class="col-md-9">
+              <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-2">
+                  <div class="col">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${description}</p>
                   </div>
-                  <div class="col-md-9">
-                    <div class="card-body">
-                      <div class="row row-cols-1 row-cols-md-2">
-                        <div class="col">
-                          <h5 class="card-title">${level.title}</h5>
-                          <p class="card-text">Level description</p>
-                        </div>
-                        <div class="col align-self-center text-md-end">
-                          <h5>
-                            <span>
-                              ${level.statistics.stars} <i class="bi bi-star-fill gold-star"></i>
-                              ${level.statistics.attempts} <i class="bi bi-play-fill"></i>
-                            </span>
-                          </h5>
-                        </div>
-                      </div>
-                    </div>
+                  <div class="col align-self-center text-md-end">
+                    <h5>
+                      <span>
+                        ${stars} <i class="bi bi-star-fill gold-star"></i>
+                        ${attempts} <i class="bi bi-play-fill"></i>
+                      </span>
+                    </h5>
                   </div>
                 </div>
-              </a>
+              </div>
             </div>
-          </div>`;
-    // return `<div class="col">
-    //           <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-    //             <div class="card border-dark d-flex flex-column h-100">
-    //               <h5 class="card-header card-title text-dark">
-    //                 ${level.title}
-    //               </h5>
-    //               <div class="card-body text-dark">
-    //                 <h6 class="card-subtitle mb-2 text-muted">
-    //                   Stars: ${level.statistics.stars}
-    //                 </h6>
-    //                 <h6 class="card-subtitle mb-2 text-muted">
-    //                   Attempts: ${level.statistics.attempts}
-    //                 </h6>
-    //                 <p>Miniature: </p> 
-    //               </div>
-    //             </div>
-    //           </a>
-    //         </div>`;
+          </div>
+        </a>
+      </div>
+    </div>`;
 }
 
 /**
