@@ -1,41 +1,56 @@
 import * as bootstrap from 'bootstrap';
-import { restartCurrentLevel } from './loaders/levelPlayerLoader';
+
 import { route } from '../client';
+import { restartCurrentLevel } from './loaders/levelPlayerLoader';
 
 let victoryModalInstance;
 let defeatModalInstance;
 
 export default async function registerModals() {
-    const nextLevelButton = document.querySelector("#victoryModal .btn-primary")
-    nextLevelButton.addEventListener("click", (event) => {
-        const url = new URL(window.location.href);
-        let levelId = parseInt(url.searchParams.get("id"));
-        const id = `${++levelId}`
+  // Victory Modal
+  const nextLevelButton = document.querySelector("#victoryModal .btn-primary");
+  nextLevelButton.addEventListener("click", (event) => {
+    const url = new URL(window.location.href);
+    let levelId = parseInt(url.searchParams.get("id"));
+    const id = `${++levelId}`;
 
-        // Change to new level
-        history.pushState({ id }, "", `level?id=${id}`);
-        route();
-    });
+    // Change to new level
+    history.pushState({ id }, "", `level?id=${id}`);
+    route();
+  });
 
-    const retryLevelButton = document.querySelector("#defeatModal .btn-primary");
-    retryLevelButton.addEventListener("click", (event) => {
-        restartCurrentLevel();
-    });
+  const vExitLevelBtn = document.querySelector("#victoryModal .btn-secondary");
+  vExitLevelBtn.addEventListener("click", (event) => {
+    window.history.back();
+  });
 
-    document.addEventListener("win", event => {
-        const { stars } = (<CustomEvent>event).detail;
+  document.addEventListener("win", (event) => {
+    const { stars } = (<CustomEvent>event).detail;
 
-        document.querySelector("#victoryModal .stars").innerHTML = '<i class="fas fa-star"></i>'.repeat(stars);
-        if (!victoryModalInstance) {
-            victoryModalInstance = new bootstrap.Modal("#victoryModal");
-        }
-        victoryModalInstance.show();
-    });
+    document.querySelector("#victoryModal .stars").innerHTML = '<i class="bi bi-star-fill gold-star" style="font-size: 2rem;"></i>'.repeat(stars);
+    if (!victoryModalInstance) {
+      victoryModalInstance = new bootstrap.Modal("#victoryModal");
+    }
+    victoryModalInstance.show();
+  });
 
-    document.addEventListener("lose", e => {
-        // document.querySelector("#defeatModal .stars").innerHTML = '<i class="fas fa-star"></i>'.repeat(0);
-        if (!defeatModalInstance)
-            defeatModalInstance = new bootstrap.Modal(document.getElementById("defeatModal"));
-        defeatModalInstance.show();
-    })
+  // Defeat modal
+  const retryLevelButton = document.querySelector("#defeatModal .btn-primary");
+  retryLevelButton.addEventListener("click", (event) => {
+    restartCurrentLevel();
+  });
+
+  const dExitLevelBtn = document.querySelector("#defeatModal .btn-secondary");
+  dExitLevelBtn.addEventListener("click", (event) => {
+    window.history.back();
+  });
+
+  document.addEventListener("lose", (e) => {
+    // document.querySelector("#defeatModal .stars").innerHTML = '<i class="fas fa-star"></i>'.repeat(0);
+    if (!defeatModalInstance)
+      defeatModalInstance = new bootstrap.Modal(
+        document.getElementById("defeatModal")
+      );
+    defeatModalInstance.show();
+  });
 }

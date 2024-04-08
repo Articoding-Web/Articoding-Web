@@ -1,13 +1,13 @@
-import * as Phaser from "phaser";
-import config from "../../config.js";
+import * as Phaser from 'phaser';
 
-import { Player } from "./Classes/Player.js";
-import { GridPhysics } from "./Classes/GridPhysics.js";
-import { Direction } from "./types/Direction.js";
-import ChestObject from "./Classes/ChestObject.js";
-import TrapObject from "./Classes/TrapObject.js";
-import ArticodingSprite from "./Classes/ArticodingSprite.js";
-import ExitObject from "./Classes/Exit.js";
+import config from '../../config.js';
+import ArticodingSprite from './Classes/ArticodingSprite.js';
+import ChestObject from './Classes/ChestObject.js';
+import ExitObject from './Classes/Exit.js';
+import { GridPhysics } from './Classes/GridPhysics.js';
+import { Player } from './Classes/Player.js';
+import TrapObject from './Classes/TrapObject.js';
+import { Direction } from './types/Direction.js';
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -115,24 +115,38 @@ export default class LevelPlayer extends Phaser.Scene {
     for (let y in this.backgroundLayerJson.objects) {
       const obj = this.backgroundLayerJson.objects[y];
       const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
-      if (tile)
-        tile.properties = obj.properties;
+      if (tile) tile.properties = obj.properties;
     }
   }
 
   createPlayers() {
-    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor, this.objects);
+    this.gridPhysics = new GridPhysics(
+      this.tilemap,
+      this.scaleFactor,
+      this.objects
+    );
 
     // Create sprites
     for (let x in this.playersLayerJson.objects) {
       const player = this.playersLayerJson.objects[x];
 
       // Create and scale sprite
-      const sprite = this.add.sprite(player.x, player.y, this.playersLayerJson.spriteSheet);
+      const sprite = this.add.sprite(
+        player.x,
+        player.y,
+        this.playersLayerJson.spriteSheet
+      );
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
-      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)), this.scaleFactor));
+      this.players.push(
+        new Player(
+          sprite,
+          this.gridPhysics,
+          new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)),
+          this.scaleFactor
+        )
+      );
     }
 
     this.cameras.main.roundPixels = true;
@@ -162,11 +176,11 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createDyingAnimation() {
-    if (!this.anims.exists('dying')) {
+    if (!this.anims.exists("dying")) {
       this.anims.create({
-        key: 'dying',
+        key: "dying",
         frameRate: 10,
-        repeat: -1
+        repeat: -1,
       });
     }
   }
@@ -180,21 +194,22 @@ export default class LevelPlayer extends Phaser.Scene {
 
         let createdObject;
         if (obj.type === "chest") {
-          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet
+          );
         } else if (obj.type === "trap") {
           this.createTrapAnim();
-          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
-          if (obj.properties.enabled)
-            createdObject.enable();
+          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet
+          );
+          if (obj.properties.enabled) createdObject.enable();
         } else if (obj.type === "exit") {
-          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet
+          );
         } else if (obj.type === "wall") {
           // TODO: add wall collisions
           const wall = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(wall, obj.x, obj.y);
           wall.setDepth(objectJson.depth);
-        }
-        else {
+        } else {
           console.error("Object type not registered");
           console.log(obj.type);
           continue;
@@ -211,13 +226,13 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createTrapAnim() {
-    if (!this.anims.exists('trap')) {
+    if (!this.anims.exists("trap")) {
       this.anims.create({
         key: "trap",
         frames: this.anims.generateFrameNames("trap", {
           start: 0,
           end: 3,
-          suffix: '.png',
+          suffix: ".png",
         }),
         frameRate: 8,
       });
@@ -267,7 +282,10 @@ export default class LevelPlayer extends Phaser.Scene {
       const event = new CustomEvent("win", { detail: { stars: 3 } });
       document.dispatchEvent(event);
     }
-  }
+
+    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost } });
+    document.dispatchEvent(statisticEvent);
+  };
 
   rotate(direction: string) {
     this.events.emit("rotateOrder", Direction[direction]);

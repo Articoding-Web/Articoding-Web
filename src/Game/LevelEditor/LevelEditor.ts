@@ -4,6 +4,9 @@ import Board from "./Classes/EditorBoard";
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
 const NUM_COLS = 5;
+const MIN_ZOOM = 0.8;
+const MAX_ZOOM = 1;
+const ZOOM_AMOUNT = 0.05;
 
 export default class LevelEditor extends Phaser.Scene {
   selectedIcon: HTMLImageElement;
@@ -79,6 +82,7 @@ export default class LevelEditor extends Phaser.Scene {
       this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
     });
 
+    this.input.on('wheel', this.cameraZoom, this);
     // TODO: Remove magic number
     this.cameras.main.setBounds(0, 0, this.cameras.main.width * 1.2, this.cameras.main.height * 1.2);
 
@@ -147,5 +151,18 @@ export default class LevelEditor extends Phaser.Scene {
     let levelJSON = this.board.toJSON();
     console.log(levelJSON);
     console.log(JSON.stringify(levelJSON));
+  }
+
+  cameraZoom(pointer, gameObjects, deltaX, deltaY, deltaZ) {
+    const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
+    if(selectedTool !== "movement")
+      return;
+
+    if (deltaY > 0) {
+      this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom - ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
+    }
+    if (deltaY < 0) {
+      this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom + ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
+    }
   }
 }

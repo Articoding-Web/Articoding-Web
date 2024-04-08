@@ -2,8 +2,8 @@ import BlocklyController from "../../Game/LevelPlayer/Blockly/BlocklyController"
 import LevelPlayer from "../../Game/LevelPlayer/Phaser/LevelPlayer";
 import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
-
-const API_ENDPOINT = "http://localhost:3001/api";
+import  config from "../../Game/config";
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let currentLevelJSON;
@@ -16,18 +16,17 @@ function getLevelPlayerHTML() {
     return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
               <div id="blocklyArea" class="col col-lg-4 h-100 position-relative collapse collapse-horizontal show">
                   <div id="blocklyDiv" class="position-absolute"></div>
-                  <div class="position-absolute top-0 end-0 me-3">
-                      <button class="btn btn-primary" id="runCodeBtn">
-                          Run Code
+                  <div class="position-absolute top-0 end-0 mt-2 me-2">
+                      <button class="btn btn-success" id="runCodeBtn">
+                        <i class="bi bi-play-fill"></i>
+                      </button>
+                      <button class="btn btn-danger" id="stopCodeBtn">
+                        <i class="bi bi-stop-fill"></i>
                       </button>
                   </div>
               </div>
               <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
                   <canvas id="phaserCanvas"></canvas>
-                  
-                  <button id="blocklyToggler" class="btn btn-primary position-absolute top-0 start-0" type="button" data-bs-toggle="collapse" data-bs-target="#blocklyArea" aria-expanded="false" aria-controls="blocklyArea">
-                      Toggle Blockly
-                  </button>
               </div>
             </div>`;
 }
@@ -55,7 +54,7 @@ export async function playLevelById(id: string) {
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 
-export async function restartCurrentLevel() {
+export function restartCurrentLevel() {
     const phaserJSON = currentLevelJSON.phaser;
     PhaserController.init("LevelPlayer", LevelPlayer, phaserJSON);
 }

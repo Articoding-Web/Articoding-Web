@@ -34,7 +34,18 @@ export default [
                 'typeof EXPERIMENTAL': JSON.stringify(true),
                 'typeof PLUGIN_CAMERA3D': JSON.stringify(false),
                 'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
-                'typeof FEATURE_SOUND': JSON.stringify(true)
+                'typeof FEATURE_SOUND': JSON.stringify(true),
+            }),
+
+            // API Config
+            replace({
+                preventAssignment: true,
+                include: ['src/Game/config.ts'],
+                values: {
+                    'ENV_API_PROTOCOL': 'http',
+                    'ENV_API_DOMAIN': 'localhost',
+                    'ENV_API_PORT': '3001'
+                }
             }),
 
             // Resolve for Blockly
