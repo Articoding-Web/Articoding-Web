@@ -1,9 +1,5 @@
-import type { Block } from 'blockly/core/block';
-import {
-  javascriptGenerator,
-  Order,
-} from 'blockly/javascript';
-
+import { Order, javascriptGenerator } from "blockly/javascript";
+import type { Block } from "blockly/core/block";
 //Here we define all block behaviour
 
 //Here we define all block behaviour
@@ -126,25 +122,25 @@ export function defineAllBlocks() {
     let childBlock;
     if (children.length === 1 && children[0].type != "math_number")
       childBlock = children[0];
-    else if(children.length > 1) {
+    else if (children.length > 1) {
       childBlock = children[1]
     }
     let childBlockCode = [];
-    while(childBlock) {
+    while (childBlock) {
       const blockCode = generator.blockToCode(childBlock, true);
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-  
+
     // Create the event code.
     let events = `[`;
-    for(let y = 0; y < childBlockCode.length; y++) {
+    for (let y = 0; y < childBlockCode.length; y++) {
       events += childBlockCode[y];
-      if(y < childBlockCode.length - 1)
+      if (y < childBlockCode.length - 1)
         events += ","
     }
     events += "]"
-  
+
     // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
     let code = {
       blockId: block.id,
@@ -154,7 +150,7 @@ export function defineAllBlocks() {
         events: events
       }
     };
-  
+
     return JSON.stringify(code);
   };
 

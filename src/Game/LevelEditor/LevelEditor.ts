@@ -23,7 +23,7 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   // TODO: pasar nivel y cargarlo
-  init(): void {}
+  init(): void { }
 
   preload(): void {
     const assetPath = `assets`;
@@ -38,11 +38,7 @@ export default class LevelEditor extends Phaser.Scene {
     this.load.multiatlas("trap", "sprites/default/trap.json", spritePath);
     this.load.image("wall", "sprites/default/wall.png");
     this.load.multiatlas("enemy", "sprites/default/enemy.json", spritePath);
-    this.load.multiatlas(
-      "background",
-      "sprites/default/background.json",
-      spritePath
-    );
+    this.load.multiatlas("background", "sprites/default/background.json", spritePath);
 
     this.load.image("green", "ui/button_green.png");
     this.load.image("green-pressed", "ui/button_green_pressed.png");
@@ -83,29 +79,18 @@ export default class LevelEditor extends Phaser.Scene {
     this.input.on("pointermove", (pointer) => {
       if (!pointer.isDown) return;
 
-      const selectedTool = (<HTMLInputElement>(
-        document.querySelector('input[name="editor-tool"]:checked')
-      ))?.id;
+      const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
       if (selectedTool !== "movement") return;
 
-      this.cameras.main.scrollX -=
-        (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
-      this.cameras.main.scrollY -=
-        (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+      this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+      this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
     });
 
     this.input.on("wheel", this.cameraZoom, this);
     // TODO: Remove magic number
-    this.cameras.main.setBounds(
-      0,
-      0,
-      this.cameras.main.width * 1.2,
-      this.cameras.main.height * 1.2
-    );
+    this.cameras.main.setBounds(0, 0, this.cameras.main.width * 1.2, this.cameras.main.height * 1.2);
 
-    document
-      .getElementById("saveEditorLevel")
-      .addEventListener("click", () => this.saveLevel());
+    document.getElementById("saveEditorLevel").addEventListener("click", () => this.saveLevel());
   }
 
   createObjectImage(key, frame?): HTMLDivElement {
@@ -163,10 +148,7 @@ export default class LevelEditor extends Phaser.Scene {
       return { texture: undefined, frame: undefined };
     }
     let data = this.selectedIcon.id.split("-");
-    return {
-      texture: data[0],
-      frame: data[1] === "undefined" ? undefined : data[1],
-    };
+    return { texture: data[0], frame: data[1] === "undefined" ? undefined : data[1], };
   }
 
   async saveLevel() {
@@ -188,24 +170,14 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   cameraZoom(pointer, gameObjects, deltaX, deltaY, deltaZ) {
-    const selectedTool = (<HTMLInputElement>(
-      document.querySelector('input[name="editor-tool"]:checked')
-    ))?.id;
+    const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
     if (selectedTool !== "movement") return;
 
     if (deltaY > 0) {
-      this.cameras.main.zoom = Phaser.Math.Clamp(
-        this.cameras.main.zoom - ZOOM_AMOUNT,
-        MIN_ZOOM,
-        MAX_ZOOM
-      );
+      this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom - ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
     }
     if (deltaY < 0) {
-      this.cameras.main.zoom = Phaser.Math.Clamp(
-        this.cameras.main.zoom + ZOOM_AMOUNT,
-        MIN_ZOOM,
-        MAX_ZOOM
-      );
+      this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom + ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
     }
   }
 }

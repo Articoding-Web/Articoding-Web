@@ -1,14 +1,13 @@
-import * as Blockly from 'blockly';
-import { ToolboxDefinition } from 'blockly/core/utils/toolbox';
-import { javascriptGenerator } from 'blockly/javascript';
+import * as Blockly from "blockly";
+import { ZoomToFitControl } from "@blockly/zoom-to-fit";
+import { javascriptGenerator } from "blockly/javascript";
+import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 
-import { ZoomToFitControl } from '@blockly/zoom-to-fit';
-
-import { restartCurrentLevel } from '../../../SPA/loaders/levelPlayerLoader';
-import config from '../../config';
-import blocks from './Blocks/blocks';
-import * as block_code from './javascript/block_code';
-import { BlockCode } from './types/BlockCode';
+import { BlockCode } from "./types/BlockCode";
+import * as block_code from "./javascript/block_code";
+import blocks from "./Blocks/blocks";
+import config from "../../config";
+import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -92,16 +91,15 @@ export default class BlocklyController {
   }
 
   static highlightBlock(id: string | null) {
-    if(this.workspace)
+    if (this.workspace)
       this.workspace.highlightBlock(id);
   }
 
-  private  static generateCode(): BlockCode[] {
+  private static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
 
     while (nextBlock) {
-      
       const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
       if (Array.isArray(blockCode)) {
         for (let innerBlockCode of blockCode)
