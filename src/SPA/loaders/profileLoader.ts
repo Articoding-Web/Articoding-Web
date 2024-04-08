@@ -63,6 +63,7 @@ async function userLogin(modal : bootstrap.Modal) {
       'include',
     );
     modal.hide();
+    alert("Inicio de sesión exitoso")
     window.location.href = "/"; 
   } catch (error) {
       if (error.status === 401 || error.status === 404) {
@@ -199,6 +200,7 @@ function appendRegisterModal() {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="text-success" >La contraseña debe tener 1 mayuscula, 1 número y más de 5 letras</p>
                         <form id="registerForm">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">Nombre</label>
