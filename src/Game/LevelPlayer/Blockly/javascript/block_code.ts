@@ -1,24 +1,26 @@
 import { Order, javascriptGenerator } from "blockly/javascript";
 import type { Block } from "blockly/core/block";
-import Blockly from "blockly";
+import { Workspace } from "blockly";
 //Here we define all block behaviour
 
 //Here we define all block behaviour
 export function defineAllBlocks() {
+  let variables: Record<string, string> = {}; // variable[name] = value;
+
   //Some functions don't need generator, but others will, so it's been left innerCoderpose.
   //generic movement block (movement steps in parsed direction)
-  javascriptGenerator.forBlock["movement"] = function (
-    block: Block,
-    generator: any
-  ) {
-    let repeats;
+  javascriptGenerator.forBlock["movement"] = function (block: Block, generator: any) {
+    let repeats = "0";
+
     if (block.getField("TIMES")) {
       // Internal number.
       repeats = String(Number(block.getFieldValue("TIMES")));
     } else {
-      // External number.
+      // Variable block or other type of blocks
       repeats = generator.valueToCode(block, "TIMES", Order.ASSIGNMENT) || "0";
     }
+
+    //overrided....
     let dropdown_direction = block.getFieldValue("DIRECTION");
     let code = {
       blockId: block.id,
@@ -28,23 +30,18 @@ export function defineAllBlocks() {
       },
       times: repeats
     };
+
     return JSON.stringify(code);
   };
 
   //Start Block, init call for phaserJS scene
-  javascriptGenerator.forBlock["start"] = function (
-    block: Block,
-    generator: any
-  ) {
+  javascriptGenerator.forBlock["start"] = function (block: Block, generator: any) {
     let code = "";
     return code;
   };
 
   //rotate block, action toolbox
-  javascriptGenerator.forBlock["rotate"] = function (
-    block: Block,
-    generator: any
-  ) {
+  javascriptGenerator.forBlock["rotate"] = function (block: Block, generator: any) {
     let dropdown_direction = block.getFieldValue("DIRECTION");
     if (dropdown_direction === "CLOCKWISE") dropdown_direction = "RIGHT";
     else dropdown_direction = "LEFT";
@@ -54,10 +51,7 @@ export function defineAllBlocks() {
   };
 
   //changeStatus block, changes the status of the specified object
-  javascriptGenerator.forBlock["changeStatus"] = function (
-    block: Block,
-    generator: any
-  ) {
+  javascriptGenerator.forBlock["changeStatus"] = function (block: Block, generator: any) {
     let dropdown_status = block.getFieldValue("STATUS"); //ON/OFF
     let code = {
       blockId: block.id,
@@ -78,20 +72,14 @@ export function defineAllBlocks() {
   }
 
   //Text block
-  javascriptGenerator.forBlock["textSpecial"] = function (
-    block: Block,
-    generator: any
-  ) {
+  javascriptGenerator.forBlock["textSpecial"] = function (block: Block, generator: any) {
     let text = block.getFieldValue("TEXT");
     let code = '"' + text + '"';
     return code; //TODO order atomic check
   };
 
   //For_X_times block
-  javascriptGenerator.forBlock["for_X_times"] = function (
-    block: any,
-    generator: any
-  ) {
+  javascriptGenerator.forBlock["for_X_times"] = function (block: any, generator: any) {
     let children = block.getChildren(true);
     // Repeat n times.
     let repeats;
@@ -112,7 +100,7 @@ export function defineAllBlocks() {
       childBlock = childBlock.getNextBlock();
     }
     if (repeats >= 25 || childBlockCode.length >= 25) {
-      console.log("You are trying to repeat too many times, this may cause performance issues.");
+      console.error("You are trying to repeat too many times, this may cause performance issues.");
       repeats = childBlockCode.length * 15;
     }
     let events = `[`;
@@ -129,34 +117,31 @@ export function defineAllBlocks() {
     return events;
   };
 
-  javascriptGenerator.forBlock["if_do"] = function (
-    block: Block,
-    generator: any
-  ) {
+  javascriptGenerator.forBlock["if_do"] = function (block: Block, generator: any) {
     let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
     let children = block.getChildren(true);
     let childBlock;
     if (children.length === 1 && children[0].type != "math_number")
       childBlock = children[0];
-    else if (children.length > 1) {
+    else if(children.length > 1) {
       childBlock = children[1]
     }
     let childBlockCode = [];
-    while (childBlock) {
+    while(childBlock) {
       const blockCode = generator.blockToCode(childBlock, true);
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-
+  
     // Create the event code.
     let events = `[`;
-    for (let y = 0; y < childBlockCode.length; y++) {
+    for(let y = 0; y < childBlockCode.length; y++) {
       events += childBlockCode[y];
-      if (y < childBlockCode.length - 1)
+      if(y < childBlockCode.length - 1)
         events += ","
     }
     events += "]"
-
+  
     // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
     let code = {
       blockId: block.id,
@@ -166,21 +151,31 @@ export function defineAllBlocks() {
         events: events
       }
     };
-
+  
     return JSON.stringify(code);
   };
-  //set block, sets the value of a variable with a block input
-  javascriptGenerator.forBlock["set"] = function (block: Block, generator: any) {
-    let variableName = block.getFieldValue("VAR_NAME");
-    let value = generator.valueToCode(block, "VALUE", Order.ASSIGNMENT) || "0";
+
+  // Variable blocks
+  javascriptGenerator.forBlock["variables_set"] = function (block: Block, generator: any) {
+    // Variable setter.
+    const argument0 = generator.valueToCode(block, 'VALUE', Order.ASSIGNMENT) || '0';
+    let varName = block.getFieldValue('VAR');
+    variables[varName] = String(argument0);
     let code = {
       blockId: block.id,
-      eventName: "set_var",
+      eventName: "variables_set",
       data: {
-        variableName: variableName,
-        value: value,
-      },
+        varName: varName,
+        value: argument0
+      }
     };
+    //TESTING
     return JSON.stringify(code);
+  };
+
+  javascriptGenerator.forBlock["variables_get"] = function (block: Block, generator: any) {
+    // Variable getter.
+    const varName = block.getFieldValue('VAR');
+    return [variables[varName], Order.ATOMIC];
   };
 }

@@ -64,7 +64,6 @@ export default class BlocklyController {
     this.startBlock.initSvg();
     this.startBlock.render();
     this.startBlock.setDeletable(false);
-    this.startBlock;
     this.startBlock.moveBy(BLOCK_OFFSET, BLOCK_OFFSET);
 
     let offset = BLOCK_OFFSET;
@@ -90,43 +89,6 @@ export default class BlocklyController {
       if (!this.blocklyEvents.includes(event.type)) return;
       this.code = this.generateCode();
     });
-
-    // Custom flyout callback
-    const customFlyoutCallback = (workspace: Blockly.Workspace) => {
-      const blockList = [];
-
-      // Add the getter block
-      blockList.push({
-        kind: "block",
-        type: "variables_get_panda",
-        fields: {
-          VAR: "panda",
-        },
-      });
-
-      // Add the setter block
-      blockList.push({
-        kind: "block",
-        type: "variables_set_panda",
-        fields: {
-          VAR: "panda",
-        },
-      });
-
-      // Add a button to create a new variable
-      blockList.push({
-        kind: "button",
-        text: "Create variable",
-        callbackKey: "CREATE_VARIABLE",
-      });
-
-      return blockList;
-    };
-
-    BlocklyController.workspace.registerToolboxCategoryCallback("VARIABLE", customFlyoutCallback);
-    BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function (button) {
-      Blockly.Variables.createVariableButtonHandler(button.getTargetWorkspace(), null, 'Panda');
-    });
   }
 
   static highlightBlock(id: string | null) {
@@ -139,10 +101,8 @@ export default class BlocklyController {
     let code = [];
 
     while (nextBlock) {
-      const blockCode = JSON.parse(
-        javascriptGenerator.blockToCode(nextBlock, true)
-      );
-
+      
+      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
       if (Array.isArray(blockCode)) {
         for (let innerBlockCode of blockCode)
           code.push(<BlockCode>innerBlockCode);
