@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import { Player } from "./Player";
 import ArticodingSprite from "./ArticodingSprite";
 import config from "../../../config";
+import EnemyObject from "./Enemy";
 
 export default class TrapObject extends ArticodingSprite {
   isOn = false;
@@ -27,7 +28,7 @@ export default class TrapObject extends ArticodingSprite {
     }
   }
 
-  collide(player: Player): void {
+  collide(player: Player | EnemyObject): void {
     if (this.isOn) {
       player.kill();
     }

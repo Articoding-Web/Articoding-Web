@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import { Player } from "./Player";
+import EnemyObject from "./Enemy";
 
 export default abstract class ArticodingSprite extends Phaser.GameObjects.Sprite {
 
@@ -13,5 +14,5 @@ export default abstract class ArticodingSprite extends Phaser.GameObjects.Sprite
     return new Phaser.Math.Vector2(this.tileX, this.tileY);
   }
 
-  abstract collide(player: Player): void;
+  abstract collide(player: Player | EnemyObject): void;
 }

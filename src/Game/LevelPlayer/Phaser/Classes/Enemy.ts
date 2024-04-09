@@ -25,8 +25,6 @@ export default class EnemyObject extends ArticodingSprite {
         this.gridPhysics = (this.scene as LevelPlayer).getGridPhysics();
         this.movementOrientation = MovementOrientation[movementOrientation];
 
-        console.log(this.movementOrientation);
-
         if(!this.movementOrientation)
             this.movementOrientation = MovementOrientation.Vertical;
 
@@ -89,6 +87,8 @@ export default class EnemyObject extends ArticodingSprite {
 
         // Set new idle frame
         // this.setFrame(0);
+
+        this.gridPhysics.collide(this);
     }
 
     private moveTween() {
@@ -122,6 +122,11 @@ export default class EnemyObject extends ArticodingSprite {
 
     getTilePos(): Phaser.Math.Vector2 {
         return new Phaser.Math.Vector2(this.tileX, this.tileY);
+    }
+
+    kill() {
+        this.isAlive = false;
+        this.destroy();
     }
 
     destroy(fromScene?: boolean): void {
