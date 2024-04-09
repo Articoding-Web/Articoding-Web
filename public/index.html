@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <!-- Bootstrap -->
     <link href="./css/bootstrap.min.css" rel="stylesheet">
-    
+
     <link href="./css/style.css" rel="stylesheet">
     <title>BlockLeap</title>
 </head>
@@ -30,62 +30,65 @@
             </button>
             <div class="navbar-collapse collapse w-100" id="navbarCollapse">
                 <ul class="navbar-nav w-100 justify-content-center">
-                    <li class="nav-item">
-                        <div class="nav-link icon py-0 px-4" id="official">
-                            <div class="row align-items-center">
-                                <div class="col text-center">
-                                    <i class="bi bi-controller h2" title="Official"></i>
+                    <div class="row row-cols-1 row-cols-md-4 gx-1 gy-3">
+                        <li class="nav-item col">
+                            <div class="nav-link icon py-0 px-4" id="official">
+                                <div class="row align-items-center">
+                                    <div class="col text-center">
+                                        <i class="bi bi-controller h2" title="Official"></i>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        Play
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col text-center">
-                                    Play
+                        </li>
+                        <li class="nav-item col">
+                            <div class="nav-link icon py-0 px-4" id="editor">
+                                <div class="row align-items-center">
+                                    <div class="col text-center">
+                                        <i class="bi bi-pencil-square h2" title="Editor"></i>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        Create
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <div class="nav-link icon py-0 px-4" id="editor">
-                            <div class="row align-items-center">
-                                <div class="col text-center">
-                                    <i class="bi bi-pencil-square h2" title="Editor"></i>
+                        </li>
+                        <li class="nav-item col">
+                            <div class="nav-link icon py-0 px-4" id="manual">
+                                <div class="row align-items-center">
+                                    <div class="col text-center">
+                                        <i class="bi bi-book h2" title="Manual"></i>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        Learn
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col text-center">
-                                    Create
+                        </li>
+                        <li class="nav-item col">
+                            <div class="nav-link icon py-0 px-4" id="community">
+                                <div class="row align-items-center">
+                                    <div class="col text-center">
+                                        <i class="bi bi-people-fill h2" title="Community"></i>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        Connect
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <div class="nav-link icon py-0 px-4" id="manual">
-                            <div class="row align-items-center">
-                                <div class="col text-center">
-                                    <i class="bi bi-book h2" title="Manual"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col text-center">
-                                    Learn
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <div class="nav-link icon py-0 px-4" id="community">
-                            <div class="row align-items-center">
-                                <div class="col text-center">
-                                    <i class="bi bi-people-fill h2" title="Community"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col text-center">
-                                    Connect
-                                </div>
-                            </div>
-                        </div>
-                    </li>
+                        </li>
+                        <div class="col d-md-none"></div>
+                    </div>
                 </ul>
                 <ul class="nav navbar-nav ms-auto w-100 justify-content-end">
                     <li class="nav-item text-center">
@@ -149,7 +152,6 @@
         </div>
     </div>
 
-    <script src="./js/bootstrap.min.js"></script>
     <script type="module" src="./client.js"></script>
 </body>
 

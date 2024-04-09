@@ -69,7 +69,7 @@ export default class EnemyObject extends ArticodingSprite {
         const pixelsToMove = config.TILE_SIZE * (this.scene as LevelPlayer).getScaleFactor();
         const movementDistance = this.gridPhysics.getMovementDistance(this.currentDirection, pixelsToMove);
         const newPosition = (this.getBottomCenter() as Phaser.Math.Vector2).add(movementDistance);
-        
+
         this.updateTilePos();
 
         this.scene.tweens.add({
@@ -96,7 +96,8 @@ export default class EnemyObject extends ArticodingSprite {
         return new Phaser.Math.Vector2(this.tileX, this.tileY);
     }
 
-    shutdown() {
+    destroy(fromScene?: boolean): void {
         document.removeEventListener("move", this.move);
+        super.destroy(fromScene);
     }
 }

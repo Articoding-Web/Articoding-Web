@@ -19,6 +19,7 @@ export default class BlocklyController {
   private static code: BlockCode[];
   private static isRunningCode: boolean = false;
   private static shouldAbort: boolean = false;
+  private static runCodeBtn;
 
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
@@ -31,9 +32,9 @@ export default class BlocklyController {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
-    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    BlocklyController.runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
     // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
-    runCodeBtn.addEventListener("click", () => this.runCode());
+    BlocklyController.runCodeBtn.addEventListener("click", this.runCode);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
@@ -113,8 +114,14 @@ export default class BlocklyController {
     return code;
   }
 
-  private static runCode() {
-    if (BlocklyController.isRunningCode)
+  private static runCode = (e: MouseEvent) =>  {
+    e.stopPropagation();
+
+    if (this.shouldAbort) {
+      this.highlightBlock(null);
+      this.isRunningCode = false; // Reset flag
+      this.shouldAbort = false; // Reset flag
+    } else if (BlocklyController.isRunningCode)
       return;
 
     let index = 0;
@@ -152,6 +159,7 @@ export default class BlocklyController {
         };
         emitEvent(code.eventName, code.data);
       } else {
+        console.log("finished running");
         BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
@@ -170,6 +178,7 @@ export default class BlocklyController {
   static destroyWorkspace() {
     if (BlocklyController.workspace) {
       BlocklyController.shouldAbort = true;
+      BlocklyController.runCodeBtn.removeEventListener("click", this.runCode);
       window.removeEventListener("resize", onresize, false);
       BlocklyController.workspace.dispose();
       BlocklyController.workspace = undefined;
