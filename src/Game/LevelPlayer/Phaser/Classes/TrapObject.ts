@@ -29,21 +29,22 @@ export default class TrapObject extends ArticodingSprite {
 
   collide(player: Player): void {
     if (this.isOn) {
-      console.log("trap killing player");
       player.kill();
     }
   }
 
   private enable() {
-    console.log("enabling");
-    this.anims.play({ key: "trap", duration: config.MOVEMENT_ANIMDURATION });
+    const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+    this.anims.play({ key: "trap", duration: config.MOVEMENT_ANIMDURATION / speedModifier });
+
     this.isOn = true;
   }
 
   private disable() {
-    console.log("disabling");
     this.isOn = false;
-    this.anims.playReverse({ key: "trap", duration: config.MOVEMENT_ANIMDURATION });
+
+    const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+    this.anims.playReverse({ key: "trap", duration: config.MOVEMENT_ANIMDURATION / speedModifier });
   }
 
   destroy(fromScene?: boolean): void {

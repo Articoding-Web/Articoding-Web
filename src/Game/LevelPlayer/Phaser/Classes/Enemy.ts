@@ -46,11 +46,13 @@ export default class EnemyObject extends ArticodingSprite {
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = (this.getBottomCenter() as Phaser.Math.Vector2).add(movementDistance);
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.scene.tweens.add({
             targets: this,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION / 2,
+            duration: config.MOVEMENT_ANIMDURATION / 2 / speedModifier,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopMoving.bind(this)
@@ -72,11 +74,13 @@ export default class EnemyObject extends ArticodingSprite {
 
         this.updateTilePos();
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.scene.tweens.add({
             targets: this,
             x: newPosition.x,
             y: newPosition.y,
-            duration: config.MOVEMENT_ANIMDURATION,
+            duration: config.MOVEMENT_ANIMDURATION / speedModifier,
             ease: "Sine.inOut",
             onComplete: this.stopMoving.bind(this)
         })

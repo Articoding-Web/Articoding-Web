@@ -151,7 +151,10 @@ export default class BlocklyController {
             const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
             times++;
-            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
+
+            const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION / speedModifier * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
           } else {
             index++;
             executeNextBlock();
@@ -159,7 +162,6 @@ export default class BlocklyController {
         };
         emitEvent(code.eventName, code.data);
       } else {
-        console.log("finished running");
         BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);

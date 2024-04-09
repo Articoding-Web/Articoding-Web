@@ -38,11 +38,13 @@ export class Player {
         
         this.updatePlayerTilePos(direction);
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.sprite.scene.tweens.add({
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION,
+            duration: config.MOVEMENT_ANIMDURATION / speedModifier,
             ease: "Sine.inOut",
             onComplete: this.stopMoving.bind(this)
         })
@@ -53,11 +55,13 @@ export class Player {
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = this.getPosition().add(movementDistance);
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.sprite.scene.tweens.add({
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION / 2,
+            duration: config.MOVEMENT_ANIMDURATION / 2 / speedModifier,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopMoving.bind(this)

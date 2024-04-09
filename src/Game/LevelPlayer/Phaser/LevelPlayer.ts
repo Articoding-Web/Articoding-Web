@@ -83,6 +83,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createObjects(); // create sprites obj, incl. cofres
 
     document.addEventListener("execution-finished", this.checkWinCondition);
+    document.getElementById("speedModifierBtn").addEventListener("click", this.changeAnimSpeed);
   }
 
   createBackground() {
@@ -273,19 +274,27 @@ export default class LevelPlayer extends Phaser.Scene {
     document.dispatchEvent(statisticEvent);
   };
 
+  private changeAnimSpeed = (e: Event) => {
+    const val = parseInt((e.currentTarget as HTMLInputElement).value);
+    const newVal = (val % 3) + 1;  // between 1 - 3
+
+    (e.currentTarget as HTMLDivElement).innerHTML = `${newVal}x`;
+    (e.currentTarget as HTMLInputElement).value = `${newVal}`;
+  }
+
   rotate(direction: string) {
     this.events.emit("rotateOrder", Direction[direction]);
   }
 
   shutdown() {
-    console.log("clearing scene");
     document.removeEventListener("execution-finished", this.checkWinCondition);
+    document.getElementById("speedModifierBtn").removeEventListener("click", this.changeAnimSpeed);
 
     while (this.players.length) {
       this.players.pop().destroy();
     }
 
-    while(this.objects.length) {
+    while (this.objects.length) {
       this.objects.pop().destroy();
     }
   }
