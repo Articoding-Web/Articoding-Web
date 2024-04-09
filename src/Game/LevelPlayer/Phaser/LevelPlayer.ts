@@ -254,11 +254,15 @@ export default class LevelPlayer extends Phaser.Scene {
   private checkWinCondition = (e: Event) => {
     let hasLost = false;
 
+    let playerBounced = false;
+
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
         player.die();
         hasLost = true;
+      } else if (player.getHasBounced()) {
+        playerBounced = true;
       }
     }
 
@@ -266,7 +270,8 @@ export default class LevelPlayer extends Phaser.Scene {
       const event = new CustomEvent("lose");
       document.dispatchEvent(event);
     } else {
-      const event = new CustomEvent("win", { detail: { stars: 3 } });
+      const stars = 1 + (playerBounced ? 0 : 1) + 1; // TODO: minBlocks star
+      const event = new CustomEvent("win", { detail: { stars } });
       document.dispatchEvent(event);
     }
 

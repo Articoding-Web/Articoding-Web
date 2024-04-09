@@ -8,6 +8,7 @@ export class Player {
     private isAlive = true;
     private reachedExit = false;
     private collectedChests: number = 0;
+    private hasBounced = false;
 
     constructor(private sprite: Phaser.GameObjects.Sprite, private gridPhysics: GridPhysics, private tilePos: Phaser.Math.Vector2, private scaleFactor: number) {
         document.addEventListener("move", this.handleMove);
@@ -25,6 +26,7 @@ export class Player {
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
             this.startRunningAnimation(direction);
             this.bounceTween(direction);
+            this.hasBounced = true;
         } else {
             this.startRunningAnimation(direction);
             this.moveTween(direction);
@@ -144,5 +146,9 @@ export class Player {
     destroy() {
         document.removeEventListener("move", this.handleMove);
         this.sprite.destroy();
+    }
+
+    getHasBounced(): boolean { 
+        return this.hasBounced;
     }
 }
