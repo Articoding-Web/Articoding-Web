@@ -194,7 +194,7 @@ export default class LevelPlayer extends Phaser.Scene {
           this.scaleSprite(wall, obj.x, obj.y);
           wall.setDepth(objectJson.depth);
         } else if (obj.type === "enemy") {
-          createdObject = new EnemyObject(this, parseInt(obj.x), parseInt(obj.y), objectJson.spriteSheet);
+          createdObject = new EnemyObject(this, parseInt(obj.x), parseInt(obj.y), objectJson.spriteSheet, obj.movementOrientation);
         }
         else {
           console.error("Object type not registered");

@@ -6,17 +6,34 @@ import LevelPlayer from "../LevelPlayer";
 import config from "../../../config";
 import { GridPhysics } from "./GridPhysics";
 
+enum MovementOrientation {
+    Horizontal = "horizontal",
+    Vertical = "vertical"
+}
+
 export default class EnemyObject extends ArticodingSprite {
     private isAlive = true;
-    private currentDirection: Direction = Direction.DOWN;
+    private currentDirection: Direction;
+    private movementOrientation: MovementOrientation;
     private gridPhysics: GridPhysics;
 
-    constructor(scene: LevelPlayer, tileX: number, tileY: number, texture: string | Phaser.Textures.Texture) {
+    constructor(scene: LevelPlayer, tileX: number, tileY: number, texture: string | Phaser.Textures.Texture, movementOrientation?: string) {
         super(scene, tileX, tileY, texture);
         this.scene = scene;
         this.scene.add.existing(this);
 
         this.gridPhysics = (this.scene as LevelPlayer).getGridPhysics();
+        this.movementOrientation = MovementOrientation[movementOrientation];
+
+        console.log(this.movementOrientation);
+
+        if(!this.movementOrientation)
+            this.movementOrientation = MovementOrientation.Vertical;
+
+        if(this.movementOrientation == MovementOrientation.Vertical)
+            this.currentDirection = Direction.DOWN;
+        else
+            this.currentDirection = Direction.RIGHT;
 
         document.addEventListener("move", this.move);
     }
@@ -34,11 +51,18 @@ export default class EnemyObject extends ArticodingSprite {
             // Running anim
             // this.anims.play(`enemy_${this.currentDirection}`);
             this.bounceTween(this.currentDirection);
-            this.currentDirection = (this.currentDirection === Direction.DOWN ? Direction.UP : Direction.DOWN);
+            this.changeDirection();
         } else {
             // this.anims.play(`enemy_${this.currentDirection}`);
             this.moveTween();
         }
+    }
+
+    private changeDirection() {
+        if(this.currentDirection === Direction.DOWN || this.currentDirection === Direction.UP)
+            this.currentDirection = (this.currentDirection === Direction.DOWN ? Direction.UP : Direction.DOWN);
+        else
+            this.currentDirection = (this.currentDirection === Direction.LEFT ? Direction.RIGHT : Direction.LEFT);
     }
 
     private bounceTween(direction) {
