@@ -28,7 +28,6 @@ export class Player {
         } else {
             this.startRunningAnimation(direction);
             this.moveTween(direction);
-            this.gridPhysics.collide(this);
         }
     }
 
@@ -76,6 +75,8 @@ export class Player {
         const animationManager = this.sprite.anims.animationManager;
         const standingFrame = animationManager.get(this.facingDirections[this.playerDir]).frames[0].frame.name;
         this.sprite.setFrame(standingFrame);
+
+        this.gridPhysics.collide(this);
     }
 
     private updatePlayerTilePos(direction: Direction) {
@@ -99,7 +100,6 @@ export class Player {
         this.tilePos = tilePosition.clone();
     }
 
-    //TODO test @sanord8
     die() {
         this.sprite.scene.tweens.add({
             targets: this.sprite,
@@ -111,7 +111,6 @@ export class Player {
                 // nothing so far
             }
         });
-
     }
 
     getIsAlive(): Boolean {

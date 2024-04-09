@@ -284,6 +284,10 @@ export default class LevelPlayer extends Phaser.Scene {
     while (this.players.length) {
       this.players.pop().destroy();
     }
+
+    while(this.objects.length) {
+      this.objects.pop().destroy();
+    }
   }
 
   getGridPhysics(): GridPhysics {
