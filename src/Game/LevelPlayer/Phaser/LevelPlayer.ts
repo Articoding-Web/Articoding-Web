@@ -26,6 +26,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private players: Player[] = [];
   private objects: ArticodingSprite[] = [];
+  private numChests = 0;
 
   private gridPhysics: GridPhysics;
 
@@ -182,6 +183,7 @@ export default class LevelPlayer extends Phaser.Scene {
         let createdObject;
         if (obj.type === "chest") {
           createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          this.numChests++;
         } else if (obj.type === "trap") {
           this.createTrapAnim();
           createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
@@ -253,7 +255,6 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private checkWinCondition = (e: Event) => {
     let hasLost = false;
-
     let playerBounced = false;
 
     for (let x in this.players) {
@@ -264,13 +265,15 @@ export default class LevelPlayer extends Phaser.Scene {
       } else if (player.getHasBounced()) {
         playerBounced = true;
       }
+      
+      this.numChests -= player.getCollectedChest();
     }
 
     if (hasLost) {
       const event = new CustomEvent("lose");
       document.dispatchEvent(event);
     } else {
-      const stars = 1 + (playerBounced ? 0 : 1) + 1; // TODO: minBlocks star
+      const stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
       const event = new CustomEvent("win", { detail: { stars } });
       document.dispatchEvent(event);
     }
