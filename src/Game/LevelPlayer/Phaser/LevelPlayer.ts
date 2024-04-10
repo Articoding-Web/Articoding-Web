@@ -268,17 +268,17 @@ export default class LevelPlayer extends Phaser.Scene {
       
       this.numChests -= player.getCollectedChest();
     }
-
+    let stars = 0;
     if (hasLost) {
       const event = new CustomEvent("lose");
       document.dispatchEvent(event);
     } else {
-      const stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+      stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
       const event = new CustomEvent("win", { detail: { stars } });
       document.dispatchEvent(event);
     }
 
-    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost } });
+    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
     document.dispatchEvent(statisticEvent);
   };
 
