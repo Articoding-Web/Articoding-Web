@@ -17,7 +17,7 @@ function getRowHTML() {
  *
  * @returns String of HTMLDivElement of a category placeholder
  */
-function generateCategoryLevelsDivPlaceholder() {
+function generateCommunityDivPlaceholder() {
   return `<div class="col placeholder-col">
               <div class="card mx-auto border-dark">
                   <div class="row g-0 text-dark">
@@ -109,19 +109,15 @@ async function playLevel(event) {
   route();
 }
 
-export default async function loadCategoryById(id: string) {
+export default async function loadCommunity() {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
 
   // Load placeholders
-  await fillContent(
-    divElement,
-    new Array(10),
-    generateCategoryLevelsDivPlaceholder
-  );
+  await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
   const levels = await fetchRequest(
-    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+    `${API_ENDPOINT}/level/community/levels`,
     "GET"
   );
 
@@ -130,7 +126,7 @@ export default async function loadCategoryById(id: string) {
   let statistics = [];
   if (cookie !== null) {
     statistics = await fetchRequest(
-      `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
+      `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
       "GET"
     );
   }
