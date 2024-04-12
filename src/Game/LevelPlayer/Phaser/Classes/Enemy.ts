@@ -6,17 +6,32 @@ import LevelPlayer from "../LevelPlayer";
 import config from "../../../config";
 import { GridPhysics } from "./GridPhysics";
 
+enum MovementOrientation {
+    Horizontal = "horizontal",
+    Vertical = "vertical"
+}
+
 export default class EnemyObject extends ArticodingSprite {
     private isAlive = true;
-    private currentDirection: Direction = Direction.DOWN;
+    private currentDirection: Direction;
+    private movementOrientation: MovementOrientation;
     private gridPhysics: GridPhysics;
 
-    constructor(scene: LevelPlayer, tileX: number, tileY: number, texture: string | Phaser.Textures.Texture) {
+    constructor(scene: LevelPlayer, tileX: number, tileY: number, texture: string | Phaser.Textures.Texture, movementOrientation?: string) {
         super(scene, tileX, tileY, texture);
         this.scene = scene;
         this.scene.add.existing(this);
 
         this.gridPhysics = (this.scene as LevelPlayer).getGridPhysics();
+        this.movementOrientation = MovementOrientation[movementOrientation];
+
+        if(!this.movementOrientation)
+            this.movementOrientation = MovementOrientation.Vertical;
+
+        if(this.movementOrientation == MovementOrientation.Vertical)
+            this.currentDirection = Direction.DOWN;
+        else
+            this.currentDirection = Direction.RIGHT;
 
         document.addEventListener("move", this.move);
     }
@@ -34,11 +49,18 @@ export default class EnemyObject extends ArticodingSprite {
             // Running anim
             // this.anims.play(`enemy_${this.currentDirection}`);
             this.bounceTween(this.currentDirection);
-            this.currentDirection = (this.currentDirection === Direction.DOWN ? Direction.UP : Direction.DOWN);
+            this.changeDirection();
         } else {
             // this.anims.play(`enemy_${this.currentDirection}`);
             this.moveTween();
         }
+    }
+
+    private changeDirection() {
+        if(this.currentDirection === Direction.DOWN || this.currentDirection === Direction.UP)
+            this.currentDirection = (this.currentDirection === Direction.DOWN ? Direction.UP : Direction.DOWN);
+        else
+            this.currentDirection = (this.currentDirection === Direction.LEFT ? Direction.RIGHT : Direction.LEFT);
     }
 
     private bounceTween(direction) {
@@ -46,11 +68,13 @@ export default class EnemyObject extends ArticodingSprite {
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = (this.getBottomCenter() as Phaser.Math.Vector2).add(movementDistance);
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.scene.tweens.add({
             targets: this,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION / 2,
+            duration: config.MOVEMENT_ANIMDURATION / 2 / speedModifier,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopMoving.bind(this)
@@ -63,6 +87,8 @@ export default class EnemyObject extends ArticodingSprite {
 
         // Set new idle frame
         // this.setFrame(0);
+
+        this.gridPhysics.collide(this);
     }
 
     private moveTween() {
@@ -72,11 +98,13 @@ export default class EnemyObject extends ArticodingSprite {
 
         this.updateTilePos();
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.scene.tweens.add({
             targets: this,
             x: newPosition.x,
             y: newPosition.y,
-            duration: config.MOVEMENT_ANIMDURATION,
+            duration: config.MOVEMENT_ANIMDURATION / speedModifier,
             ease: "Sine.inOut",
             onComplete: this.stopMoving.bind(this)
         })
@@ -94,6 +122,11 @@ export default class EnemyObject extends ArticodingSprite {
 
     getTilePos(): Phaser.Math.Vector2 {
         return new Phaser.Math.Vector2(this.tileX, this.tileY);
+    }
+
+    kill() {
+        this.isAlive = false;
+        this.destroy();
     }
 
     destroy(fromScene?: boolean): void {
