@@ -9,6 +9,7 @@ import blocks from "./Blocks/blocks";
 
 import config from "../../config";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
+import { Block } from "blockly";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -58,7 +59,7 @@ export default class BlocklyController {
 
     window.addEventListener("resize", onresize, false);
     onresize();
-
+    
     Blockly.defineBlocksWithJsonArray(blocks);
 
     this.startBlock = this.workspace.newBlock("start");
@@ -136,6 +137,7 @@ export default class BlocklyController {
       if (index < this.code.length) {
         BlocklyController.isRunningCode = true;
         let code = this.code[index];
+        console.log("running code", code);
         this.highlightBlock(code.blockId);
 
         let times = 0;

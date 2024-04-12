@@ -42,6 +42,9 @@ export default async function registerModals() {
 
   const dExitLevelBtn = document.querySelector("#defeatModal .btn-secondary");
   dExitLevelBtn.addEventListener("click", (event) => {
+    //let streak = Number(window.history.state.id);
+    //window.history.go(-streak);
+   // let newUrl = new URL(window.location.href);
     window.history.back();
   });
 
