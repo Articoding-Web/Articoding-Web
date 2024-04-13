@@ -1,6 +1,7 @@
 import config from '../Game/config.js';
 import { sessionCookieValue } from './loaders/profileLoader';
 import { fetchRequest } from './utils';
+import XAPISingleton from '../xAPI/xapi.js';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -25,5 +26,9 @@ export default async function initLogger() {
       );
       
     }
+    
+    const statement = XAPISingleton.levelCompletedStatement();
+    
+    XAPISingleton.sendStatement(statement);
   });
 }
