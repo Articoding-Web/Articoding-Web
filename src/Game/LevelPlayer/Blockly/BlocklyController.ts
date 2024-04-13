@@ -20,8 +20,8 @@ export default class BlocklyController {
   private static code: BlockCode[];
   private static isRunningCode: boolean = false;
   private static shouldAbort: boolean = false;
+  private static changeData: any;
   private static runCodeBtn;
-
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
     Blockly.Events.BLOCK_CREATE,
@@ -59,7 +59,7 @@ export default class BlocklyController {
 
     window.addEventListener("resize", onresize, false);
     onresize();
-    
+
     Blockly.defineBlocksWithJsonArray(blocks);
 
     this.startBlock = this.workspace.newBlock("start");
@@ -67,7 +67,6 @@ export default class BlocklyController {
     this.startBlock.render();
     this.startBlock.setDeletable(false);
     this.startBlock.moveBy(BLOCK_OFFSET, BLOCK_OFFSET);
-
     let offset = BLOCK_OFFSET;
     for (let workspaceBlock of workspaceBlocks) {
       offset += BLOCK_OFFSET;
@@ -87,89 +86,101 @@ export default class BlocklyController {
     block_code.defineAllBlocks();
 
     this.workspace.addChangeListener((event) => {
+      console.log(event);
+      if (event.type === "block_field_intermediate_change") {
+        this.changeData = event;
+      }
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
+      // if (event.type === Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE){
+      //   console.log("BlockFieldIntermediateChange event", event);
+      // }
       this.code = this.generateCode();
     });
   }
 
   static highlightBlock(id: string | null) {
-    if(this.workspace)
+    if (this.workspace)
       this.workspace.highlightBlock(id);
   }
 
-  private  static generateCode(): BlockCode[] {
+  private static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
-
     while (nextBlock) {
-      
-      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
-      if (Array.isArray(blockCode)) {
-        for (let innerBlockCode of blockCode)
-          code.push(<BlockCode>innerBlockCode);
-      } else code.push(<BlockCode>blockCode);
-
+      if (nextBlock.id === this.changeData.blockId) {
+        code.push([String(this.changeData.newValue), 0]);
+      }
+      else{
+        const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
+        if (Array.isArray(blockCode)) {
+          for (let innerBlockCode of blockCode)
+            code.push(<BlockCode>innerBlockCode);
+        } else code.push(<BlockCode>blockCode);
+      }
       nextBlock = nextBlock.getNextBlock();
     }
     return code;
   }
 
-  private static runCode = (e: MouseEvent) =>  {
+  private static runCode = (e: MouseEvent) => {
     e.stopPropagation();
-
-    if (this.shouldAbort) {
-      this.highlightBlock(null);
-      this.isRunningCode = false; // Reset flag
-      this.shouldAbort = false; // Reset flag
-    } else if (BlocklyController.isRunningCode)
-      return;
-
-    let index = 0;
-    const executeNextBlock = () => {
+    //this.workspace.getAllBlocks(true)[0].select();
+    setTimeout(() => {
       if (this.shouldAbort) {
         this.highlightBlock(null);
         this.isRunningCode = false; // Reset flag
         this.shouldAbort = false; // Reset flag
-        return; // Abort execution
-      }
+      } else if (BlocklyController.isRunningCode)
+        return;
 
-      if (index < this.code.length) {
-        BlocklyController.isRunningCode = true;
-        let code = this.code[index];
-        console.log("running code", code);
-        this.highlightBlock(code.blockId);
+      let index = 0;
+      const executeNextBlock = () => {
+        if (this.shouldAbort) {
+          this.highlightBlock(null);
+          this.isRunningCode = false; // Reset flag
+          this.shouldAbort = false; // Reset flag
+          return; // Abort execution
+        }
 
-        let times = 0;
-        const emitEvent = (eventName: string, eventData) => {
-          if (this.shouldAbort) {
-            this.highlightBlock(null);
-            this.isRunningCode = false; // Reset flag
-            this.shouldAbort = false; // Reset flag
-            return; // Abort execution
-          }
+        if (index < this.code.length) {
+          BlocklyController.isRunningCode = true;
+          let code = this.code[index];
+          console.log("running code", code);
+          this.highlightBlock(code.blockId);
 
-          if (times < (code.times || 1)) {
-            const event = new CustomEvent(eventName, { detail: eventData });
-            document.dispatchEvent(event);
-            times++;
-            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
-          } else {
-            index++;
-            executeNextBlock();
-          }
-        };
-        emitEvent(code.eventName, code.data);
-      } else {
-        console.log("finished running");
-        BlocklyController.isRunningCode = false;
-        // Finished code execution
-        this.highlightBlock(null);
-        const event = new CustomEvent("execution-finished");
-        document.dispatchEvent(event);
-      }
-    };
-    executeNextBlock();
+          let times = 0;
+          const emitEvent = (eventName: string, eventData) => {
+            if (this.shouldAbort) {
+              this.highlightBlock(null);
+              this.isRunningCode = false; // Reset flag
+              this.shouldAbort = false; // Reset flag
+              return; // Abort execution
+            }
+
+            if (times < (code.times || 1)) {
+              const event = new CustomEvent(eventName, { detail: eventData });
+              document.dispatchEvent(event);
+              times++;
+              setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
+            } else {
+              index++;
+              executeNextBlock();
+            }
+          };
+          emitEvent(code.eventName, code.data);
+        } else {
+          console.log("finished running");
+          BlocklyController.isRunningCode = false;
+          // Finished code execution
+          this.highlightBlock(null);
+          const event = new CustomEvent("execution-finished");
+          document.dispatchEvent(event);
+        }
+      };
+      executeNextBlock();
+    }, 1000);
+
   }
 
   private static abortAndReset() {
