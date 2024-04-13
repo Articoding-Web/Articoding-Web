@@ -30,7 +30,7 @@ class XAPISingleton {
 
   public static levelCompletedStatement(
     userName: string, levelId: string, stars: number, speed: number, attempts: number, 
-    playerBounced: boolean, totalLevels: number, userLevels: number) : Statement{
+    playerBounced: boolean, totalLevels: number, userLevels: number, clickStopBtn: number) : Statement{
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -64,6 +64,7 @@ class XAPISingleton {
           "https://articoding.e-ucm.es/exts/bounced": playerBounced,
           "https://articoding.e-ucm.es/exts/totalOfficialLevels": totalLevels,
           "https://articoding.e-ucm.es/exts/userLevelsCompleted": userLevels,
+          "https://articoding.e-ucm.es/exts/clicksStopBtn": clickStopBtn,
           "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },
@@ -77,7 +78,7 @@ class XAPISingleton {
   }
   public static levelFailedStatement(
     userName: string, levelId: string, speed: number, attempt: number, playerBounced: boolean, 
-    totalLevels: number, userLevels: number): Statement {
+    totalLevels: number, userLevels: number, clickStopBtn: number): Statement {
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -104,6 +105,7 @@ class XAPISingleton {
           "https://articoding.e-ucm.es/exts/bounced": playerBounced,
           "https://articoding.e-ucm.es/exts/totalOfficialLevels": totalLevels,
           "https://articoding.e-ucm.es/exts/userLevelsCompleted": userLevels,
+          "https://articoding.e-ucm.es/exts/clicksStopBtn": clickStopBtn,
           "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },

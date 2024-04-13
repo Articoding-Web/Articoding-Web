@@ -270,7 +270,7 @@ export default class LevelPlayer extends Phaser.Scene {
       
       this.numChests -= player.getCollectedChest();
     }
-    let nAttempt = this.attempts++;
+    let nAttempt = ++this.attempts;
     
     let stars = 0;
     let speed = this.gameSpeed;

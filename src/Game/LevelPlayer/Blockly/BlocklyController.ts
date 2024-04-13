@@ -9,7 +9,7 @@ import blocks from "./Blocks/blocks";
 
 import config from "../../config";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
-
+import { incrementStopCodeBtn } from "../../../SPA/Logger";
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
 
@@ -38,7 +38,10 @@ export default class BlocklyController {
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
-    stopCodeBtn.onclick = (ev: MouseEvent) => this.abortAndReset();
+    stopCodeBtn.onclick = (ev: MouseEvent) => {
+      incrementStopCodeBtn();
+      this.abortAndReset()
+    };
   }
 
   private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {

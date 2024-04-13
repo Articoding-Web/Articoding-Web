@@ -5,6 +5,11 @@ import XAPISingleton from '../xAPI/xapi.js';
 import { Statement } from '@xapi/xapi';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
+let nClicksStopCodeBtn = 0;
+
+export function incrementStopCodeBtn(){
+  nClicksStopCodeBtn++;
+}
 
 export default async function initLogger() {
   document.addEventListener("updateStatistic", async (event: CustomEvent)  => {
@@ -48,10 +53,11 @@ export default async function initLogger() {
     let statement : Statement;
     if(win)
       statement = XAPISingleton.levelCompletedStatement(
-        userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted);
+        userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn);
     else
       statement = XAPISingleton.levelFailedStatement(
-        userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted);
-    XAPISingleton.sendStatement(statement);
+        userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn);
+    await XAPISingleton.sendStatement(statement);
+    nClicksStopCodeBtn = 0;
   });
 }
