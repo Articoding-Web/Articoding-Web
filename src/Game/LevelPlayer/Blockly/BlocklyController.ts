@@ -92,9 +92,7 @@ export default class BlocklyController {
       }
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
-      // if (event.type === Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE){
-      //   console.log("BlockFieldIntermediateChange event", event);
-      // }
+
       this.code = this.generateCode();
     });
   }
@@ -108,16 +106,12 @@ export default class BlocklyController {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
     while (nextBlock) {
-      if (nextBlock.id === this.changeData.blockId) {
-        code.push([String(this.changeData.newValue), 0]);
-      }
-      else{
+
         const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
         if (Array.isArray(blockCode)) {
           for (let innerBlockCode of blockCode)
             code.push(<BlockCode>innerBlockCode);
         } else code.push(<BlockCode>blockCode);
-      }
       nextBlock = nextBlock.getNextBlock();
     }
     return code;
@@ -126,7 +120,14 @@ export default class BlocklyController {
   private static runCode = (e: MouseEvent) => {
     e.stopPropagation();
     //this.workspace.getAllBlocks(true)[0].select();
-    setTimeout(() => {
+      let prepBlocks = this.workspace.getAllBlocks(true);
+      for (let block of prepBlocks) {
+        if (this.changeData) {
+          this.workspace.getBlockById(this.changeData.blockId).setFieldValue(this.changeData.newValue, this.changeData.name);
+          this.changeData = null;
+          this.code = this.generateCode();
+        }
+      }
       if (this.shouldAbort) {
         this.highlightBlock(null);
         this.isRunningCode = false; // Reset flag
@@ -179,8 +180,6 @@ export default class BlocklyController {
         }
       };
       executeNextBlock();
-    }, 1000);
-
   }
 
   private static abortAndReset() {
