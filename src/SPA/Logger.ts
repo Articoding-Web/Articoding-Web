@@ -11,6 +11,9 @@ export default async function initLogger() {
     const cookie = sessionCookieValue();
     const win : boolean = event.detail.win;
     const stars : integer = event.detail.stars;
+    const speed : integer = event.detail.speed;
+    const nAttempt : integer = event.detail.nAttempt;
+    const playerBounced: boolean = event.detail.playerBounced;
     let userName = "nl";
     const urlParams = new URLSearchParams(window.location.search);
     const levelId = urlParams.get('id');
@@ -31,9 +34,9 @@ export default async function initLogger() {
     }
     let statement : Statement;
     if(win)
-      statement = XAPISingleton.levelCompletedStatement(userName, levelId, stars);
+      statement = XAPISingleton.levelCompletedStatement(userName, levelId, stars, speed, nAttempt, playerBounced);
     else
-      statement = XAPISingleton.levelFailedStatement(userName, levelId);
+      statement = XAPISingleton.levelFailedStatement(userName, levelId, speed, nAttempt, playerBounced);
     XAPISingleton.sendStatement(statement);
   });
 }

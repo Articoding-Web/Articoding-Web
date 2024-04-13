@@ -30,6 +30,8 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private gridPhysics: GridPhysics;
 
+  private gameSpeed = 1;
+  private attempts = 0;
   constructor() {
     super("LevelPlayer");
   }
@@ -268,7 +270,10 @@ export default class LevelPlayer extends Phaser.Scene {
       
       this.numChests -= player.getCollectedChest();
     }
+    let nAttempt = this.attempts++;
+    
     let stars = 0;
+    let speed = this.gameSpeed;
     if (hasLost) {
       const event = new CustomEvent("lose");
       document.dispatchEvent(event);
@@ -278,14 +283,14 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(event);
     }
 
-    const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars } });
+    const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars, speed,  nAttempt, playerBounced} });
     document.dispatchEvent(statisticEvent);
   };
 
   private changeAnimSpeed = (e: Event) => {
     const val = parseInt((e.currentTarget as HTMLInputElement).value);
     const newVal = (val % 3) + 1;  // between 1 - 3
-
+    this.gameSpeed = newVal;
     (e.currentTarget as HTMLDivElement).innerHTML = `${newVal}x`;
     (e.currentTarget as HTMLInputElement).value = `${newVal}`;
   }

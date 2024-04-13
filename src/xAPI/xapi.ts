@@ -28,7 +28,7 @@ class XAPISingleton {
     });
   }
 
-  public static levelCompletedStatement(userName: string, levelId: string, stars: number) : Statement{
+  public static levelCompletedStatement(userName: string, levelId: string, stars: number, speed: number, attempts: number, playerBounced: boolean) : Statement{
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -53,17 +53,25 @@ class XAPISingleton {
           raw: stars,
           min: 0,
           max: 3
+        },
+        extensions: {
+          "https://articoding.e-ucm.es/exts/minimumBlocks": true, //TODO
+          "https://articoding.e-ucm.es/exts/blocksUsed": 3, //TODO
+          "https://articoding.e-ucm.es/exts/gameVelocity": speed,
+          "https://articoding.e-ucm.es/exts/attemptsUntilWin": attempts,
+          "https://articoding.e-ucm.es/exts/bounced": playerBounced,
+          "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },
-      "context": {
-        "extensions": {
-          "https://articoding.e-ucm.es/gameVersion": config.GAME_VERSION
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/exts/gameVersion": config.GAME_VERSION
         }
       }
     }
     return myStatement;
   }
-  public static levelFailedStatement(userName: string, levelId: string): Statement {
+  public static levelFailedStatement(userName: string, levelId: string, speed: number, attempt: number, playerBounced: boolean): Statement {
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -83,6 +91,13 @@ class XAPISingleton {
       },
       result: {
         success: false,
+        extensions: {
+          "https://articoding.e-ucm.es/exts/blocksUsed": 3, //TODO
+          "https://articoding.e-ucm.es/exts/gameVelocity": speed,
+          "https://articoding.e-ucm.es/exts/nAttempt": attempt,
+          "https://articoding.e-ucm.es/exts/bounced": playerBounced,
+          "https://articoding.e-ucm.es/exts/code": '...' //TODO
+        }
       },
       "context": {
         "extensions": {
