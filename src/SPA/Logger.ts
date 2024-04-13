@@ -7,7 +7,7 @@ import { Statement } from '@xapi/xapi';
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 export default async function initLogger() {
-  document.addEventListener("updateStatistic", (event: CustomEvent) => {
+  document.addEventListener("updateStatistic", async (event: CustomEvent)  => {
     const cookie = sessionCookieValue();
     const win : boolean = event.detail.win;
     const stars : integer = event.detail.stars;
@@ -17,6 +17,13 @@ export default async function initLogger() {
     let userName = "nl";
     const urlParams = new URLSearchParams(window.location.search);
     const levelId = urlParams.get('id');
+
+    const totalOfficialLevels = await fetchRequest(
+      `${API_ENDPOINT}/level/totalOfficialLevels`,
+      "GET",
+    )
+    let userLevelsCompleted = 0;
+
     if (cookie !== null) {
       userName = cookie.name;
       const postData = {
@@ -25,18 +32,26 @@ export default async function initLogger() {
         stars,
       };
 
-      fetchRequest(
+      await fetchRequest(
         `${API_ENDPOINT}/play`,
         "POST",
         JSON.stringify(postData)
       );
-      
+
+      userLevelsCompleted = await fetchRequest(
+        `${API_ENDPOINT}/user/officialLevelsCompleted`,
+        "GET",
+        null,
+        "include"
+      )      
     }
     let statement : Statement;
     if(win)
-      statement = XAPISingleton.levelCompletedStatement(userName, levelId, stars, speed, nAttempt, playerBounced);
+      statement = XAPISingleton.levelCompletedStatement(
+        userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted);
     else
-      statement = XAPISingleton.levelFailedStatement(userName, levelId, speed, nAttempt, playerBounced);
+      statement = XAPISingleton.levelFailedStatement(
+        userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted);
     XAPISingleton.sendStatement(statement);
   });
 }
