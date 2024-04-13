@@ -159,27 +159,29 @@ export default class BlocklyController {
               return; // Abort execution
             }
 
-            if (times < (code.times || 1)) {
-              const event = new CustomEvent(eventName, { detail: eventData });
-              document.dispatchEvent(event);
-              times++;
-              setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
-            } else {
-              index++;
-              executeNextBlock();
-            }
-          };
-          emitEvent(code.eventName, code.data);
-        } else {
-          console.log("finished running");
-          BlocklyController.isRunningCode = false;
-          // Finished code execution
-          this.highlightBlock(null);
-          const event = new CustomEvent("execution-finished");
-          document.dispatchEvent(event);
-        }
-      };
-      executeNextBlock();
+          if (times < (code.times || 1)) {
+            const event = new CustomEvent(eventName, { detail: eventData });
+            document.dispatchEvent(event);
+            times++;
+
+            const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION / speedModifier * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
+          } else {
+            index++;
+            executeNextBlock();
+          }
+        };
+        emitEvent(code.eventName, code.data);
+      } else {
+        BlocklyController.isRunningCode = false;
+        // Finished code execution
+        this.highlightBlock(null);
+        const event = new CustomEvent("execution-finished");
+        document.dispatchEvent(event);
+      }
+    };
+    executeNextBlock();
   }
 
   private static abortAndReset() {

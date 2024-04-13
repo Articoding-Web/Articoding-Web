@@ -62,7 +62,7 @@ export class GridPhysics {
     );
   }
 
-  collide(player: Player): void {
+  collide(player: Player | EnemyObject): void {
     // get obj in position
     const pos = player.getTilePos();
 

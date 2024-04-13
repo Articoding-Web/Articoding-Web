@@ -27,7 +27,7 @@ export default async function registerModals() {
   document.addEventListener("win", (event) => {
     const { stars } = (<CustomEvent>event).detail;
 
-    document.querySelector("#victoryModal .stars").innerHTML = '<i class="bi bi-star-fill gold-star" style="font-size: 2rem;"></i>'.repeat(stars);
+    document.querySelector("#victoryModal .stars").innerHTML = `${'<i class="bi bi-star-fill gold-star" style="font-size: 2rem;"></i>'.repeat(stars)}${'<i class="bi bi-star gold-star" style="font-size: 2rem;"></i>'.repeat(3 - stars)}`;
     if (!victoryModalInstance) {
       victoryModalInstance = new bootstrap.Modal("#victoryModal");
     }
