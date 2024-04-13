@@ -278,7 +278,7 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(event);
     }
 
-    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
+    const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars } });
     document.dispatchEvent(statisticEvent);
   };
 

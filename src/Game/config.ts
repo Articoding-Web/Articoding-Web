@@ -7,6 +7,7 @@ const config = {
     LRS_ENDPOINT: 'https://watershedlrs.com/api/organizations/25302/lrs/',
     LRS_USERNAME: 'f4597ef587ad94',
     LRS_PASSWORD: 'd24b133cd8bac3',
+    GAME_VERSION: '1.0.0',
     EDITOR_MIN_ROWS: 3,
     EDITOR_MIN_COLS: 3,
     EDITOR_MAX_ROWS: 8,

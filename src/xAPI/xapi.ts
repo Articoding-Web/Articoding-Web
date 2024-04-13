@@ -2,6 +2,7 @@ import XAPI, { Statement } from "@xapi/xapi";
 import config from "../Game/config";
 
 class XAPISingleton {
+
   private static instance: XAPI | null = null;
 
   private constructor() {}
@@ -27,20 +28,20 @@ class XAPISingleton {
     });
   }
 
-  public static levelCompletedStatement() : Statement{
+  public static levelCompletedStatement(userName: string, levelId: string, stars: number) : Statement{
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
         account: {
           homePage: "https://articoding.e-ucm.es/",
-          name: "prueba"
+          name: userName
         }
       },
       verb: {
         id: "http://adlnet.gov/expapi/verbs/completed"
       },
       object: {
-        id: "https://articoding.e-ucm.es/level?id=1",
+        id: `https://articoding.e-ucm.es/level?id=${levelId}`,
         definition: {
           type: "https://w3id.org/xapi/seriousgames/activity-types/level"
         }
@@ -49,20 +50,48 @@ class XAPISingleton {
         success: true,
         score: {
           scaled: 1,
-          raw: 3,
+          raw: stars,
           min: 0,
           max: 3
         }
       },
       "context": {
         "extensions": {
-          "https://articoding.e-ucm.es/gameVersion": "1.0.0"
+          "https://articoding.e-ucm.es/gameVersion": config.GAME_VERSION
         }
       }
     }
     return myStatement;
   }
-
+  public static levelFailedStatement(userName: string, levelId: string): Statement {
+    const myStatement: Statement = {
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "http://adlnet.gov/expapi/verbs/failed"
+      },
+      object: {
+        id: `https://articoding.e-ucm.es/level?id=${levelId}`,
+        definition: {
+          type: "https://w3id.org/xapi/seriousgames/activity-types/level"
+        }
+      },
+      result: {
+        success: false,
+      },
+      "context": {
+        "extensions": {
+          "https://articoding.e-ucm.es/gameVersion": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
 }
 
 export default XAPISingleton;
