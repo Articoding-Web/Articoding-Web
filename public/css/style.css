@@ -50,3 +50,11 @@ a, .card a {
 }
 
 /* Category levels END */
+
+/* Level Editor START */
+
+#phaserDiv .selector-icon:hover {
+    cursor: pointer;
+}
+
+/* Level Editor END */
