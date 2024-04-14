@@ -74,6 +74,7 @@ declare namespace Level {
     interface ToolboxBlock {
         type: string;
         kind: string;
+        enabled?: boolean;
     }
 }
 

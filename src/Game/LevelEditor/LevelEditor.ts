@@ -73,6 +73,9 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   create(): void {
+    this.events.on('shutdown', this.shutdown, this);
+    this.events.on('destroy', this.shutdown, this);
+
     this.board = new Board(this, this.numRows, this.numCols, this.loadedLevel?.layers);
 
     const paintbrushPopoverTrigger = document.getElementById("paintbrushContent");
@@ -168,9 +171,6 @@ export default class LevelEditor extends Phaser.Scene {
       console.error("Does not have player or exit");
       return;
     }
-    console.log(JSON.stringify(levelJSON));
-
-    this.brushPopover.hide();
 
     await PhaserController.destroyGame();
     loadLevel(levelJSON, true);
@@ -198,5 +198,9 @@ export default class LevelEditor extends Phaser.Scene {
     if (deltaY < 0) {
       this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom + ZOOM_AMOUNT, MIN_ZOOM, MAX_ZOOM);
     }
+  }
+
+  shutdown() {
+    this.brushPopover?.dispose();
   }
 }

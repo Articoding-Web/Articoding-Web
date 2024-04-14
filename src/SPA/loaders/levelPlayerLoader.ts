@@ -39,12 +39,9 @@ function getLevelPlayerHTML(fromLevelEditor?: boolean) {
 }
 
 function getEditButton(fromLevelEditor: boolean) {
-    if(!fromLevelEditor)
-        return;
-    
     return `<button class="btn btn-primary" id="editButton">
-                <i class="bi bi-pencil-square"></i>
-            </button>`
+                <i class="bi ${fromLevelEditor ? "bi-pencil-square" : "bi-copy"}"></i>
+            </button>`;
 }
 
 /**
@@ -53,19 +50,18 @@ function getEditButton(fromLevelEditor: boolean) {
  */
 export default async function playLevelById(id: string) {
     let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
-    loadLevel(level.data);
+    loadLevel(JSON.parse(level.data));
 }
 
 export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean) {
     document.getElementById("content").innerHTML = getLevelPlayerHTML(fromLevelEditor);
     currentLevelJSON = levelJSON;
 
-    const toolbox = currentLevelJSON.blockly.toolbox;
+    const toolbox = levelJSON.blockly.toolbox;
     const maxInstances = currentLevelJSON.blockly.maxInstances;
     const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
-    const phaserJSON = currentLevelJSON.phaser;
 
-    PhaserController.init("LevelPlayer", LevelPlayer, {levelJSON: phaserJSON, fromLevelEditor});
+    PhaserController.init("LevelPlayer", LevelPlayer, {levelJSON, fromLevelEditor});
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 

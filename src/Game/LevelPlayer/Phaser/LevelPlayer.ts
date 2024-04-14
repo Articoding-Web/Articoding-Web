@@ -13,6 +13,11 @@ import loadLevelEditor from '../../../SPA/loaders/levelEditorLoader.js';
 import Level from "../../level";
 import PhaserController from '../../PhaserController.js';
 
+// For saving levels
+import { sessionCookieValue } from '../../../SPA/loaders/profileLoader';
+import { fetchRequest } from '../../../SPA/utils';
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
+
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
   private height: number;
@@ -33,23 +38,26 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private gridPhysics: GridPhysics;
 
-  private levelJSON: Level.Phaser;
+  private levelJSON: Level.Level;
   private fromLevelEditor: boolean;
 
   constructor() {
     super("LevelPlayer");
   }
 
-  init(data: { levelJSON: Level.Phaser, fromLevelEditor: boolean }) {
-    this.theme = data.levelJSON.theme;
-    this.height = data.levelJSON.height;
-    this.width = data.levelJSON.width;
-    this.backgroundLayerJson = data.levelJSON.layers.background;
-    this.playersLayerJson = data.levelJSON.layers.players;
-    this.objectsLayers = data.levelJSON.layers.objects;
-
+  init(data: { levelJSON: Level.Level, fromLevelEditor?: boolean }) {
     this.levelJSON = data.levelJSON;
     this.fromLevelEditor = data.fromLevelEditor;
+
+    const { theme, height, width, layers } = this.levelJSON.phaser;
+    const { background, players, objects } = layers;
+    
+    this.theme = theme;
+    this.height = height;
+    this.width = width;
+    this.backgroundLayerJson = background;
+    this.playersLayerJson = players;
+    this.objectsLayers = objects;    
   }
 
   preload() {
@@ -263,7 +271,7 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  private checkWinCondition = (e: Event) => {
+  private checkWinCondition = async (e: Event) => {
     let hasLost = false;
     let playerBounced = false;
 
@@ -278,18 +286,40 @@ export default class LevelPlayer extends Phaser.Scene {
 
       this.numChests -= player.getCollectedChest();
     }
-    let stars = 0;
-    if (hasLost) {
-      const event = new CustomEvent("lose");
-      document.dispatchEvent(event);
-    } else {
-      stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
-      const event = new CustomEvent("win", { detail: { stars } });
-      document.dispatchEvent(event);
-    }
+    
+    if(!this.fromLevelEditor) {
+      // Official Level
+      let stars = 0;
+      if (hasLost) {
+        const event = new CustomEvent("lose");
+        document.dispatchEvent(event);
+      } else {
+        stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+        const event = new CustomEvent("win", { detail: { stars } });
+        document.dispatchEvent(event);
+      }
 
-    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
-    document.dispatchEvent(statisticEvent);
+      const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
+      document.dispatchEvent(statisticEvent);
+    } else {
+      // From Level Editor
+      const object = sessionCookieValue();
+      if (object !== null) {
+        if (window.confirm("Save Level?")) {
+          const levelData = {
+            user: object.id,
+            category: null,
+            self: null,
+            title: "Editor",
+            data: JSON.stringify(this.levelJSON),
+            minBlocks: null,
+          };
+          console.log("Nivel:", levelData);
+          await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
+          alert("Nivel creado");
+        }        
+      } else alert("Necesitas iniciar sesión");
+    }
   };
 
   private changeAnimSpeed = (e: Event) => {
@@ -302,7 +332,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private loadLevelEditor = async () => {
     await PhaserController.destroyGame();
-    loadLevelEditor(this.levelJSON);
+    loadLevelEditor(this.levelJSON.phaser);
   }
 
   rotate(direction: string) {
