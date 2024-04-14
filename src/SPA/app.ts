@@ -2,6 +2,7 @@ import loadCategoryById from "./loaders/categoryLoader";
 import loadHome from "./loaders/homeLoader";
 import loadLevelEditor from "./loaders/levelEditorLoader";
 import loadLevelPlayer from "./loaders/levelPlayerLoader";
+import loadCommunity from "./loaders/communityLoader";
 import loadProfile from "./loaders/profileLoader";
 
 export async function setPageHome() {
@@ -20,7 +21,9 @@ export async function setPageLevelEditor(levelId?: number) {
   loadLevelEditor();
 }
 
-export function setPageCommunity() {}
+export function setPageCommunity() {
+  loadCommunity();
+}
 
 export async function setPageProfile() {
   loadProfile();

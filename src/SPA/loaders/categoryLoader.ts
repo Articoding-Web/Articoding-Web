@@ -1,10 +1,7 @@
-import { route } from '../../client';
-import config from '../../Game/config.js';
-import {
-  fetchRequest,
-  fillContent,
-} from '../utils';
-import { sessionCookieValue } from './profileLoader';
+import { route } from "../../client";
+import config from "../../Game/config.js";
+import { fetchRequest, fillContent } from "../utils";
+import { sessionCookieValue } from "./profileLoader";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -18,57 +15,85 @@ function getRowHTML() {
 
 /**
  *
+ * @returns String of HTMLDivElement of a category placeholder
+ */
+function generateCategoryLevelsDivPlaceholder() {
+  return `<div class="col placeholder-col">
+              <div class="card mx-auto border-dark">
+                  <div class="row g-0 text-dark">
+                      <div class="placeholder bg-secondary col-md-3">
+
+                      </div>
+                      <div class="col-md-9">
+                          <div class="card-body">
+                            <div class="row row-cols-1 row-cols-md-2">
+                                <div class="col">
+                                    <h5 class="placeholder row card-title bg-secondary"></h5>
+                                    <p class="placeholder row card-text bg-secondary"></p>
+                                </div>
+                                <div class="col align-self-center text-md-end">
+                                    <h5>
+                                        <span>
+                                            <span class="placeholder col-1 bg-secondary"></span> <i class="placeholder bi bi-star-fill gold-star bg-secondary"></i>
+                                            <span class="placeholder col-1 bg-secondary"></span> <i class="placeholder bi bi-play-fill bg-secondary"></i>
+                                        </span>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+          </div>`;
+}
+
+/**
+ *
  * @param {Object} level with id, title, etc
  * @returns String of HTMLDivElement
  */
 async function generateLevelDiv(level) {
-  return `<div class="col">
-            <div class="card mx-auto border-dark ">
-              <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-                <div class="row g-0 text-dark">
-                  <div class="col-md-3">
-                    <img src="..." class="img-fluid rounded-start" alt="Miniature">
+  if (!level || !level.statistics) {
+    throw new Error("Invalid level data");
+  }
+
+  const { id, miniature, title, description = "Blockleap level" } = level;
+  const { stars, attempts } = level.statistics;
+
+  return `
+    <div class="col">
+      <div class="card mx-auto border-dark">
+        <a class="getLevel" href="${API_ENDPOINT}/level/${id}">
+          <div class="row g-0 text-dark">
+            <div class="col-md-3">
+              ${
+                miniature
+                  ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">`
+                  : ""
+              }
+            </div>
+            <div class="col-md-9">
+              <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-2">
+                  <div class="col">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${description}</p>
                   </div>
-                  <div class="col-md-9">
-                    <div class="card-body">
-                      <div class="row row-cols-1 row-cols-md-2">
-                        <div class="col">
-                          <h5 class="card-title">${level.title}</h5>
-                          <p class="card-text">Level description</p>
-                        </div>
-                        <div class="col align-self-center text-md-end">
-                          <h5>
-                            <span>
-                              ${level.statistics.stars} <i class="bi bi-star-fill gold-star"></i>
-                              ${level.statistics.attempts} <i class="bi bi-play-fill"></i>
-                            </span>
-                          </h5>
-                        </div>
-                      </div>
-                    </div>
+                  <div class="col align-self-center text-md-end">
+                    <h5>
+                      <span>
+                        ${stars} <i class="bi bi-star-fill gold-star"></i>
+                        ${attempts} <i class="bi bi-play-fill"></i>
+                      </span>
+                    </h5>
                   </div>
                 </div>
-              </a>
+              </div>
             </div>
-          </div>`;
-    // return `<div class="col">
-    //           <a class="getLevel" href="${API_ENDPOINT}/level/${level.id}">
-    //             <div class="card border-dark d-flex flex-column h-100">
-    //               <h5 class="card-header card-title text-dark">
-    //                 ${level.title}
-    //               </h5>
-    //               <div class="card-body text-dark">
-    //                 <h6 class="card-subtitle mb-2 text-muted">
-    //                   Stars: ${level.statistics.stars}
-    //                 </h6>
-    //                 <h6 class="card-subtitle mb-2 text-muted">
-    //                   Attempts: ${level.statistics.attempts}
-    //                 </h6>
-    //                 <p>Miniature: </p> 
-    //               </div>
-    //             </div>
-    //           </a>
-    //         </div>`;
+          </div>
+        </a>
+      </div>
+    </div>`;
 }
 
 /**
@@ -86,34 +111,47 @@ async function playLevel(event) {
 
 export default async function loadCategoryById(id: string) {
   document.getElementById("content").innerHTML = getRowHTML();
+  const divElement = document.getElementById("categories");
 
-    const levels = await fetchRequest(
-        `${API_ENDPOINT}/level/levelsByCategory/${id}`,
-        "GET"
+  // Load placeholders
+  await fillContent(
+    divElement,
+    new Array(10),
+    generateCategoryLevelsDivPlaceholder
+  );
+
+  const levels = await fetchRequest(
+    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+    "GET"
+  );
+
+  const cookie = sessionCookieValue();
+
+  let statistics = [];
+  if (cookie !== null) {
+    statistics = await fetchRequest(
+      `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
+      "GET"
     );
-    
-    const cookie = sessionCookieValue();
-    let statistics = [];
-    if(cookie !== null){
-      statistics = await fetchRequest( `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,"GET");
+  }
+  const statisticsMap = statistics.reduce((map, statistic) => {
+    map[statistic.level] = {
+      stars: statistic.stars,
+      attempts: statistic.attempts,
     };
-    const statisticsMap = statistics.reduce((map, statistic) => {
-      map[statistic.level] = {stars: statistic.stars, attempts:statistic.attempts};
-      return map;
-    }, {});
+    return map;
+  }, {});
 
-    const levelsWithStatistics = levels.map(level => {
-      const levelId = level.id;
-      const statistic = statisticsMap[levelId]; 
-      return {
-          ...level,
-          statistics: statistic || { stars: 0, attempts: 0 } 
-      };
-    });
+  const levelsWithStatistics = levels.map((level) => {
+    const levelId = level.id;
+    const statistic = statisticsMap[levelId];
+    return {
+      ...level,
+      statistics: statistic || { stars: 0, attempts: 0 },
+    };
+  });
 
-
-    const divElement = document.getElementById("categories");
-    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+  await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
   // Add getLevel event listener
   document.querySelectorAll("a.getLevel").forEach((level) => {

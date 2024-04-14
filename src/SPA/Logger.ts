@@ -8,11 +8,7 @@ export default async function initLogger() {
   document.addEventListener("updateStatistic", (event: CustomEvent) => {
     const cookie = sessionCookieValue();
     const hasLost : Boolean = event.detail.hasLost;
-    let stars : integer;
-    if(hasLost)
-      stars = 0
-    else
-      stars = 1;
+    const stars : integer = event.detail.stars;
     if (cookie !== null) {
       const urlParams = new URLSearchParams(window.location.search);
       const levelId = urlParams.get('id');

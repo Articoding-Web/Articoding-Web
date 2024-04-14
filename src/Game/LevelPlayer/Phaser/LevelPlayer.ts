@@ -8,6 +8,7 @@ import { GridPhysics } from './Classes/GridPhysics.js';
 import { Player } from './Classes/Player.js';
 import TrapObject from './Classes/TrapObject.js';
 import { Direction } from './types/Direction.js';
+import EnemyObject from './Classes/Enemy.js';
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
@@ -25,6 +26,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private players: Player[] = [];
   private objects: ArticodingSprite[] = [];
+  private numChests = 0;
 
   private gridPhysics: GridPhysics;
 
@@ -82,6 +84,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createObjects(); // create sprites obj, incl. cofres
 
     document.addEventListener("execution-finished", this.checkWinCondition);
+    document.getElementById("speedModifierBtn").addEventListener("click", this.changeAnimSpeed);
   }
 
   createBackground() {
@@ -120,33 +123,18 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createPlayers() {
-    this.gridPhysics = new GridPhysics(
-      this.tilemap,
-      this.scaleFactor,
-      this.objects
-    );
+    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor, this.objects);
 
     // Create sprites
     for (let x in this.playersLayerJson.objects) {
       const player = this.playersLayerJson.objects[x];
 
       // Create and scale sprite
-      const sprite = this.add.sprite(
-        player.x,
-        player.y,
-        this.playersLayerJson.spriteSheet
-      );
+      const sprite = this.add.sprite(player.x, player.y, this.playersLayerJson.spriteSheet);
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
-      this.players.push(
-        new Player(
-          sprite,
-          this.gridPhysics,
-          new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)),
-          this.scaleFactor
-        )
-      );
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)), this.scaleFactor));
     }
 
     this.cameras.main.roundPixels = true;
@@ -194,22 +182,23 @@ export default class LevelPlayer extends Phaser.Scene {
 
         let createdObject;
         if (obj.type === "chest") {
-          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet
-          );
+          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          this.numChests++;
         } else if (obj.type === "trap") {
           this.createTrapAnim();
-          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet
-          );
+          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
           if (obj.properties.enabled) createdObject.enable();
         } else if (obj.type === "exit") {
-          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet
-          );
+          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet);
         } else if (obj.type === "wall") {
           // TODO: add wall collisions
           const wall = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(wall, obj.x, obj.y);
           wall.setDepth(objectJson.depth);
-        } else {
+        } else if (obj.type === "enemy") {
+          createdObject = new EnemyObject(this, parseInt(obj.x), parseInt(obj.y), objectJson.spriteSheet, obj.movementOrientation);
+        }
+        else {
           console.error("Object type not registered");
           console.log(obj.type);
           continue;
@@ -266,37 +255,63 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private checkWinCondition = (e: Event) => {
     let hasLost = false;
+    let playerBounced = false;
 
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
         player.die();
         hasLost = true;
+      } else if (player.getHasBounced()) {
+        playerBounced = true;
       }
+      
+      this.numChests -= player.getCollectedChest();
     }
-
+    let stars = 0;
     if (hasLost) {
       const event = new CustomEvent("lose");
       document.dispatchEvent(event);
     } else {
-      const event = new CustomEvent("win", { detail: { stars: 3 } });
+      stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+      const event = new CustomEvent("win", { detail: { stars } });
       document.dispatchEvent(event);
     }
 
-    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost } });
+    const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
     document.dispatchEvent(statisticEvent);
   };
+
+  private changeAnimSpeed = (e: Event) => {
+    const val = parseInt((e.currentTarget as HTMLInputElement).value);
+    const newVal = (val % 3) + 1;  // between 1 - 3
+
+    (e.currentTarget as HTMLDivElement).innerHTML = `${newVal}x`;
+    (e.currentTarget as HTMLInputElement).value = `${newVal}`;
+  }
 
   rotate(direction: string) {
     this.events.emit("rotateOrder", Direction[direction]);
   }
 
   shutdown() {
-    console.log("clearing scene");
     document.removeEventListener("execution-finished", this.checkWinCondition);
+    document.getElementById("speedModifierBtn").removeEventListener("click", this.changeAnimSpeed);
 
     while (this.players.length) {
       this.players.pop().destroy();
     }
+
+    while (this.objects.length) {
+      this.objects.pop().destroy();
+    }
+  }
+
+  getGridPhysics(): GridPhysics {
+    return this.gridPhysics;
+  }
+
+  getScaleFactor(): number {
+    return this.scaleFactor;
   }
 }

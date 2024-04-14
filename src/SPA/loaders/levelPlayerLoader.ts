@@ -2,7 +2,7 @@ import BlocklyController from "../../Game/LevelPlayer/Blockly/BlocklyController"
 import LevelPlayer from "../../Game/LevelPlayer/Phaser/LevelPlayer";
 import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
-import  config from "../../Game/config";
+import config from "../../Game/config";
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
@@ -27,6 +27,11 @@ function getLevelPlayerHTML() {
               </div>
               <div id="phaserDiv" class="col col-lg-8 mh-100 p-0 position-relative">
                   <canvas id="phaserCanvas"></canvas>
+                  <div class="position-absolute top-0 end-0 mt-2 me-2">
+                      <button class="btn btn-warning" id="speedModifierBtn" value="1">
+                        1x
+                      </button>
+                  </div>
               </div>
             </div>`;
 }

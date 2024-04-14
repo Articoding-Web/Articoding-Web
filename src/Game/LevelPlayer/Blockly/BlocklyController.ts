@@ -18,6 +18,7 @@ export default class BlocklyController {
   private static code: BlockCode[];
   private static isRunningCode: boolean = false;
   private static shouldAbort: boolean = false;
+  private static runCodeBtn;
 
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
@@ -30,9 +31,9 @@ export default class BlocklyController {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
-    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    BlocklyController.runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
     // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
-    runCodeBtn.addEventListener("click", () => this.runCode());
+    BlocklyController.runCodeBtn.addEventListener("click", this.runCode);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
@@ -111,8 +112,14 @@ export default class BlocklyController {
     return code;
   }
 
-  private static runCode() {
-    if (BlocklyController.isRunningCode)
+  private static runCode = (e: MouseEvent) =>  {
+    e.stopPropagation();
+
+    if (this.shouldAbort) {
+      this.highlightBlock(null);
+      this.isRunningCode = false; // Reset flag
+      this.shouldAbort = false; // Reset flag
+    } else if (BlocklyController.isRunningCode)
       return;
 
     let index = 0;
@@ -142,7 +149,10 @@ export default class BlocklyController {
             const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
             times++;
-            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
+
+            const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION / speedModifier * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
           } else {
             index++;
             executeNextBlock();
@@ -168,6 +178,7 @@ export default class BlocklyController {
   static destroyWorkspace() {
     if (BlocklyController.workspace) {
       BlocklyController.shouldAbort = true;
+      BlocklyController.runCodeBtn.removeEventListener("click", this.runCode);
       window.removeEventListener("resize", onresize, false);
       BlocklyController.workspace.dispose();
       BlocklyController.workspace = undefined;
