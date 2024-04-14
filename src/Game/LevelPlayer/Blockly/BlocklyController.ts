@@ -86,7 +86,6 @@ export default class BlocklyController {
     block_code.defineAllBlocks();
 
     this.workspace.addChangeListener((event) => {
-      console.log(event);
       if (event.type === "block_field_intermediate_change") {
         this.changeData = event;
       }
