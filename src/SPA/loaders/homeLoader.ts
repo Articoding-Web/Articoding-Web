@@ -1,6 +1,8 @@
 import { route } from "../../client";
 import config from "../../Game/config.js";
 import { fetchRequest, fillContent } from "../utils";
+import { sessionCookieValue } from "./profileLoader";
+import localUtils from "../localStorage";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -45,21 +47,43 @@ function generateCategoryDivPlaceholder() {
  * @returns String of HTMLDivElement
  */
 async function generateCategoryDiv(category) {
-  return `<div class="col">
-              <div class="card mx-auto border-dark d-flex flex-column h-100">
-                <a class="category" href="category/${category.id}">
-                    <h5 class="card-header card-title text-dark">
-                      ${category.name}
-                    </h5>
-                    <div class="card-body text-dark">
-                      <h6 class="card-subtitle mb-2 text-muted">
-                        Levels: ${category.count}
-                      </h6>
-                      ${category.description}
-                    </div>
-                </a>
-              </div>
-            </div>`;
+  let categoryHTML =  `<div class="col">
+                        <div class="card mx-auto border-dark d-flex flex-column h-100">
+                          <a class="category" href="category/${category.id}">
+                            <h5 class="card-header card-title text-dark">
+                              ${category.name}
+                            </h5>
+                            <div class="card-body text-dark">
+                              <h6 class="card-subtitle mb-2 text-muted">
+                                Levels: ${category.count}
+                              </h6>
+                              ${category.description}
+                            </div>
+                          </a>
+                        </div>
+                      </div>`;
+
+  if (sessionCookieValue()) {
+    // check if the previous category is completed
+    if (!category.playable) {
+      // if the category is not completed, add a lock icon
+      categoryHTML = categoryHTML.replace(
+        '</h5>',
+        `</h5><i class="bi bi-lock"></i>`
+      );
+    }
+  }
+  else {
+    if (!localUtils.hasPassedCategory(category.id, category.count)) {
+      // if the previous category is not completed, add a lock icon
+      categoryHTML = categoryHTML.replace(
+        '</h5>',
+        `</h5><i class="bi bi-lock"></i>`
+      );
+    }
+  }
+
+  return categoryHTML;
 }
 
 /**
@@ -85,10 +109,16 @@ export default async function loadHome() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
+  const cookie = sessionCookieValue();
+
+  if (!cookie) cookie.id = null;
+
   const categories = await fetchRequest(
-    `${API_ENDPOINT}/level/categories`,
+    `${API_ENDPOINT}/level/categories?user=${cookie.id}`,
     "GET"
   );
+
+  console.log("Categorías:", categories);
 
   await fillContent(divElement, categories, generateCategoryDiv);
 

@@ -4,9 +4,10 @@ import {
   appendLoginModal,
   checkSessionCookie,
 } from './SPA/loaders/profileLoader';
-import initLogger from './SPA/Logger';
+import initLogger from './SPA/logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
+import localUtils from "./SPA/localStorage";
 
 export async function route() {
     // Always destroy phaser game
@@ -53,9 +54,9 @@ function setNavbarListeners() {
   document
     .getElementById("profile")
     .addEventListener("click", () => {
-      if(!checkSessionCookie()){
+      if (!checkSessionCookie()) {
         appendLoginModal();
-      }else{
+      } else {
         routeIfNewPath("/profile")
       }
     });
@@ -63,6 +64,8 @@ function setNavbarListeners() {
 
 (function () {
   window.addEventListener("popstate", route);
+
+    localUtils.init();
 
     setNavbarListeners();
 
