@@ -117,6 +117,34 @@ class XAPISingleton {
     }
     return myStatement;
   }
+
+  public static screenAccessedStament(userName: string, url: string){
+    const myStatement: Statement = {
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "http://adlnet.gov/expapi/verbs/accessed"
+      },
+      object: {
+        id: `https://articoding.e-ucm.es/${url}`,
+        definition: {
+          type: "https://w3id.org/xapi/seriousgames/activity-types/screen"
+        }
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/gameVersion": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
+
 }
 
 export default XAPISingleton;
