@@ -6,15 +6,11 @@ export default [
             {
                 type: "field_variable",
                 name: "VAR",
-                variable: "%{BKY_VARIABLES_DEFAULT_NAME}",
-                variableTypes: [
-                    "Panda"
-                ],
-                defaultType: "Panda"
+                variable: "%{BKY_VARIABLES_DEFAULT_NAME}"
             }
         ],
         colour: "#a55b80",
-        output: "Panda",
+        output: "null",
         onchange: "updateBlock"
     },
     {
@@ -25,15 +21,10 @@ export default [
                 type: "field_variable",
                 name: "VAR",
                 variable: "%{BKY_VARIABLES_DEFAULT_NAME}",
-                variableTypes: [
-                    "Panda"
-                ],
-                defaultType: "Panda"
             },
             {
                 type: "input_value",
-                name: "VALUE",
-                check: "Panda"
+                name: "VALUE"
             }
         ],
         colour: "#a55b80",
