@@ -158,10 +158,11 @@ export default class LevelEditor extends Phaser.Scene {
     if (object !== null) {
       const levelData = {
         user: object.id,
-        category: 8,
+        category: null,
         self: null,
         title: "Editor",
         data: JSON.stringify(levelJSON),
+        minBlocks: null,
       };
       console.log("Nivel:", levelData);
       await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
