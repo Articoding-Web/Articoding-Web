@@ -4,10 +4,9 @@ import * as bootstrap from 'bootstrap';
 import { loadLevel } from "../../SPA/loaders/levelPlayerLoader";
 import PhaserController from "../PhaserController";
 import Level from "../level";
+import config from '../config';
 
 // TODO: eliminar magic numbers
-const NUM_ROWS = 5;
-const NUM_COLS = 5;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 1;
 const ZOOM_AMOUNT = 0.05;
@@ -25,14 +24,14 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   // TODO: pasar nivel y cargarlo
-  init(data: {levelJSON: Level.Phaser}): void {
+  init(data: { levelJSON: Level.Phaser }): void {
     this.loadedLevel = data.levelJSON;
-    if(this.loadedLevel) {
+    if (this.loadedLevel) {
       this.numRows = this.loadedLevel.height;
       this.numCols = this.loadedLevel.width;
     } else {
-      this.numRows = NUM_ROWS;
-      this.numCols = NUM_COLS;
+      this.numRows = Math.floor((config.EDITOR_MAX_COLS + config.EDITOR_MIN_COLS) / 2);
+      this.numCols = Math.floor((config.EDITOR_MAX_ROWS + config.EDITOR_MIN_ROWS) / 2);
     }
   }
 
@@ -80,7 +79,7 @@ export default class LevelEditor extends Phaser.Scene {
     this.brushPopover = new bootstrap.Popover(paintbrushPopoverTrigger);
     this.brushPopover.setContent({ '.popover-body': this.getPaintBrushContent.bind(this) })
     paintbrushPopoverTrigger.addEventListener("shown.bs.popover", () => {
-      document.querySelectorAll(".selector-icon").forEach(icon => {
+      document.querySelectorAll(".selector-icon").forEach((icon) => {
         icon.addEventListener("click", (e) => {
           document.getElementById(this.selectedIconId)?.classList.remove("border");
 
@@ -108,7 +107,7 @@ export default class LevelEditor extends Phaser.Scene {
     // TODO: Remove magic number
     this.cameras.main.setBounds(-this.cameras.main.width / 2, -this.cameras.main.height / 2, this.cameras.main.width * 2, this.cameras.main.height * 2);
 
-    document.getElementById("saveEditorLevel").addEventListener("click", () => this.saveLevel())
+    document.getElementById("saveEditorLevel").addEventListener("click", () => this.saveLevel());
   }
 
   createObjectImage(key, frame?): string {
@@ -165,7 +164,7 @@ export default class LevelEditor extends Phaser.Scene {
 
   async saveLevel() {
     let levelJSON = this.board.toJSON();
-    if(levelJSON.phaser.layers.players.objects.length <= 0 || levelJSON.phaser.layers.objects.some(obj => obj.spriteSheet === "exit" && obj.objects.length <= 0)) {
+    if (levelJSON.phaser.layers.players.objects.length <= 0 || levelJSON.phaser.layers.objects.some(obj => obj.spriteSheet === "exit" && obj.objects.length <= 0)) {
       console.error("Does not have player or exit");
       return;
     }
