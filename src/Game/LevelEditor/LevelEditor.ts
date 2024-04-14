@@ -1,6 +1,9 @@
 import * as Phaser from "phaser";
 import Board from "./Classes/EditorBoard";
 import * as bootstrap from 'bootstrap';
+import { loadLevel } from "../../SPA/loaders/levelPlayerLoader";
+import PhaserController from "../PhaserController";
+import Level from "../level";
 
 // TODO: eliminar magic numbers
 const NUM_ROWS = 5;
@@ -12,14 +15,25 @@ const ZOOM_AMOUNT = 0.05;
 export default class LevelEditor extends Phaser.Scene {
   selectedIconId: string;
   board: Board;
+  brushPopover: bootstrap.Popover;
+  loadedLevel: Level.Phaser;
+  numRows: number;
+  numCols: number;
 
   constructor() {
     super("LevelEditor");
   }
 
   // TODO: pasar nivel y cargarlo
-  init(): void {
-
+  init(data: {levelJSON: Level.Phaser}): void {
+    this.loadedLevel = data.levelJSON;
+    if(this.loadedLevel) {
+      this.numRows = this.loadedLevel.height;
+      this.numCols = this.loadedLevel.width;
+    } else {
+      this.numRows = NUM_ROWS;
+      this.numCols = NUM_COLS;
+    }
   }
 
   preload(): void {
@@ -48,7 +62,6 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   getPaintBrushContent() {
-    console.log("getting content");
     return `<h5 class="border-bottom">Background</h5>
             <div id="background-selector" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2">
               ${this.createBackgroundSelectors()}
@@ -61,11 +74,11 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   create(): void {
-    this.board = new Board(this, NUM_ROWS, NUM_COLS);
+    this.board = new Board(this, this.numRows, this.numCols, this.loadedLevel?.layers);
 
     const paintbrushPopoverTrigger = document.getElementById("paintbrushContent");
-    const popover = new bootstrap.Popover(paintbrushPopoverTrigger);
-    popover.setContent({ '.popover-body': this.getPaintBrushContent.bind(this) })
+    this.brushPopover = new bootstrap.Popover(paintbrushPopoverTrigger);
+    this.brushPopover.setContent({ '.popover-body': this.getPaintBrushContent.bind(this) })
     paintbrushPopoverTrigger.addEventListener("shown.bs.popover", () => {
       document.querySelectorAll(".selector-icon").forEach(icon => {
         icon.addEventListener("click", (e) => {
@@ -84,10 +97,10 @@ export default class LevelEditor extends Phaser.Scene {
 
     document.getElementById("eraserBtn").addEventListener("click", () => {
       this.selectedIconId = undefined;
-      popover.hide();
+      this.brushPopover.hide();
     });
     document.getElementById("cameraBtn").addEventListener("click", () => {
-      popover.hide();
+      this.brushPopover.hide();
     });
 
     this.input.on('pointermove', this.cameraMove, this);
@@ -150,10 +163,18 @@ export default class LevelEditor extends Phaser.Scene {
     return { texture: data[0], frame: (data[1] === "undefined" ? undefined : data[1]) };
   }
 
-  saveLevel() {
+  async saveLevel() {
     let levelJSON = this.board.toJSON();
-    console.log(levelJSON);
+    if(levelJSON.phaser.layers.players.objects.length <= 0 || levelJSON.phaser.layers.objects.some(obj => obj.spriteSheet === "exit" && obj.objects.length <= 0)) {
+      console.error("Does not have player or exit");
+      return;
+    }
     console.log(JSON.stringify(levelJSON));
+
+    this.brushPopover.hide();
+
+    await PhaserController.destroyGame();
+    loadLevel(levelJSON, true);
   }
 
   cameraMove(pointer) {

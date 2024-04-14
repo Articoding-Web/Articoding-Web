@@ -3,6 +3,7 @@ import DropZoneTile from './DropZoneTile';
 import LevelEditor from '../LevelEditor';
 import config from '../../config';
 import EmptyLevel from './EmptyLevel';
+import Level from '../../level';
 
 export default class EditorBoard {
     private dropZoneTiles: DropZoneTile[][] = [];
@@ -22,21 +23,51 @@ export default class EditorBoard {
     private addRowBtn: Phaser.GameObjects.Sprite;
     private addRowPlus: Phaser.GameObjects.Sprite;
 
-    constructor(scene: LevelEditor, rows: number, cols: number, tiles?: DropZoneTile[][]) {
+    constructor(scene: LevelEditor, rows: number, cols: number, levelLayers?: { background: Level.Layer; players: Level.Layer; objects?: Level.Layer[];}) {
         this.scene = scene;
         this.numRows = rows;
         this.numCols = cols;
 
         this.calculateScale();
+        this.createTiles();
 
-        this.dropZoneTiles = tiles || [];
+        if (levelLayers) {
+            const backgroundLayerJson = levelLayers.background;
+            const playersLayerJson = levelLayers.players;
+            const objectLayers = levelLayers.objects;
 
-        if (!tiles)
-            this.createDefaultTiles();
+            // Background
+            for(let tile of <Level.BackgroundTile[]>backgroundLayerJson.objects) {
+                const dropZoneTile = this.dropZoneTiles[tile.y][tile.x];
 
-        // TODO: pintar tiles si ya existen
-        // else
-        //     paintExistingTiles()
+                const sprite = this.scene.add.sprite(dropZoneTile.x, dropZoneTile.y, backgroundLayerJson.spriteSheet, tile.spriteIndex);
+                sprite.setScale(this.scaleFactor);
+
+                dropZoneTile.setBgSprite(sprite);
+            }
+
+            // Players
+            for(let tile of <Level.ObjectTile[]>playersLayerJson.objects) {
+                const dropZoneTile = this.dropZoneTiles[tile.y][tile.x];
+
+                const sprite = this.scene.add.sprite(dropZoneTile.x, dropZoneTile.y, playersLayerJson.spriteSheet);
+                sprite.setScale(this.scaleFactor);
+
+                dropZoneTile.setObjectSprite(sprite);
+            }
+
+            // Objects
+            for(let layer of objectLayers) {
+                for(let tile of <Level.ObjectTile[]>layer.objects) {
+                    const dropZoneTile = this.dropZoneTiles[tile.y][tile.x];
+    
+                    const sprite = this.scene.add.sprite(dropZoneTile.x, dropZoneTile.y, layer.spriteSheet);
+                    sprite.setScale(this.scaleFactor);
+    
+                    dropZoneTile.setObjectSprite(sprite);
+                }
+            }
+        }
 
         this.createResizeButtons();
     }
@@ -50,7 +81,7 @@ export default class EditorBoard {
         this.y = (this.scene.cameras.main.height - layerHeight * this.scaleFactor) / 2;
     }
 
-    private createDefaultTiles(): void {
+    private createTiles(): void {
         const scaledTileSize = config.TILE_SIZE * this.scaleFactor;
 
         for (let y = 0; y < this.numRows; y++) {
@@ -186,8 +217,8 @@ export default class EditorBoard {
         }
     }
 
-    toJSON(): Record<any, any> {
-        let levelJson = JSON.parse(JSON.stringify(EmptyLevel)); // Create a copy
+    toJSON(): Level.Level {
+        let levelJson: Level.Level = JSON.parse(JSON.stringify(EmptyLevel)); // Create a copy
 
         levelJson.phaser.height = this.numRows;
         levelJson.phaser.width = this.numCols;
@@ -213,7 +244,7 @@ export default class EditorBoard {
                     if (objSprite) {
                         if (objSprite.texture.key === "player") {
                             // Add player
-                            levelJson.phaser.layers.players.objects.push({
+                            (levelJson.phaser.layers.players.objects as Level.ObjectTile[]).push({
                                 "x": parseInt(x),
                                 "y": parseInt(y)
                             });
@@ -221,8 +252,8 @@ export default class EditorBoard {
                         else {
                             // Object
                             let object = {
-                                "x": x,
-                                "y": y,
+                                "x": parseInt(x),
+                                "y": parseInt(y),
                                 "type": objSprite.texture.key,
                             };
                             
@@ -236,7 +267,7 @@ export default class EditorBoard {
                             const dataIndex = levelJson.phaser.layers.objects.findIndex(obj => obj.spriteSheet === objSprite.texture.key);
                             if (dataIndex !== -1) {
                                 // Already registerd, add object
-                                levelJson.phaser.layers.objects[dataIndex].objects.push(object);
+                                (levelJson.phaser.layers.objects[dataIndex].objects as Level.ObjectTile[]).push(object);
                             } else {
                                 // Not registered, create and add
                                 const spriteSheetType = (objSprite.texture.getFrameNames().length > 1 ? "multi" : "img");

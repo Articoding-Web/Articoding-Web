@@ -1,5 +1,6 @@
 import LevelEditor from "../../Game/LevelEditor/LevelEditor";
 import PhaserController from "../../Game/PhaserController";
+import Level from "../../Game/level";
 
 /**
  *
@@ -41,8 +42,8 @@ function getLevelEditorHTML() {
             </div>`;
 }
 
-export default function loadLevelEditor() {
+export default function loadLevelEditor(levelJSON?: Level.Phaser) {
     document.getElementById("content").innerHTML = getLevelEditorHTML();
 
-    PhaserController.init("LevelEditor", LevelEditor);
+    PhaserController.init("LevelEditor", LevelEditor, { levelJSON });
 }

@@ -9,6 +9,7 @@ import blocks from "./Blocks/blocks";
 
 import config from "../../config";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
+import Level from "../../level";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -19,7 +20,7 @@ export default class BlocklyController {
   private static code: BlockCode[];
   private static isRunningCode: boolean = false;
   private static shouldAbort: boolean = false;
-  private static runCodeBtn;
+  private static runCodeBtn: HTMLElement;
 
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
@@ -28,7 +29,7 @@ export default class BlocklyController {
     Blockly.Events.BLOCK_MOVE,
   ];
 
-  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
@@ -41,7 +42,7 @@ export default class BlocklyController {
     stopCodeBtn.onclick = (ev: MouseEvent) => this.abortAndReset();
   }
 
-  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     BlocklyController.workspace = Blockly.inject(container, { toolbox, maxInstances, zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2, pinch: true, }, });
 
     // Initialize plugin.
