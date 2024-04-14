@@ -51,11 +51,11 @@ function setNavbarListeners() {
   // Profile
   document
     .getElementById("profile")
-    .addEventListener("click", () => {
+    .addEventListener("click", (e: MouseEvent) => {
       if (!checkSessionCookie()) {
         appendLoginModal();
       } else {
-        routeIfNewPath("/profile")
+        routeIfNewPath("/profile", e);
       }
     });
 }
