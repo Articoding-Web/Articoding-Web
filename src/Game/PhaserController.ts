@@ -1,7 +1,8 @@
 import * as Phaser from "phaser";
 import LevelPlayer from "./LevelPlayer/Phaser/LevelPlayer";
 import LevelEditor from "./LevelEditor/LevelEditor";
-
+import Blockly from "blockly";
+import blocks from "./LevelPlayer/Blockly/Blocks/blocks";
 function createPhaserConfig(): Phaser.Types.Core.GameConfig {
   return {
     type: Phaser.CANVAS,
@@ -45,5 +46,8 @@ export default class PhaserController {
         resolve();
       }
     });
+  }
+  static async defineBlocks() {
+    Blockly.defineBlocksWithJsonArray(blocks);
   }
 }
