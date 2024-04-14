@@ -1,6 +1,6 @@
 import config from '../Game/config.js';
-import { sessionCookieValue } from './loaders/profileLoader';
-import { fetchRequest } from './utils';
+import { sessionCookieValue } from './loaders/profileLoader.js';
+import { fetchRequest } from './utils.js';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 

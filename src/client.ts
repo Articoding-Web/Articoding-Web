@@ -63,7 +63,7 @@ function setNavbarListeners() {
 (function () {
   window.addEventListener("popstate", route);
 
-    localUtils.init();
+  localUtils.init();
 
   setNavbarListeners();
 

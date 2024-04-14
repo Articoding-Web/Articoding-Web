@@ -47,6 +47,44 @@ function generateCategoryDivPlaceholder() {
  * @returns String of HTMLDivElement
  */
 async function generateCategoryDiv(category) {
+let categoryHTML =  `<div class="col">
+                        <div class="card mx-auto border-success border-2 d-flex flex-column h-100">`;
+
+  // conditionally include the anchor tag based on the 'playable' field
+  if (category.playable) {
+    categoryHTML += `<a class="category" href="category/${category.id}">`;
+  }
+
+  categoryHTML += `<h5 class="card-header card-title text-dark">
+                      ${category.name}
+                    </h5>
+                    ${category.playable ? '</a>' : ''}
+                    <div class="card-body text-dark">
+                      <h6 class="card-subtitle mb-2 text-muted">
+                        Levels: ${category.count}
+                      </h6>
+                      ${category.description}
+                    </div>
+                  </div>
+                </div>`;
+
+  if (sessionCookieValue()) {
+    if (!category.playable) {
+      // if the previous category is not completed, paint the category in another color
+      categoryHTML = categoryHTML.replace('border-success', 'border-danger');
+    }
+  }
+  else {
+    if (!localUtils.hasPassedCategory(category.id, category.count)) {
+      // if the previous category is not completed, paint the category in another color
+      categoryHTML = categoryHTML.replace('border-success', 'border-danger');
+    }
+  }
+
+  return categoryHTML;
+
+}
+/* async function generateCategoryDiv(category) {
   let categoryHTML =  `<div class="col">
                         <div class="card mx-auto border-dark d-flex flex-column h-100">
                           <a class="category" href="category/${category.id}">
@@ -64,27 +102,20 @@ async function generateCategoryDiv(category) {
                       </div>`;
 
   if (sessionCookieValue()) {
-    // check if the previous category is completed
     if (!category.playable) {
-      // if the category is not completed, add a lock icon
-      categoryHTML = categoryHTML.replace(
-        '</h5>',
-        `</h5><i class="bi bi-lock"></i>`
-      );
+      // if the previous category is not completed, paint the category in another color
+
     }
   }
   else {
     if (!localUtils.hasPassedCategory(category.id, category.count)) {
-      // if the previous category is not completed, add a lock icon
-      categoryHTML = categoryHTML.replace(
-        '</h5>',
-        `</h5><i class="bi bi-lock"></i>`
-      );
+      // if the previous category is not completed, paint the category in another color
+
     }
   }
 
   return categoryHTML;
-}
+} */
 
 /**
  *
