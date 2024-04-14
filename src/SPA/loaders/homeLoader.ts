@@ -55,16 +55,16 @@ let categoryHTML =  `<div class="col">
     categoryHTML += `<a class="category" href="category/${category.id}">`;
   }
 
-  categoryHTML += `<h5 class="card-header card-title text-dark">
+  categoryHTML +=  `<h5 class="card-header card-title text-dark">
                       ${category.name}
                     </h5>
-                    ${category.playable ? '</a>' : ''}
                     <div class="card-body text-dark">
                       <h6 class="card-subtitle mb-2 text-muted">
                         Levels: ${category.count}
                       </h6>
                       ${category.description}
                     </div>
+                    ${category.playable ? '</a>' : ''}
                   </div>
                 </div>`;
 
