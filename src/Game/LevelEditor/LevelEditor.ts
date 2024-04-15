@@ -10,6 +10,7 @@ import config from '../config';
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 1;
 const ZOOM_AMOUNT = 0.05;
+const INIT_ROWS_COLS = 5;
 
 export default class LevelEditor extends Phaser.Scene {
   selectedIconId: string;
@@ -30,8 +31,8 @@ export default class LevelEditor extends Phaser.Scene {
       this.numRows = this.loadedLevel.height;
       this.numCols = this.loadedLevel.width;
     } else {
-      this.numRows = Math.floor((config.EDITOR_MAX_COLS + config.EDITOR_MIN_COLS) / 2);
-      this.numCols = Math.floor((config.EDITOR_MAX_ROWS + config.EDITOR_MIN_ROWS) / 2);
+      this.numRows = INIT_ROWS_COLS;
+      this.numCols = INIT_ROWS_COLS;
     }
   }
 

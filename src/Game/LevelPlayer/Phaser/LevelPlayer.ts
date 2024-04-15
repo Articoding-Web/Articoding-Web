@@ -94,8 +94,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.events.on('destroy', this.shutdown, this);
     
     document.getElementById("speedModifierBtn").addEventListener("click", this.changeAnimSpeed);
-    if (this.fromLevelEditor)
-      document.getElementById("editButton").addEventListener("click", this.loadLevelEditor);
+    document.getElementById("editButton").addEventListener("click", this.loadLevelEditor);
 
     // this.zoom();
     this.createBackground(); // create un tilemap

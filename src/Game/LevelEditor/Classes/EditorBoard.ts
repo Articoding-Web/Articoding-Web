@@ -23,7 +23,7 @@ export default class EditorBoard {
     private addRowBtn: Phaser.GameObjects.Sprite;
     private addRowPlus: Phaser.GameObjects.Sprite;
 
-    constructor(scene: LevelEditor, rows: number, cols: number, levelLayers?: { background: Level.Layer; players: Level.Layer; objects?: Level.Layer[];}) {
+    constructor(scene: LevelEditor, rows: number, cols: number, levelLayers?: { background: Level.Layer; players: Level.Layer; objects?: Level.Layer[]; }) {
         this.scene = scene;
         this.numRows = rows;
         this.numCols = cols;
@@ -37,7 +37,10 @@ export default class EditorBoard {
             const objectLayers = levelLayers.objects;
 
             // Background
-            for(let tile of <Level.BackgroundTile[]>backgroundLayerJson.objects) {
+            for (let tile of <Level.BackgroundTile[]>backgroundLayerJson.objects) {
+                if(!this.dropZoneTiles[tile.y])
+                    continue;
+
                 const dropZoneTile = this.dropZoneTiles[tile.y][tile.x];
 
                 const sprite = this.scene.add.sprite(dropZoneTile.x, dropZoneTile.y, backgroundLayerJson.spriteSheet, tile.spriteIndex);
@@ -47,7 +50,7 @@ export default class EditorBoard {
             }
 
             // Players
-            for(let tile of <Level.ObjectTile[]>playersLayerJson.objects) {
+            for (let tile of <Level.ObjectTile[]>playersLayerJson.objects) {
                 const dropZoneTile = this.dropZoneTiles[tile.y][tile.x];
 
                 const sprite = this.scene.add.sprite(dropZoneTile.x, dropZoneTile.y, playersLayerJson.spriteSheet);
@@ -57,13 +60,13 @@ export default class EditorBoard {
             }
 
             // Objects
-            for(let layer of objectLayers) {
-                for(let tile of <Level.ObjectTile[]>layer.objects) {
+            for (let layer of objectLayers) {
+                for (let tile of <Level.ObjectTile[]>layer.objects) {
                     const dropZoneTile = this.dropZoneTiles[tile.y][tile.x];
-    
+
                     const sprite = this.scene.add.sprite(dropZoneTile.x, dropZoneTile.y, layer.spriteSheet);
                     sprite.setScale(this.scaleFactor);
-    
+
                     dropZoneTile.setObjectSprite(sprite);
                 }
             }
@@ -212,8 +215,9 @@ export default class EditorBoard {
 
         this.numRows--;
 
-        for (let tile of this.dropZoneTiles[this.numRows]) {
-            tile.destroy();
+        const tileLayer = this.dropZoneTiles.pop();
+        while (tileLayer.length) {
+            tileLayer.pop()?.destroy();
         }
     }
 
@@ -256,8 +260,8 @@ export default class EditorBoard {
                                 "y": parseInt(y),
                                 "type": objSprite.texture.key,
                             };
-                            
-                            if(objSprite.texture.key === "trap") {
+
+                            if (objSprite.texture.key === "trap") {
                                 object["properties"] = {
                                     "enabled": objSprite.frame.name === "0.png" ? false : true
                                 };
