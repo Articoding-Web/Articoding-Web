@@ -58,6 +58,49 @@ async function generateLevelDiv(level) {
   }
 
   const { id, miniature, title, description = "Blockleap level" } = level;
+  const { stars, attempts, playable } = level.statistics;
+  const borderColorClass = playable ? 'success' : 'danger';
+  const anchorTag = playable ? `<a class="getLevel" href="${API_ENDPOINT}/level/${id}">` : '';
+  const endAnchorTag = playable ? '</a>' : '';
+
+  return `
+    <div class="col">
+      <div class="card mx-auto border-${borderColorClass} border-2">
+        ${anchorTag}
+          <div class="row g-0 text-dark">
+            <div class="col-md-3">
+              ${miniature ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">` : ""}
+            </div>
+            <div class="col-md-9">
+              <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-2">
+                  <div class="col">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${description}</p>
+                  </div>
+                  <div class="col align-self-center text-md-end">
+                    <h5>
+                      <span>
+                        ${stars} <i class="bi bi-star-fill gold-star"></i>
+                        ${attempts} <i class="bi bi-play-fill"></i>
+                      </span>
+                    </h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ${endAnchorTag}
+      </div>
+    </div>
+  `;
+}
+/* async function generateLevelDiv(level) {
+  if (!level || !level.statistics) {
+    throw new Error("Invalid level data");
+  }
+
+  const { id, miniature, title, description = "Blockleap level" } = level;
   const { stars, attempts } = level.statistics;
 
   return `
@@ -94,7 +137,7 @@ async function generateLevelDiv(level) {
         </a>
       </div>
     </div>`;
-}
+} */
 
 /**
  * Sets content and starts phaser LevelPlayer
@@ -134,20 +177,34 @@ export default async function loadCategoryById(id: string) {
       "GET"
     );
   }
+
+  // Map statistics to include the playable attribute
+  statistics = statistics.map((statistic, index) => {
+    // The first level of each category is considered playable
+    const isPlayable = index === 0 || statistics[index - 1].stars > 0;
+    return {
+      ...statistic,
+      playable: isPlayable,
+    };
+  });
+
   const statisticsMap = statistics.reduce((map, statistic) => {
     map[statistic.level] = {
       stars: statistic.stars,
       attempts: statistic.attempts,
+      playable: statistic.playable,
     };
     return map;
   }, {});
 
-  const levelsWithStatistics = levels.map((level) => {
+  const levelsWithStatistics = levels.map((level, index) => {
     const levelId = level.id;
     const statistic = statisticsMap[levelId];
+    const previousStatistic = index > 0 ? statisticsMap[levels[index - 1].id] : null;
+    const isPlayable: boolean = previousStatistic == null ? false : previousStatistic.stars > 0;
     return {
       ...level,
-      statistics: statistic || { stars: 0, attempts: 0 },
+      statistics: statistic || { stars: 0, attempts: 0, playable: isPlayable },
     };
   });
 
