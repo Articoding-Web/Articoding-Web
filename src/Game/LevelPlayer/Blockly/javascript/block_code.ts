@@ -1,15 +1,28 @@
 import { Order, javascriptGenerator } from "blockly/javascript";
 import type { Block } from "blockly/core/block";
 import { Workspace } from "blockly";
+
 //Here we define all block behaviour
 
 //Here we define all block behaviour
 export function defineAllBlocks() {
   let variables: Record<string, string> = {}; // variable[name] = value;
 
-  //Some functions don't need generator, but others will, so it's been left innerCoderpose.
+  // Wrapper function for block functions
+  function wrapBlockFunction(blockName: string, blockFunction: Function) {
+    return function (block: Block, generator: any) {
+      try {
+        return blockFunction(block, generator);
+      } catch (error) {
+        //We caught an error here....
+        //pending custom catch ? @sanord8
+        error.message = `[ERROR]: caught Error in block '${blockName}': ${error.message}. (Don't worry, keep playing... for now :P)`; 
+      }
+    };
+  }
+
   //generic movement block (movement steps in parsed direction)
-  javascriptGenerator.forBlock["movement"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["movement"] = wrapBlockFunction("movement", function (block: Block, generator: any) {
     let repeats = "0";
 
     if (block.getField("TIMES")) {
@@ -32,26 +45,26 @@ export function defineAllBlocks() {
     };
 
     return JSON.stringify(code);
-  };
+  });
 
   //Start Block, init call for phaserJS scene
-  javascriptGenerator.forBlock["start"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["start"] = wrapBlockFunction("start", function (block: Block, generator: any) {
     let code = "";
     return code;
-  };
+  });
 
   //rotate block, action toolbox
-  javascriptGenerator.forBlock["rotate"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["rotate"] = wrapBlockFunction("rotate", function (block: Block, generator: any) {
     let dropdown_direction = block.getFieldValue("DIRECTION");
     if (dropdown_direction === "CLOCKWISE") dropdown_direction = "RIGHT";
     else dropdown_direction = "LEFT";
 
     let code = 'this.rotate("' + dropdown_direction + '");';
     return code;
-  };
+  });
 
   //changeStatus block, changes the status of the specified object
-  javascriptGenerator.forBlock["changeStatus"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["changeStatus"] = wrapBlockFunction("changeStatus", function (block: Block, generator: any) {
     let dropdown_status = block.getFieldValue("STATUS"); //ON/OFF
     let code = {
       blockId: block.id,
@@ -61,25 +74,25 @@ export function defineAllBlocks() {
       },
     };
     return JSON.stringify(code);
-  };
+  });
 
   //number block:
-  javascriptGenerator.forBlock["math_block"] = function (block: Block, generator: any): [string, Order] {
+  javascriptGenerator.forBlock["math_block"] = wrapBlockFunction("math_block", function (block: Block, generator: any): [string, Order] {
     // Numeric value.
     const number = Number(block.getFieldValue('NUM'));
     const order = number >= 0 ? Order.ATOMIC : Order.UNARY_NEGATION;
     return [String(number), order];
-  }
+  });
 
   //Text block
-  javascriptGenerator.forBlock["textSpecial"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["textSpecial"] = wrapBlockFunction("textSpecial", function (block: Block, generator: any) {
     let text = block.getFieldValue("TEXT");
     let code = '"' + text + '"';
     return code; //TODO order atomic check
-  };
+  });
 
   //For_X_times block
-  javascriptGenerator.forBlock["for_X_times"] = function (block: any, generator: any) {
+  javascriptGenerator.forBlock["for_X_times"] = wrapBlockFunction("for_X_times", function (block: any, generator: any) {
     let children = block.getChildren(true);
     // Repeat n times.
     let repeats;
@@ -115,9 +128,9 @@ export function defineAllBlocks() {
     }
     events += "]"
     return events;
-  };
+  });
 
-  javascriptGenerator.forBlock["if_do"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["if_do"] = wrapBlockFunction("if_do", function (block: Block, generator: any) {
     let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
     let children = block.getChildren(true);
     let childBlock;
@@ -153,10 +166,10 @@ export function defineAllBlocks() {
     };
   
     return JSON.stringify(code);
-  };
+  });
 
   // Variable blocks
-  javascriptGenerator.forBlock["variables_set"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["variables_set"] = wrapBlockFunction("variables_set", function (block: Block, generator: any) {
     // Variable setter.
     const argument0 = generator.valueToCode(block, 'VALUE', Order.ASSIGNMENT) || '0';
     let varName = block.getFieldValue('VAR');
@@ -171,11 +184,11 @@ export function defineAllBlocks() {
     };
     //TESTING
     return JSON.stringify(code);
-  };
+  });
 
-  javascriptGenerator.forBlock["variables_get"] = function (block: Block, generator: any) {
+  javascriptGenerator.forBlock["variables_get"] = wrapBlockFunction("variables_get", function (block: Block, generator: any) {
     // Variable getter.
     const varName = block.getFieldValue('VAR');
     return [variables[varName], Order.ATOMIC];
-  };
+  });
 }
