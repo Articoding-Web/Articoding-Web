@@ -88,10 +88,13 @@ export default class BlocklyController {
     javascriptGenerator.init(this.workspace);
     block_code.defineAllBlocks();
 
-    this.workspace.addChangeListener((event) => {
+    this.workspace.addChangeListener((event: Blockly.Events.BlockBase) => {
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
       this.code = this.generateCode();
+      console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ event:", event)      
+      const block = this.workspace.getBlockById(event.blockId);
+      console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ block:", block)
     });
   }
 
