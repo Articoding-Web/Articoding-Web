@@ -1,56 +1,49 @@
 import LevelEditor from "../../Game/LevelEditor/LevelEditor";
 import PhaserController from "../../Game/PhaserController";
+import Level from "../../Game/level";
 
 /**
  *
  * @returns String of HTMLElement for LevelEditor
  */
 function getLevelEditorHTML() {
-    return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
-              <div class="row row-cols-1 row-cols-md-2 h-100 g-0">
-                  <div id="selector" class="col col-md-2 h-100 mt-2 px-2">
-                      <!-- Tools -->
-                      <h5 class="card-title border-bottom pb-2 mb-2">Tool</h5>
-                      <div class="d-flex justify-content-around">
-                          <span id="paintbrushBtn">
-                              <input type="radio" class="btn-check" name="editor-tool" id="paintbrush" autocomplete="off" />
-                              <label class="btn btn-primary" for="paintbrush"><i class="bi bi-brush-fill"></i></label>
-                          </span>
-                          <span id="eraserBtn">
-                              <input type="radio" class="btn-check" name="editor-tool" id="eraser" autocomplete="off" />
-                              <label class="btn btn-primary" for="eraser"><i class="bi bi-eraser-fill"></i></label>
-                          </span>
-                          <span>
-                              <input type="radio" class="btn-check" name="editor-tool" id="movement" autocomplete="off" />
-                              <label class="btn btn-primary" for="movement"><i class="bi bi-arrows-move"></i></label>
-                          </span>
-                      </div>
-  
-                      <!-- Background -->
-                      <h5 class="card-title border-bottom pb-2 my-2">Background</h5>
-                      <div id="background-selector" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2"></div>
-                      
-                      <!-- Objects -->
-                      <h5 class="card-title border-bottom pb-2 my-2">Objects</h5>
-                      <div id="object-selector" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2"></div>
-                  </div>
-                  <div id="phaserDiv" class="col col-md-10 mh-100 p-0 position-relative">
-                      <canvas id="phaserCanvas"></canvas>
-                      <!-- <button id="selectorToggler" class="btn btn-primary position-absolute top-0 start-0" type="button" data-bs-toggle="collapse" data-bs-target="#selector" aria-expanded="false" aria-controls="selector">
-                                Toggle Selector
-                            </button> -->
-                      <div class="position-absolute top-0 end-0 me-2 mt-2">
+    return `<div class="row h-100 g-0">
+                <div id="phaserDiv" class="col mh-100 p-0 position-relative">
+                    <canvas id="phaserCanvas"></canvas>
+                    <div id="selector" class="position-absolute top-0 start-0 mt-2 ms-2">
+                        <!-- Tools -->
+                        <div class="row row-cols-1 gy-3">
+                            <div id="paintbrushBtn" class="col">
+                                <a id="paintbrushContent" data-bs-html="true" role="button" data-bs-toggle="popover" data-bs-title="Select Tile" data-bs-content="">
+                                    <input type="radio" class="btn-check" name="editor-tool" id="paintbrush" autocomplete="off" />
+                                    <label class="btn btn-primary" for="paintbrush" data-bs-toggle="tooltip" data-bs-title="Painbrush" data-bs-placement="right"><i class="bi bi-brush-fill"></i></label>
+                                </a>
+                            </div>
+                            <div id="eraserBtn" class="col">
+                                <span data-bs-toggle="tooltip" data-bs-title="Eraser" data-bs-placement="right">
+                                    <input type="radio" class="btn-check" name="editor-tool" id="eraser" autocomplete="off" />
+                                    <label class="btn btn-primary" for="eraser"><i class="bi bi-eraser-fill"></i></label>
+                                </span>
+                            </div>
+                            <div id="cameraBtn" class="col">
+                                <span data-bs-toggle="tooltip" data-bs-title="Move Viewport" data-bs-placement="right">
+                                    <input type="radio" class="btn-check" name="editor-tool" id="movement" autocomplete="off" />
+                                    <label class="btn btn-primary" for="movement"><i class="bi bi-arrows-move"></i></label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="position-absolute top-0 end-0 me-2 mt-2">
                         <button class="btn btn-primary" id="saveEditorLevel">
-                            <i class="bi bi-cloud-upload-fill"></i>
+                            <i class="bi bi-floppy-fill"></i>
                         </button>
-                      </div>
-                  </div>
-              </div>
+                    </div>
+                </div>
             </div>`;
 }
 
-export default function loadLevelEditor() {
+export default function loadLevelEditor(levelJSON?: Level.Phaser) {
     document.getElementById("content").innerHTML = getLevelEditorHTML();
 
-    PhaserController.init("LevelEditor", LevelEditor);
+    PhaserController.init("LevelEditor", LevelEditor, { levelJSON });
 }
