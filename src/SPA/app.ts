@@ -1,7 +1,7 @@
 import loadCategoryById from "./loaders/categoryLoader";
 import loadHome from "./loaders/homeLoader";
 import loadLevelEditor from "./loaders/levelEditorLoader";
-import loadLevelPlayer from "./loaders/levelPlayerLoader";
+import playLevelById from "./loaders/levelPlayerLoader";
 import loadCommunity from "./loaders/communityLoader";
 import loadProfile, { sessionCookieValue } from "./loaders/profileLoader";
 import XAPISingleton from "../xAPI/xapi";
@@ -34,9 +34,9 @@ export async function setPageLevelPlayer(params: URLSearchParams) {
   let userName = getUserName();
   const idLevel = params.get("id") 
   let urlLevel = `level?id=${idLevel}`;
-  loadLevelPlayer(idLevel);
   let statement = XAPISingleton.screenAccessedStament(userName, urlLevel);
   await XAPISingleton.sendStatement(statement);
+  playLevelById(idLevel);
 }
 
 export async function setPageLevelEditor(levelId?: number) {

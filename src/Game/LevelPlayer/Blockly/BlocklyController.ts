@@ -10,6 +10,9 @@ import blocks from "./Blocks/blocks";
 import config from "../../config";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 import { incrementStopCodeBtn } from "../../../SPA/Logger";
+import { Block } from "blockly";
+import Level from "../../level";
+
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
 
@@ -19,8 +22,8 @@ export default class BlocklyController {
   private static code: BlockCode[];
   private static isRunningCode: boolean = false;
   private static shouldAbort: boolean = false;
-  private static runCodeBtn;
-
+  private static changeData: any;
+  private static runCodeBtn: HTMLElement;
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
     Blockly.Events.BLOCK_CREATE,
@@ -28,7 +31,7 @@ export default class BlocklyController {
     Blockly.Events.BLOCK_MOVE,
   ];
 
-  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
 
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
@@ -44,7 +47,7 @@ export default class BlocklyController {
     };
   }
 
-  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     BlocklyController.workspace = Blockly.inject(container, { toolbox, maxInstances, zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2, pinch: true, }, });
 
     // Initialize plugin.
@@ -69,7 +72,6 @@ export default class BlocklyController {
     this.startBlock.render();
     this.startBlock.setDeletable(false);
     this.startBlock.moveBy(BLOCK_OFFSET, BLOCK_OFFSET);
-
     let offset = BLOCK_OFFSET;
     for (let workspaceBlock of workspaceBlocks) {
       offset += BLOCK_OFFSET;
@@ -89,8 +91,12 @@ export default class BlocklyController {
     block_code.defineAllBlocks();
 
     this.workspace.addChangeListener((event: Blockly.Events.BlockBase) => {
+      if (event.type === "block_field_intermediate_change") {
+        this.changeData = event;
+      }
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
+
       this.code = this.generateCode();
       console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ event:", event)      
       const block = this.workspace.getBlockById(event.blockId);
@@ -99,59 +105,66 @@ export default class BlocklyController {
   }
 
   static highlightBlock(id: string | null) {
-    if(this.workspace)
+    if (this.workspace)
       this.workspace.highlightBlock(id);
   }
 
-  private  static generateCode(): BlockCode[] {
+  private static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
-
     while (nextBlock) {
-      
-      const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
-      if (Array.isArray(blockCode)) {
-        for (let innerBlockCode of blockCode)
-          code.push(<BlockCode>innerBlockCode);
-      } else code.push(<BlockCode>blockCode);
 
+        const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
+        if (Array.isArray(blockCode)) {
+          for (let innerBlockCode of blockCode)
+            code.push(<BlockCode>innerBlockCode);
+        } else code.push(<BlockCode>blockCode);
       nextBlock = nextBlock.getNextBlock();
     }
     return code;
   }
 
-  private static runCode = (e: MouseEvent) =>  {
+  private static runCode = (e: MouseEvent) => {
     e.stopPropagation();
-
-    if (this.shouldAbort) {
-      this.highlightBlock(null);
-      this.isRunningCode = false; // Reset flag
-      this.shouldAbort = false; // Reset flag
-    } else if (BlocklyController.isRunningCode)
-      return;
-
-    let index = 0;
-    const executeNextBlock = () => {
+    //this.workspace.getAllBlocks(true)[0].select();
+      let prepBlocks = this.workspace.getAllBlocks(true);
+      for (let block of prepBlocks) {
+        if (this.changeData) {
+          this.workspace.getBlockById(this.changeData.blockId).setFieldValue(this.changeData.newValue, this.changeData.name);
+          this.changeData = null;
+          this.code = this.generateCode();
+        }
+      }
       if (this.shouldAbort) {
         this.highlightBlock(null);
         this.isRunningCode = false; // Reset flag
         this.shouldAbort = false; // Reset flag
-        return; // Abort execution
-      }
+      } else if (BlocklyController.isRunningCode)
+        return;
 
-      if (index < this.code.length) {
-        BlocklyController.isRunningCode = true;
-        let code = this.code[index];
-        this.highlightBlock(code.blockId);
+      let index = 0;
+      const executeNextBlock = () => {
+        if (this.shouldAbort) {
+          this.highlightBlock(null);
+          this.isRunningCode = false; // Reset flag
+          this.shouldAbort = false; // Reset flag
+          return; // Abort execution
+        }
 
-        let times = 0;
-        const emitEvent = (eventName: string, eventData) => {
-          if (this.shouldAbort) {
-            this.highlightBlock(null);
-            this.isRunningCode = false; // Reset flag
-            this.shouldAbort = false; // Reset flag
-            return; // Abort execution
-          }
+        if (index < this.code.length) {
+          BlocklyController.isRunningCode = true;
+          let code = this.code[index];
+          console.log("running code", code);
+          this.highlightBlock(code.blockId);
+
+          let times = 0;
+          const emitEvent = (eventName: string, eventData) => {
+            if (this.shouldAbort) {
+              this.highlightBlock(null);
+              this.isRunningCode = false; // Reset flag
+              this.shouldAbort = false; // Reset flag
+              return; // Abort execution
+            }
 
           if (times < (code.times || 1)) {
             const event = new CustomEvent(eventName, { detail: eventData });
