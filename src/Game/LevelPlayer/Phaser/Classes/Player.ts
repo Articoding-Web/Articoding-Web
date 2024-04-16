@@ -1,7 +1,8 @@
 import { Direction } from "../types/Direction";
 import { GridPhysics } from "./GridPhysics";
 import config from "../../../config";
-
+import EnemyObject from "./Enemy";
+import TrapObject from "./TrapObject";
 export class Player {
     private facingDirections = [Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT];
     private playerDir: number = 0; //por defecto la ranita mira "abajo" down/left/up/right
@@ -18,7 +19,15 @@ export class Player {
         const data = (e as CustomEvent).detail;
         this.movePlayer(Direction[data["direction"]]);
     }
-
+    checkPosition(direction: string, type: string) {
+        const currentTilePos = this.getTilePos();
+        let adjacentTilePos = this.gridPhysics.tilePosInDirection(currentTilePos, Direction[direction]);
+        //esto es un poco sus
+        if (this.gridPhysics.getTileContent(adjacentTilePos) instanceof eval(type)){
+            return true;
+        }
+        else return false;
+    }
     private movePlayer(direction: Direction): void {
         if (!this.isAlive || this.reachedExit)
             return;

@@ -1,7 +1,8 @@
 import { Order, javascriptGenerator } from "blockly/javascript";
 import type { Block } from "blockly/core/block";
 import { Workspace } from "blockly";
-
+import { wrap } from "module";
+import BlocklyController from "../BlocklyController";
 //Here we define all block behaviour
 
 //Here we define all block behaviour
@@ -75,7 +76,15 @@ export function defineAllBlocks() {
     };
     return JSON.stringify(code);
   });
-
+  javascriptGenerator.forBlock["block_pos"] = wrapBlockFunction("block_pos", function (block: Block, generator: any) {
+    let dropdown_direction = block.getFieldValue("DIRECTION");
+    let blockType = block.getFieldValue("TYPE");
+    if(BlocklyController.checkPosition(dropdown_direction, blockType)){
+      return true;
+    } else{
+      return false;
+    }
+  });
   //number block:
   javascriptGenerator.forBlock["math_block"] = wrapBlockFunction("math_block", function (block: Block, generator: any): [string, Order] {
     // Numeric value.
@@ -132,6 +141,7 @@ export function defineAllBlocks() {
 
   javascriptGenerator.forBlock["if_do"] = wrapBlockFunction("if_do", function (block: Block, generator: any) {
     let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
+    
     let children = block.getChildren(true);
     let childBlock;
     if (children.length === 1 && children[0].type != "math_number")
@@ -145,16 +155,18 @@ export function defineAllBlocks() {
       childBlockCode.push(blockCode);
       childBlock = childBlock.getNextBlock();
     }
-  
-    // Create the event code.
     let events = `[`;
+    if(condition){
+
     for(let y = 0; y < childBlockCode.length; y++) {
       events += childBlockCode[y];
       if(y < childBlockCode.length - 1)
         events += ","
     }
     events += "]"
-  
+    }
+    
+    //should send empty if not met.
     // Conditions WILL be evaluated in their block function, otherwise this gets out of hand real f***ing fast
     let code = {
       blockId: block.id,

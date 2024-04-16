@@ -360,4 +360,8 @@ export default class LevelPlayer extends Phaser.Scene {
   getScaleFactor(): number {
     return this.scaleFactor;
   }
+
+  getPlayers(): Player[] {
+    return this.players;
+  }
 }

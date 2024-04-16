@@ -52,6 +52,36 @@ export default [
     helpUrl: "",
   },
   {
+    "type": "block_pos",
+    "message0": "block %1 is %2",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "DIRECTION",
+        "options": [
+          ["up", "UP"],
+          ["down", "DOWN"],
+          ["left", "LEFT"],
+          ["right", "RIGHT"]
+        ]
+      },
+      {
+        "type": "field_dropdown",
+        "name": "TYPE",
+        "options": [
+          ["spikes", "SPIKES"],
+          ["skeleton", "SKELETON"],
+          ["wall", "WALL"],
+          ["frog", "FROG"]
+        ]
+      }
+    ],
+    "output": "Boolean",
+    "colour": "#5b80a5",
+    "tooltip": "",
+    "helpUrl": ""
+  },
+  {
     type: "comparator",
     message0: "%1 %2 %3",
     args0: [

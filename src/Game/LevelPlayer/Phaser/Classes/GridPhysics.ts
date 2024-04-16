@@ -61,6 +61,14 @@ export class GridPhysics {
       this.tileMap.hasTileAt(pos.x, pos.y, layer.name)
     );
   }
+  
+  getTileContent(pos: Phaser.Math.Vector2): ArticodingSprite | null {
+    const tileContent = this.objects.find((obj) => {
+      const objPos = obj.getPosition();
+      return objPos.x === pos.x && objPos.y === pos.y;
+    });
+    return tileContent || null;
+  }
 
   collide(player: Player | EnemyObject): void {
     // get obj in position

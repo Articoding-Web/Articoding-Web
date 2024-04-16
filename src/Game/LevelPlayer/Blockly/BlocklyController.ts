@@ -11,6 +11,7 @@ import config from "../../config";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 import { Block } from "blockly";
 import Level from "../../level";
+import LevelPlayer from "../Phaser/LevelPlayer";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -116,7 +117,16 @@ export default class BlocklyController {
     }
     return code;
   }
-
+  //pensado para 1 ranita, por ahora
+  static checkPosition(direction: string, type: string): boolean {
+    let players = LevelPlayer.prototype.getPlayers();
+    for (let player of players) {
+      if (player.checkPosition(direction, type)) {
+        return true;
+      }
+    }
+    return false;
+  }
   private static runCode = (e: MouseEvent) => {
     e.stopPropagation();
     //this.workspace.getAllBlocks(true)[0].select();
