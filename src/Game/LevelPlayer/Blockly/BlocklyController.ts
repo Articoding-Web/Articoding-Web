@@ -9,6 +9,8 @@ import blocks from "./Blocks/blocks";
 
 import config from "../../config";
 import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
+import { Block } from "blockly";
+import Level from "../../level";
 
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -19,7 +21,8 @@ export default class BlocklyController {
   private static code: BlockCode[];
   private static isRunningCode: boolean = false;
   private static shouldAbort: boolean = false;
-
+  private static changeData: any;
+  private static runCodeBtn: HTMLElement;
   private static blocklyEvents = [
     Blockly.Events.BLOCK_CHANGE,
     Blockly.Events.BLOCK_CREATE,
@@ -27,11 +30,20 @@ export default class BlocklyController {
     Blockly.Events.BLOCK_MOVE,
   ];
 
-  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+  static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    BlocklyController.runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
+    // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
+    BlocklyController.runCodeBtn.addEventListener("click", this.runCode);
+
+    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
+    let stopCodeBtn = <HTMLElement>document.getElementById("stopCodeBtn");
+    stopCodeBtn.onclick = (ev: MouseEvent) => this.abortAndReset();
   }
 
-  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: { [blockType: string]: number }, workspaceBlocks?: any) {
+  private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     BlocklyController.workspace = Blockly.inject(container, { toolbox, maxInstances, zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2, pinch: true, }, });
 
     // Initialize plugin.
@@ -55,9 +67,7 @@ export default class BlocklyController {
     this.startBlock.initSvg();
     this.startBlock.render();
     this.startBlock.setDeletable(false);
-    this.startBlock;
     this.startBlock.moveBy(BLOCK_OFFSET, BLOCK_OFFSET);
-
     let offset = BLOCK_OFFSET;
     for (let workspaceBlock of workspaceBlocks) {
       offset += BLOCK_OFFSET;
@@ -77,109 +87,86 @@ export default class BlocklyController {
     block_code.defineAllBlocks();
 
     this.workspace.addChangeListener((event) => {
+      if (event.type === "block_field_intermediate_change") {
+        this.changeData = event;
+      }
       if (this.workspace.isDragging()) return; // Don't update while changes are happening.
       if (!this.blocklyEvents.includes(event.type)) return;
+
       this.code = this.generateCode();
-    });
-
-    // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
-    let runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
-    runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
-
-    // Custom flyout callback
-    const customFlyoutCallback = (workspace: Blockly.Workspace) => {
-      const blockList = [];
-
-      // Add the getter block
-      blockList.push({
-        kind: "block",
-        type: "variables_get_panda",
-        fields: {
-          VAR: "panda",
-        },
-      });
-
-      // Add the setter block
-      blockList.push({
-        kind: "block",
-        type: "variables_set_panda",
-        fields: {
-          VAR: "panda",
-        },
-      });
-
-      // Add a button to create a new variable
-      blockList.push({
-        kind: "button",
-        text: "Create variable",
-        callbackKey: "CREATE_VARIABLE",
-      });
-
-      return blockList;
-    };
-
-    BlocklyController.workspace.registerToolboxCategoryCallback("VARIABLE", customFlyoutCallback);
-    BlocklyController.workspace.registerButtonCallback('CREATE_VARIABLE', function (button) {
-      Blockly.Variables.createVariableButtonHandler(button.getTargetWorkspace(), null, 'Panda');
     });
   }
 
   static highlightBlock(id: string | null) {
-    this.workspace.highlightBlock(id);
+    if (this.workspace)
+      this.workspace.highlightBlock(id);
   }
 
-  static generateCode(): BlockCode[] {
+  private static generateCode(): BlockCode[] {
     let nextBlock = this.startBlock.getNextBlock();
     let code = [];
-
     while (nextBlock) {
-      const blockCode = JSON.parse(
-        javascriptGenerator.blockToCode(nextBlock, true)
-      );
 
-      if (Array.isArray(blockCode)) {
-        for (let innerBlockCode of blockCode)
-          code.push(<BlockCode>innerBlockCode);
-      } else code.push(<BlockCode>blockCode);
-
+        const blockCode = JSON.parse(javascriptGenerator.blockToCode(nextBlock, true));
+        if (Array.isArray(blockCode)) {
+          for (let innerBlockCode of blockCode)
+            code.push(<BlockCode>innerBlockCode);
+        } else code.push(<BlockCode>blockCode);
       nextBlock = nextBlock.getNextBlock();
     }
     return code;
   }
 
-  static runCode() {
-    if(BlocklyController.isRunningCode)
-      return;
-
-    // Restart level  
-    restartCurrentLevel();
-
-    let index = 0;
-    const executeNextBlock = () => {
+  private static runCode = (e: MouseEvent) => {
+    e.stopPropagation();
+    //this.workspace.getAllBlocks(true)[0].select();
+      let prepBlocks = this.workspace.getAllBlocks(true);
+      for (let block of prepBlocks) {
+        if (this.changeData) {
+          this.workspace.getBlockById(this.changeData.blockId).setFieldValue(this.changeData.newValue, this.changeData.name);
+          this.changeData = null;
+          this.code = this.generateCode();
+        }
+      }
       if (this.shouldAbort) {
+        this.highlightBlock(null);
         this.isRunningCode = false; // Reset flag
         this.shouldAbort = false; // Reset flag
-        return; // Abort execution
-      }
+      } else if (BlocklyController.isRunningCode)
+        return;
 
-      if (index < this.code.length) {
-        BlocklyController.isRunningCode = true;
-        let code = this.code[index];
-        this.highlightBlock(code.blockId);
+      let index = 0;
+      const executeNextBlock = () => {
+        if (this.shouldAbort) {
+          this.highlightBlock(null);
+          this.isRunningCode = false; // Reset flag
+          this.shouldAbort = false; // Reset flag
+          return; // Abort execution
+        }
 
-        let times = 0;
-        const emitEvent = (eventName: string, eventData) => {
-          if (this.shouldAbort) {
-            this.isRunningCode = false; // Reset flag
-            this.shouldAbort = false; // Reset flag
-            return; // Abort execution
-          }
+        if (index < this.code.length) {
+          BlocklyController.isRunningCode = true;
+          let code = this.code[index];
+          console.log("running code", code);
+          this.highlightBlock(code.blockId);
+
+          let times = 0;
+          const emitEvent = (eventName: string, eventData) => {
+            if (this.shouldAbort) {
+              this.highlightBlock(null);
+              this.isRunningCode = false; // Reset flag
+              this.shouldAbort = false; // Reset flag
+              return; // Abort execution
+            }
 
           if (times < (code.times || 1)) {
             const event = new CustomEvent(eventName, { detail: eventData });
             document.dispatchEvent(event);
             times++;
-            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
+
+            const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
+            setTimeout(emitEvent, config.MOVEMENT_ANIMDURATION / speedModifier * 1.5, eventName, eventData);  // TODO: ver como esperar a que acabe la acción
           } else {
             index++;
             executeNextBlock();
@@ -187,7 +174,7 @@ export default class BlocklyController {
         };
         emitEvent(code.eventName, code.data);
       } else {
-        BlocklyController.isRunningCode = true;
+        BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
         const event = new CustomEvent("execution-finished");
@@ -197,9 +184,15 @@ export default class BlocklyController {
     executeNextBlock();
   }
 
+  private static abortAndReset() {
+    this.shouldAbort = true;
+    restartCurrentLevel();
+  }
+
   static destroyWorkspace() {
     if (BlocklyController.workspace) {
       BlocklyController.shouldAbort = true;
+      BlocklyController.runCodeBtn.removeEventListener("click", this.runCode);
       window.removeEventListener("resize", onresize, false);
       BlocklyController.workspace.dispose();
       BlocklyController.workspace = undefined;

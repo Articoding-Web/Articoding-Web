@@ -31,10 +31,10 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
   }
 
   clickEvent() {
-    const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked'))).id;
+    const selectedTool = (<HTMLInputElement>(document.querySelector('input[name="editor-tool"]:checked')))?.id;
     if (selectedTool === "paintbrush") {
       this.paintIcon();
-    } else {
+    } else if(selectedTool === "eraser"){
       this.deleteIcon();
     }
   }
@@ -89,24 +89,26 @@ export default class DropZoneTile extends Phaser.GameObjects.Zone {
     return this.objectSprite;
   }
 
-  private setObjectSprite(sprite: Phaser.GameObjects.Sprite) {
+  setObjectSprite(sprite: Phaser.GameObjects.Sprite) {
     this.objectSprite?.destroy(true);
 
     if (this.bgSprite !== undefined) {
       // Create duplicate sprite only if has background
       this.objectSprite = sprite;
+      this.objectSprite.setDepth(this.depth + 2);
     } else {
       // Destroy sprite
       sprite.destroy(true);
     }
   }
 
-  private setBgSprite(sprite: Phaser.GameObjects.Sprite) {
+  setBgSprite(sprite: Phaser.GameObjects.Sprite) {
     this.objectSprite?.destroy(true); // destroy if existed
     this.objectSprite = undefined;
 
     this.bgSprite?.destroy(true); // destroy if existed
     this.bgSprite = sprite;
+    this.bgSprite.setDepth(this.depth + 1);
   }
 
   destroy(fromScene?: boolean): void {

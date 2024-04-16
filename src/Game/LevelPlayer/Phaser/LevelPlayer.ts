@@ -1,22 +1,31 @@
 import * as Phaser from "phaser";
 
-import config from "../../config.js";
-import ArticodingSprite from "./Classes/ArticodingSprite.js";
-import ChestObject from "./Classes/ChestObject.js";
-import ExitObject from "./Classes/Exit.js";
-import { GridPhysics } from "./Classes/GridPhysics.js";
-import { Player } from "./Classes/Player.js";
-import TrapObject from "./Classes/TrapObject.js";
-import { Direction } from "./types/Direction.js";
+import config from '../../config.js';
+import ArticodingSprite from './Classes/ArticodingSprite.js';
+import ChestObject from './Classes/ChestObject.js';
+import ExitObject from './Classes/Exit.js';
+import { GridPhysics } from './Classes/GridPhysics.js';
+import { Player } from './Classes/Player.js';
+import TrapObject from './Classes/TrapObject.js';
+import { Direction } from './types/Direction.js';
+import EnemyObject from './Classes/Enemy.js';
+import loadLevelEditor from '../../../SPA/loaders/levelEditorLoader.js';
+import Level from "../../level";
+import PhaserController from '../../PhaserController.js';
+
+// For saving levels
+import { sessionCookieValue } from '../../../SPA/loaders/profileLoader';
+import { fetchRequest } from '../../../SPA/utils';
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 export default class LevelPlayer extends Phaser.Scene {
   private theme: String;
   private height: number;
   private width: number;
 
-  private backgroundLayerJson: any;
-  private playersLayerJson: any;
-  private objectsLayerJson: any;
+  private backgroundLayerJson: Level.Layer;
+  private playersLayerJson: Level.Layer;
+  private objectsLayers: Level.Layer[];
 
   private tilemap: Phaser.Tilemaps.Tilemap;
   private mapCoordX: number;
@@ -25,22 +34,30 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private players: Player[] = [];
   private objects: ArticodingSprite[] = [];
+  private numChests = 0;
 
   private gridPhysics: GridPhysics;
+
+  private levelJSON: Level.Level;
+  private fromLevelEditor: boolean;
 
   constructor() {
     super("LevelPlayer");
   }
 
-  init(...params) {
-    const levelJson = params[0];
+  init(data: { levelJSON: Level.Level, fromLevelEditor?: boolean }) {
+    this.levelJSON = data.levelJSON;
+    this.fromLevelEditor = data.fromLevelEditor;
 
-    this.theme = levelJson.theme;
-    this.height = levelJson.height;
-    this.width = levelJson.width;
-    this.backgroundLayerJson = levelJson.layers.background;
-    this.playersLayerJson = levelJson.layers.players;
-    this.objectsLayerJson = levelJson.layers.objects;
+    const { theme, height, width, layers } = this.levelJSON.phaser;
+    const { background, players, objects } = layers;
+    
+    this.theme = theme;
+    this.height = height;
+    this.width = width;
+    this.backgroundLayerJson = background;
+    this.playersLayerJson = players;
+    this.objectsLayers = objects;    
   }
 
   preload() {
@@ -51,13 +68,13 @@ export default class LevelPlayer extends Phaser.Scene {
     this.loadAssetFromLayer(this.playersLayerJson);
 
     // Load objects assets
-    for (let x in this.objectsLayerJson) {
-      let objJson = this.objectsLayerJson[x];
+    for (let x in this.objectsLayers) {
+      let objJson = this.objectsLayers[x];
       this.loadAssetFromLayer(objJson);
     }
   }
 
-  loadAssetFromLayer(layerJson: any) {
+  loadAssetFromLayer(layerJson: Level.Layer) {
     const themePath = `assets/sprites/${this.theme}`;
 
     const assetKey = layerJson.spriteSheet;
@@ -73,8 +90,11 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   create() {
-    this.events.on("shutdown", this.shutdown, this);
-    this.events.on("destroy", this.shutdown, this);
+    this.events.on('shutdown', this.shutdown, this);
+    this.events.on('destroy', this.shutdown, this);
+    
+    document.getElementById("speedModifierBtn").addEventListener("click", this.changeAnimSpeed);
+    document.getElementById("editButton").addEventListener("click", this.loadLevelEditor);
 
     // this.zoom();
     this.createBackground(); // create un tilemap
@@ -113,40 +133,25 @@ export default class LevelPlayer extends Phaser.Scene {
     layer.depth = this.backgroundLayerJson.depth || layer.depth;
 
     for (let y in this.backgroundLayerJson.objects) {
-      const obj = this.backgroundLayerJson.objects[y];
-      const tile = this.tilemap.putTileAt(obj.spriteIndex || 0, obj.x, obj.y);
+      const obj = <Level.BackgroundTile>this.backgroundLayerJson.objects[y];
+      const tile = this.tilemap.putTileAt(parseInt(obj.spriteIndex) || 0, obj.x, obj.y);
       if (tile) tile.properties = obj.properties;
     }
   }
 
   createPlayers() {
-    this.gridPhysics = new GridPhysics(
-      this.tilemap,
-      this.scaleFactor,
-      this.objects
-    );
+    this.gridPhysics = new GridPhysics(this.tilemap, this.scaleFactor, this.objects);
 
     // Create sprites
     for (let x in this.playersLayerJson.objects) {
       const player = this.playersLayerJson.objects[x];
 
       // Create and scale sprite
-      const sprite = this.add.sprite(
-        player.x,
-        player.y,
-        this.playersLayerJson.spriteSheet
-      );
+      const sprite = this.add.sprite(player.x, player.y, this.playersLayerJson.spriteSheet);
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
-      this.players.push(
-        new Player(
-          sprite,
-          this.gridPhysics,
-          new Phaser.Math.Vector2(parseInt(player.x), parseInt(player.y)),
-          this.scaleFactor
-        )
-      );
+      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(player.x, player.y), this.scaleFactor));
     }
 
     this.cameras.main.roundPixels = true;
@@ -186,44 +191,33 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   createObjects() {
-    for (let x in this.objectsLayerJson) {
-      const objectJson = this.objectsLayerJson[x];
+    for (let x in this.objectsLayers) {
+      const objectJson = this.objectsLayers[x];
       const objects = objectJson.objects;
       for (let y in objects) {
-        const obj = objects[y];
+        const obj = <Level.ObjectTile>objects[y];
 
         let createdObject;
         if (obj.type === "chest") {
-          createdObject = new ChestObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
-          );
+          createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
+          this.numChests++;
         } else if (obj.type === "trap") {
           this.createTrapAnim();
-          createdObject = new TrapObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
-          );
+          createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
           if (obj.properties.enabled) createdObject.enable();
         } else if (obj.type === "exit") {
-          createdObject = new ExitObject(
-            this,
-            obj.x,
-            obj.y,
-            objectJson.spriteSheet
-          );
+          createdObject = new ExitObject(this, obj.x, obj.y, objectJson.spriteSheet);
         } else if (obj.type === "wall") {
           // TODO: add wall collisions
           const wall = this.add.sprite(obj.x, obj.y, objectJson.spriteSheet);
           this.scaleSprite(wall, obj.x, obj.y);
           wall.setDepth(objectJson.depth);
-        } else {
+        } else if (obj.type === "enemy") {
+          createdObject = new EnemyObject(this, obj.x, obj.y, objectJson.spriteSheet, obj.movementOrientation);
+        }
+        else {
           console.error("Object type not registered");
-          console.log(obj.type);
+          console.error(obj.type);
           continue;
         }
 
@@ -251,11 +245,7 @@ export default class LevelPlayer extends Phaser.Scene {
     }
   }
 
-  scaleSprite(
-    sprite: Phaser.GameObjects.Sprite,
-    gridXPosition: number,
-    gridYPosition: number
-  ) {
+  scaleSprite(sprite: Phaser.GameObjects.Sprite, gridXPosition: number, gridYPosition: number) {
     const offsetX = (config.TILE_SIZE / 2) * this.scaleFactor + this.mapCoordX;
     const offsetY = config.TILE_SIZE * this.scaleFactor + this.mapCoordY;
 
@@ -280,36 +270,94 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  private checkWinCondition = (e: Event) => {
+  private checkWinCondition = async (e: Event) => {
     let hasLost = false;
+    let playerBounced = false;
 
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
         player.die();
         hasLost = true;
+      } else if (player.getHasBounced()) {
+        playerBounced = true;
       }
-    }
 
-    if (hasLost) {
-      const event = new CustomEvent("lose");
-      document.dispatchEvent(event);
+      this.numChests -= player.getCollectedChest();
+    }
+    
+    if(!this.fromLevelEditor) {
+      // Official Level
+      let stars = 0;
+      if (hasLost) {
+        const event = new CustomEvent("lose");
+        document.dispatchEvent(event);
+      } else {
+        stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+        const event = new CustomEvent("win", { detail: { stars } });
+        document.dispatchEvent(event);
+      }
+
+      const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
+      document.dispatchEvent(statisticEvent);
     } else {
-      const event = new CustomEvent("win", { detail: { stars: 3 } });
-      document.dispatchEvent(event);
+      // From Level Editor
+      const object = sessionCookieValue();
+      if (object !== null) {
+        if (window.confirm("Save Level?")) {
+          const levelData = {
+            user: object.id,
+            category: null,
+            self: null,
+            title: "Editor",
+            data: JSON.stringify(this.levelJSON),
+            minBlocks: null,
+          };
+          console.log("Nivel:", levelData);
+          await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
+          alert("Nivel creado");
+        }        
+      } else alert("Necesitas iniciar sesión");
     }
   };
+
+  private changeAnimSpeed = (e: Event) => {
+    const val = parseInt((e.currentTarget as HTMLInputElement).value);
+    const newVal = (val % 3) + 1;  // between 1 - 3
+
+    (e.currentTarget as HTMLDivElement).innerHTML = `${newVal}x`;
+    (e.currentTarget as HTMLInputElement).value = `${newVal}`;
+  }
+
+  private loadLevelEditor = async () => {
+    await PhaserController.destroyGame();
+    loadLevelEditor(this.levelJSON.phaser);
+  }
 
   rotate(direction: string) {
     this.events.emit("rotateOrder", Direction[direction]);
   }
 
   shutdown() {
-    console.log("Clearing scene");
     document.removeEventListener("execution-finished", this.checkWinCondition);
+    document.getElementById("speedModifierBtn").removeEventListener("click", this.changeAnimSpeed);
+    if (this.fromLevelEditor)
+      document.getElementById("editButton").removeEventListener("click", this.loadLevelEditor);
 
     while (this.players.length) {
       this.players.pop().destroy();
     }
+
+    while (this.objects.length) {
+      this.objects.pop().destroy();
+    }
+  }
+
+  getGridPhysics(): GridPhysics {
+    return this.gridPhysics;
+  }
+
+  getScaleFactor(): number {
+    return this.scaleFactor;
   }
 }

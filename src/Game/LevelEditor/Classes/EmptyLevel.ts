@@ -1,4 +1,6 @@
-export default {
+import Level from "../../level";
+
+export default <Level.Level>{
     "phaser": {
         "width": 0,
         "height": 0,

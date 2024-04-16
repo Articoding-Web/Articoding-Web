@@ -1,3 +1,12 @@
+export class HTTPError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 /**
  *
  * @param {URL} endpoint endpoint where the call should be made
@@ -5,15 +14,25 @@
  * @returns json response
  */
 export async function fetchRequest(endpoint, method, data?, credentials?) {
-  const response = fetch(endpoint, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: credentials,
-    body: data,
-  });
-  return (await response).json();
+  try {
+    const response = await fetch(endpoint, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: credentials,
+      body: data,
+    });
+
+    if (!response.ok) {
+      throw new HTTPError(response.status, `Fetch request failed with status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error occurred during fetch request:', error);
+    throw error;
+  }
 }
 
 /**

@@ -6,8 +6,8 @@ const config = {
     API_PORT: 'ENV_API_PORT',
     EDITOR_MIN_ROWS: 3,
     EDITOR_MIN_COLS: 3,
-    EDITOR_MAX_ROWS: 8,
-    EDITOR_MAX_COLS: 8,
+    EDITOR_MAX_ROWS: 15,
+    EDITOR_MAX_COLS: 15,
 };
 
 export default config;

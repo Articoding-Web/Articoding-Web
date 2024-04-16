@@ -1,37 +1,29 @@
 import config from '../Game/config.js';
-import { sessionCookieValue } from './loaders/profileLoader.js';
+import { sessionCookieValue } from './loaders/profileLoader';
+import { fetchRequest } from './utils';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
 export default async function initLogger() {
-  document.addEventListener("win", event => {
+  document.addEventListener("updateStatistic", (event: CustomEvent) => {
     const cookie = sessionCookieValue();
+    const hasLost : Boolean = event.detail.hasLost;
+    const stars : integer = event.detail.stars;
     if (cookie !== null) {
       const urlParams = new URLSearchParams(window.location.search);
       const levelId = urlParams.get('id');
       const postData = {
         user: cookie.id,
         level: levelId,
-        stars: 1,
+        stars,
       };
 
-      fetch(API_ENDPOINT + "/play", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      })
-        .then(response => {
-          if (response.ok) {
-            console.log("La petición se ha realizado correctamente.");
-          } else {
-            console.error("La petición falló con estado:", response.status);
-          }
-        })
-        .catch(error => {
-          console.error("Error al realizar la petición:", error);
-        });
+      fetchRequest(
+        `${API_ENDPOINT}/play`,
+        "POST",
+        JSON.stringify(postData)
+      );
+      
     }
   });
 }

@@ -4,6 +4,7 @@ import config from '../../Game/config.js';
 import { fetchRequest } from '../utils';
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
 
 // Variable para controlar si el evento click ya se agregó al botón
 let registerSubmitBtnAdded = false;
@@ -38,50 +39,96 @@ function getCookieValue(cookieName) {
   return null;
 }
 
-function checkSessionCookie() {
+export function checkSessionCookie() {
   const cookies = document.cookie.split("; ");
   const sessionCookie = cookies.find((cookie) => cookie.startsWith("session="));
   return sessionCookie !== undefined;
 }
 
-function userLogin() {
-  const userId = (document.getElementById("userId") as HTMLInputElement).value;
+async function userLogin(modal : bootstrap.Modal) {
+  const username = (document.getElementById("username") as HTMLInputElement).value;
   const password = (document.getElementById("password") as HTMLInputElement)
     .value;
 
   const postData = {
-    id: userId,
+    username,
     password: password,
   };
 
-  fetchRequest(
-    `${API_ENDPOINT}/user/login`,
-    "POST",
-    JSON.stringify(postData),
-    "include"
-  );
+  try {
+    const responseData = await fetchRequest(
+      `${API_ENDPOINT}/user/login`,
+      "POST",
+      JSON.stringify(postData),
+      'include',
+    );
+    modal.hide();
+    window.location.href = "/"; 
+  } catch (error) {
+      if (error.status === 401 || error.status === 404) {
+        const errorElement = document.getElementById("text-error-login");
+        errorElement.innerText = "Error con el username o contraseña";
+        errorElement.style.color = "red";
+      } else {
+      console.error('Error general:', error);
+    }
+  }
 }
 
-function useRegister() {
+async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
+    console.log("🚀 ~ useRegister ~ userName.length:", userName.length)  
+  if (userName.length < 3) {
+    const errorElement = document.getElementById("text-error-register");
+    errorElement.innerText = "El nombre de usuario debe tener al menos 3 letras";
+    errorElement.style.color = "red";
+    return; 
+  }
+
   const userPassword = (
     document.getElementById("userPassword") as HTMLInputElement
   ).value;
 
+  if (!PASSWORD_REGEX.test(userPassword)) {
+    const errorElement = document.getElementById("text-error-register");
+    errorElement.innerText = "La contraseña debe contener al menos 1 mayúscula, 1 número y tener más de 5 letras";
+    errorElement.style.color = "red";
+    return; 
+  }
+  const confirmPassword = (document.getElementById("confirmPassword") as HTMLInputElement).value;
+  if (userPassword !== confirmPassword) {
+    const errorElement = document.getElementById("text-error-register");
+    errorElement.innerText = "Las contraseñas no coinciden";
+    errorElement.style.color = "red";
+    return; 
+  }
   const postData = {
     userName: userName,
     userPassword: userPassword,
   };
 
-  fetchRequest(
-    `${API_ENDPOINT}/user/registro`,
-    "POST",
-    JSON.stringify(postData)
-  );
+  try{
+    await fetchRequest(
+      `${API_ENDPOINT}/user/registro`,
+      "POST",
+      JSON.stringify(postData)
+    );
+    modal.hide();
+    window.location.href = "/"; 
+  }
+  catch(error){
+    if (error.status === 409) {
+      const errorElement = document.getElementById("text-error-register");
+      errorElement.innerText = "El username ya existe";
+      errorElement.style.color = "red";
+    } else {
+    console.error('Error general:', error);
+    }
+  }
 }
 
-function appendLoginModal() {
+export function appendLoginModal() {
   let loginModalHtml = `
         <div id="loginModal" class="modal fade" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -93,8 +140,8 @@ function appendLoginModal() {
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
-                                <label for="userId" class="form-label">ID Numérico</label>
-                                <input type="number" class="form-control" id="userId" required>
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Contraseña</label>
@@ -105,6 +152,7 @@ function appendLoginModal() {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
                         <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
+                        <span id="text-error-login"></span>
                     </div>
                 </div>
             </div>
@@ -134,9 +182,9 @@ function appendLoginModal() {
 
   let loginBtn = document.getElementById("loginReq");
   if (loginBtn) {
-    loginBtn.addEventListener("click", function (event) {
+    loginBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      userLogin();
+      await userLogin(loginModalInstance);
     });
   }
 }
@@ -160,11 +208,17 @@ function appendRegisterModal() {
                                 <label for="userPassword" class="form-label">Contraseña</label>
                                 <input type="password" class="form-control" id="userPassword" required>
                             </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                                <input type="password" class="form-control" id="confirmPassword" required>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <span >Tras registrarte, deberás hacer login</span>
+                        <span id="text-error-register"></span>
                     </div>
                 </div>
             </div>
@@ -185,12 +239,10 @@ function appendRegisterModal() {
   registerModalInstance.show();
 
   let registerSubmitBtn = document.getElementById("registerSubmitBtn");
-  // Agregar event listener solo si no se ha agregado antes
   if (!registerSubmitBtnAdded) {
-    registerSubmitBtn.addEventListener("click", function (event) {
+    registerSubmitBtn.addEventListener("click", async function (event) {
       event.preventDefault();
-      useRegister();
-      registerModalInstance.hide();
+      await useRegister(registerModalInstance);
     });
     registerSubmitBtnAdded = true; // Marcar que el event listener se ha agregado
   }
@@ -223,14 +275,31 @@ function generateProfileDiv(user) {
                   <div class="row mx-auto my-auto">
                     <p class="role">${user.role}</p>
                   </div>
+                  <button type="submit" class="btn btn-danger" id="logoutBtn">
+                    Cerrar Sesion
+                  </button>
                 </div>
               </div>
             </div>
           </div>`;
+  
+}
+
+function logout(){
+  let logoutSubmitBtn = document.getElementById("logoutBtn");
+  logoutSubmitBtn.addEventListener("click", async function (event) {
+    event.preventDefault();
+    await fetchRequest(
+      `${API_ENDPOINT}/user/logout`,
+      "DELETE",
+      null,
+      'include'
+    );
+    window.location.href = "/"; 
+  });
 }
 
 export default async function loadProfile() {
-  if (checkSessionCookie()) {
     document.getElementById("content").innerHTML = getRowHTML();
     const divElement = document.getElementById("categories");
 
@@ -239,5 +308,5 @@ export default async function loadProfile() {
 
     const user = sessionCookieValue();
     divElement.innerHTML = generateProfileDiv(user);
-  } else appendLoginModal();
+    logout();
 }

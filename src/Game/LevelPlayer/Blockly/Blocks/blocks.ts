@@ -2,6 +2,7 @@
 import action_blocks from "./blocks_action";
 import loop_blocks from "./blocks_loops";
 import logic_blocks from "./blocks_logic"
+import variable_blocks from "./variable_blocks"
 
 export default [
     {
@@ -14,5 +15,6 @@ export default [
     },
     ...action_blocks,
     ...loop_blocks,
-    ...logic_blocks
+    ...logic_blocks,
+    ...variable_blocks,
 ];

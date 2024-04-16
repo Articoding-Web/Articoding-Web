@@ -8,6 +8,7 @@ export class Player {
     private isAlive = true;
     private reachedExit = false;
     private collectedChests: number = 0;
+    private hasBounced = false;
 
     constructor(private sprite: Phaser.GameObjects.Sprite, private gridPhysics: GridPhysics, private tilePos: Phaser.Math.Vector2, private scaleFactor: number) {
         document.addEventListener("move", this.handleMove);
@@ -25,10 +26,10 @@ export class Player {
         if (this.gridPhysics.isBlockingDirection(this.getTilePos(), direction)) {
             this.startRunningAnimation(direction);
             this.bounceTween(direction);
+            this.hasBounced = true;
         } else {
             this.startRunningAnimation(direction);
             this.moveTween(direction);
-            this.gridPhysics.collide(this);
         }
     }
 
@@ -39,11 +40,13 @@ export class Player {
         
         this.updatePlayerTilePos(direction);
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.sprite.scene.tweens.add({
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION,
+            duration: config.MOVEMENT_ANIMDURATION / speedModifier,
             ease: "Sine.inOut",
             onComplete: this.stopMoving.bind(this)
         })
@@ -54,11 +57,13 @@ export class Player {
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = this.getPosition().add(movementDistance);
 
+        const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
+
         this.sprite.scene.tweens.add({
             targets: this.sprite,
             x: newPlayerPos.x,
             y: newPlayerPos.y,
-            duration: config.MOVEMENT_ANIMDURATION / 2,
+            duration: config.MOVEMENT_ANIMDURATION / 2 / speedModifier,
             ease: "Sine.inOut",
             yoyo: true,
             onComplete: this.stopMoving.bind(this)
@@ -69,17 +74,15 @@ export class Player {
         this.sprite.anims.play(direction);
     }
 
-    private stopAnimation() {
+    private stopMoving(): void {
         this.sprite.anims.stop();
 
         // Set new idle frame
         const animationManager = this.sprite.anims.animationManager;
         const standingFrame = animationManager.get(this.facingDirections[this.playerDir]).frames[0].frame.name;
         this.sprite.setFrame(standingFrame);
-    }
 
-    private stopMoving(): void {
-        this.stopAnimation();
+        this.gridPhysics.collide(this);
     }
 
     private updatePlayerTilePos(direction: Direction) {
@@ -103,7 +106,6 @@ export class Player {
         this.tilePos = tilePosition.clone();
     }
 
-    //TODO test @sanord8
     die() {
         this.sprite.scene.tweens.add({
             targets: this.sprite,
@@ -115,7 +117,6 @@ export class Player {
                 // nothing so far
             }
         });
-
     }
 
     getIsAlive(): Boolean {
@@ -145,5 +146,9 @@ export class Player {
     destroy() {
         document.removeEventListener("move", this.handleMove);
         this.sprite.destroy();
+    }
+
+    getHasBounced(): boolean { 
+        return this.hasBounced;
     }
 }
