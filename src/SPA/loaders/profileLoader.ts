@@ -110,7 +110,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
 
   try{
     await fetchRequest(
-      `${API_ENDPOINT}/user/registro`,
+      `${API_ENDPOINT}/user/create`,
       "POST",
       JSON.stringify(postData)
     );
