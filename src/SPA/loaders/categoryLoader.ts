@@ -1,5 +1,6 @@
 import { route } from "../../client";
 import config from "../../Game/config.js";
+import localUtils from "../localStorage";
 import { fetchRequest, fillContent } from "../utils";
 import { sessionCookieValue } from "./profileLoader";
 
@@ -53,21 +54,17 @@ function generateCategoryLevelsDivPlaceholder() {
  * @returns String of HTMLDivElement
  */
 async function generateLevelDiv(level) {
-  if (!level || !level.statistics) {
+  if (!level) {
     throw new Error("Invalid level data");
   }
 
-  const { id, miniature, title, description = "Blockleap level" } = level;
-  const { stars, attempts, playable } = level.statistics;
-  const borderColorClass = playable ? 'success' : 'danger';
-  const anchorTag = playable ? `<a class="getLevel" href="${API_ENDPOINT}/level/${id}">` : '';
-  const endAnchorTag = playable ? '</a>' : '';
+  const { id, miniature, title, description = "Blockleap level", stars, attempts, playable } = level;
 
   return `
     <div class="col">
-      <div class="card mx-auto border-${borderColorClass} border-2">
-        ${anchorTag}
-          <div class="row g-0 text-dark">
+      <div class="card mx-auto border-2 ${playable ? '' : 'text-bg-dark'}">
+        ${playable ? `<a class="getLevel" href="${API_ENDPOINT}/level/${id}">` : ''}
+          <div class="row g-0 ${playable ? 'text-dark' : ''}">
             <div class="col-md-3">
               ${miniature ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">` : ""}
             </div>
@@ -75,7 +72,7 @@ async function generateLevelDiv(level) {
               <div class="card-body">
                 <div class="row row-cols-1 row-cols-md-2">
                   <div class="col">
-                    <h5 class="card-title">${title}</h5>
+                    <h5 class="card-title">${playable ? '<i class="bi bi-unlock-fill"></i>' : `<i class="bi bi-lock-fill"></i>`} ${title}</h5>
                     <p class="card-text">${description}</p>
                   </div>
                   <div class="col align-self-center text-md-end">
@@ -90,7 +87,7 @@ async function generateLevelDiv(level) {
               </div>
             </div>
           </div>
-        ${endAnchorTag}
+        ${playable ? '</a>' : ''}
       </div>
     </div>
   `;
@@ -157,58 +154,70 @@ export default async function loadCategoryById(id: string) {
   const divElement = document.getElementById("categories");
 
   // Load placeholders
-  await fillContent(
-    divElement,
-    new Array(10),
-    generateCategoryLevelsDivPlaceholder
-  );
+  await fillContent(divElement, new Array(10), generateCategoryLevelsDivPlaceholder);
 
-  const levels = await fetchRequest(
-    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
-    "GET"
-  );
+  const levels = await fetchRequest(`${API_ENDPOINT}/level/levelsByCategory/${id}`, "GET");
 
   const cookie = sessionCookieValue();
 
   let statistics = [];
   if (cookie !== null) {
-    statistics = await fetchRequest(
-      `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
-      "GET"
-    );
+    // Get statistics from server
+    statistics = await fetchRequest(`${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`, "GET");
+  } else {
+    // Unlock categories
+    levels.forEach((level, index) => {
+      let stats = localUtils.getLevel(id, level.id);
+      if (stats === null) {
+        stats = {
+          id: level.id,
+          stars: 0,
+          attempts: 0,
+          playable: level.id === 1 ? true : false
+        }
+
+        localUtils.setLevel(id, statistics[index]);
+      }
+
+      // Append to level data
+      levels[index] = { ...level, ...stats };
+    });
+
+    console.log(levels);
   }
 
-  // Map statistics to include the playable attribute
-  statistics = statistics.map((statistic, index) => {
-    // The first level of each category is considered playable
-    const isPlayable = index === 0 || statistics[index - 1].stars > 0;
-    return {
-      ...statistic,
-      playable: isPlayable,
-    };
-  });
+  // // Map statistics to include the playable attribute
+  // statistics = levels.map((level, index) => {
+  //   const statistic = statistics[index];
+  //   // The first level of each category is considered playable or if previous level has star
+  //   const isPlayable = index === 0 || statistics[index - 1]?.stars > 0 || levels[index - 1]?.stars > 0;
+  //   return {
+  //     ...statistic,
+  //     playable: isPlayable,
+  //   };
+  // });
 
-  const statisticsMap = statistics.reduce((map, statistic) => {
-    map[statistic.level] = {
-      stars: statistic.stars,
-      attempts: statistic.attempts,
-      playable: statistic.playable,
-    };
-    return map;
-  }, {});
+  // const statisticsMap = statistics.reduce((map, statistic) => {
+  //   map[statistic.level] = {
+  //     stars: statistic.stars,
+  //     attempts: statistic.attempts,
+  //     playable: statistic.playable,
+  //   };
+  //   return map;
+  // }, {});
 
-  const levelsWithStatistics = levels.map((level, index) => {
-    const levelId = level.id;
-    const statistic = statisticsMap[levelId];
-    const previousStatistic = index > 0 ? statisticsMap[levels[index - 1].id] : null;
-    const isPlayable: boolean = previousStatistic == null ? false : previousStatistic.stars > 0;
-    return {
-      ...level,
-      statistics: statistic || { stars: 0, attempts: 0, playable: isPlayable },
-    };
-  });
+  // const levelsWithStatistics = levels.map((level, index) => {
+  //   const levelId = level.id;
+  //   const statistic = statisticsMap[levelId];
+  //   const previousStatistic = index > 0 ? statisticsMap[levels[index - 1].id] : null;
+  //   const isPlayable: boolean = previousStatistic == null ? false : previousStatistic.stars > 0;
+  //   return {
+  //     ...level,
+  //     statistics: statistic || { stars: 0, attempts: 0, playable: isPlayable },
+  //   };
+  // });
 
-  await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+  await fillContent(divElement, levels, generateLevelDiv);
 
   // Add getLevel event listener
   document.querySelectorAll("a.getLevel").forEach((level) => {

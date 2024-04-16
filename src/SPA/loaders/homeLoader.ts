@@ -47,39 +47,22 @@ function generateCategoryDivPlaceholder() {
  * @returns String of HTMLDivElement
  */
 async function generateCategoryDiv(category) {
-let categoryHTML =  `<div class="col">
-                        <div class="card mx-auto border-success border-2 d-flex flex-column h-100">`;
+  let categoryHTML = `<div class="col">
+                        <div class="card mx-auto border-2 d-flex flex-column h-100 ${category.playable ? '' : 'text-bg-dark'}">
+                          ${category.playable ? `<a class="category" href="category/${category.id}">` : ''}
+                            <h5 class="card-header card-title ${category.playable ? 'text-dark' : ''}">
+                            ${category.playable ? '<i class="bi bi-unlock-fill"></i>': `<i class="bi bi-lock-fill"></i>`} ${category.name}
+                            </h5>
+                            <div class="card-body ${category.playable ? 'text-dark' : ''}">
+                              <h6 class="card-subtitle mb-2 ${category.playable ? 'text-muted' : ''}">
+                                Levels: ${category.count}
+                              </h6>
+                              ${category.description}
+                            </div>
+                          ${category.playable ? '</a>' : ''}
+                        </div>
+                      </div>`;
 
-  // Conditionally include the anchor tag based on the playable field
-  if (category.playable) {
-    categoryHTML += `<a class="category" href="category/${category.id}">`;
-  }
-
-  categoryHTML +=  `<h5 class="card-header card-title text-dark">
-                      ${category.name}
-                    </h5>
-                    <div class="card-body text-dark">
-                      <h6 class="card-subtitle mb-2 text-muted">
-                        Levels: ${category.count}
-                      </h6>
-                      ${category.description}
-                    </div>
-                    ${category.playable ? '</a>' : ''}
-                  </div>
-                </div>`;
-
-  if (sessionCookieValue()) {
-    if (!category.playable) {
-      // If the previous category is not completed, paint the category in another color
-      categoryHTML = categoryHTML.replace('border-success', 'border-danger');
-    }
-  }
-  else {
-    // if (!localUtils.canPlayCategory(category.id)) {
-    //   // If the previous category is not completed, paint the category in another color
-    //   categoryHTML = categoryHTML.replace('border-success', 'border-danger');
-    // }
-  }
 
   return categoryHTML;
 }
@@ -109,20 +92,25 @@ export default async function loadHome() {
 
   const id: number | null = sessionCookieValue()?.id || null;
 
-  const categories = await fetchRequest(
-    `${API_ENDPOINT}/level/categories?user=${id}`,
-    "GET"
-  );
+  const categories = await fetchRequest( `${API_ENDPOINT}/level/categories?user=${id}`, "GET");
 
   // Maintain the categories for the user without session
-  if (!sessionCookieValue) {
-    categories.forEach(category => {
-      const addition = { id: category.id };
-      localUtils.setCategory(`${category.id}`, addition);
+  if (!sessionCookieValue()) {
+    let highestCat = localUtils.getHighestCategory();
+    if(highestCat == null) {
+      // First time playing, unlock cat 1
+      highestCat = 1;
+      localUtils.setHighestCategory(highestCat);
+    }
+
+    // Unlock categories
+    categories.forEach(category => {      
+      if(category.id <= highestCat) 
+        category.playable = true;
+      else
+        category.playable = false;
     });
   }
-
-  console.log("CATEGORÍAS:", await localUtils.getAllCategories());
 
   await fillContent(divElement, categories, generateCategoryDiv);
 

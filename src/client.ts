@@ -4,7 +4,7 @@ import {
   appendLoginModal,
   checkSessionCookie,
 } from './SPA/loaders/profileLoader';
-import initLogger from './SPA/logger';
+import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
 import localUtils from "./SPA/localStorage";
@@ -49,9 +49,7 @@ function setNavbarListeners() {
   document.getElementById("community").addEventListener("click", (e: MouseEvent) => routeIfNewPath("/community", e));
 
   // Profile
-  document
-    .getElementById("profile")
-    .addEventListener("click", (e: MouseEvent) => {
+  document.getElementById("profile").addEventListener("click", (e: MouseEvent) => {
       if (!checkSessionCookie()) {
         appendLoginModal();
       } else {
