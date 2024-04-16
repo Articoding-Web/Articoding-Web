@@ -57,20 +57,20 @@ class XAPISingleton {
           max: 3
         },
         extensions: {
-          "https://articoding.e-ucm.es/exts/minimumBlocks": true, //TODO
-          "https://articoding.e-ucm.es/exts/blocksUsed": 3, //TODO
-          "https://articoding.e-ucm.es/exts/gameVelocity": speed,
-          "https://articoding.e-ucm.es/exts/attemptsUntilWin": attempts,
+          "https://articoding.e-ucm.es/exts/minimum-blocks": true, //TODO
+          "https://articoding.e-ucm.es/exts/blocks-used": 3, //TODO
+          "https://articoding.e-ucm.es/exts/game-velocity": speed,
+          "https://articoding.e-ucm.es/exts/attempts-until-win": attempts,
           "https://articoding.e-ucm.es/exts/bounced": playerBounced,
-          "https://articoding.e-ucm.es/exts/totalOfficialLevels": totalLevels,
-          "https://articoding.e-ucm.es/exts/userLevelsCompleted": userLevels,
-          "https://articoding.e-ucm.es/exts/clicksStopBtn": clickStopBtn,
+          "https://articoding.e-ucm.es/exts/total-official-levels": totalLevels,
+          "https://articoding.e-ucm.es/exts/user-levels-completed": userLevels,
+          "https://articoding.e-ucm.es/exts/clicks-stop-btn": clickStopBtn,
           "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },
       context: {
         extensions: {
-          "https://articoding.e-ucm.es/exts/gameVersion": config.GAME_VERSION
+          "https://articoding.e-ucm.es/exts/game-version": config.GAME_VERSION
         }
       }
     }
@@ -99,19 +99,19 @@ class XAPISingleton {
       result: {
         success: false,
         extensions: {
-          "https://articoding.e-ucm.es/exts/blocksUsed": 3, //TODO
-          "https://articoding.e-ucm.es/exts/gameVelocity": speed,
-          "https://articoding.e-ucm.es/exts/nAttempt": attempt,
+          "https://articoding.e-ucm.es/exts/blocks-used": 3, //TODO
+          "https://articoding.e-ucm.es/exts/game-velocity": speed,
+          "https://articoding.e-ucm.es/exts/index-attempt": attempt,
           "https://articoding.e-ucm.es/exts/bounced": playerBounced,
-          "https://articoding.e-ucm.es/exts/totalOfficialLevels": totalLevels,
-          "https://articoding.e-ucm.es/exts/userLevelsCompleted": userLevels,
-          "https://articoding.e-ucm.es/exts/clicksStopBtn": clickStopBtn,
+          "https://articoding.e-ucm.es/exts/total-official-levels": totalLevels,
+          "https://articoding.e-ucm.es/exts/user-levels-completed": userLevels,
+          "https://articoding.e-ucm.es/exts/clicks-stop-Btn": clickStopBtn,
           "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },
       "context": {
         "extensions": {
-          "https://articoding.e-ucm.es/gameVersion": config.GAME_VERSION
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
         }
       }
     }
@@ -138,12 +138,14 @@ class XAPISingleton {
       },
       context: {
         extensions: {
-          "https://articoding.e-ucm.es/gameVersion": config.GAME_VERSION
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
         }
       }
     }
     return myStatement;
   }
+
+  
 
 }
 

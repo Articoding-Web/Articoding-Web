@@ -30,10 +30,10 @@ export default class BlocklyController {
     Blockly.Events.BLOCK_DELETE,
     Blockly.Events.BLOCK_MOVE,
   ];
-
+  private static idsMap: Map<string, string> = new Map();
+  
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
-
     // onclick en vez de addEventListener porque las escenas no se cierran bien y el event listener no se elimina...
     BlocklyController.runCodeBtn = <HTMLElement>document.getElementById("runCodeBtn");
     // runCodeBtn.onclick = (ev: MouseEvent) => this.runCode();
@@ -49,6 +49,7 @@ export default class BlocklyController {
 
   private static createWorkspace(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     BlocklyController.workspace = Blockly.inject(container, { toolbox, maxInstances, zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2, pinch: true, }, });
+    this.idsMap.clear();
 
     // Initialize plugin.
     const zoomToFit = new ZoomToFitControl(this.workspace);
@@ -98,9 +99,38 @@ export default class BlocklyController {
       if (!this.blocklyEvents.includes(event.type)) return;
 
       this.code = this.generateCode();
+      if(event.type === "create"){
+        this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
+      }
+
+      let blockType = this.idsMap.get(event.blockId);  
+
+      if(event.type === "delete"){
+        const eventDelete = event as Blockly.Events.BlockDelete;
+        const blocksDeletedArray = eventDelete.ids.map(clave => this.idsMap.get(clave));
+        const deletedBlocks = blocksDeletedArray.join("-");
+        console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ deletedBlocks:", deletedBlocks)
+
+      }else if(event.type === "move"){
+        if(!this.idsMap.has(event.blockId)){
+          this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
+          blockType = this.idsMap.get(event.blockId)
+        }
+        const eventMove = event as Blockly.Events.BlockMove;
+        let moveActions = "initialize";
+        if (eventMove.reason !== undefined && eventMove.reason !== null) {
+          moveActions = eventMove.reason.join("-");
+        }
+        console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ moveActions:", moveActions);
+      }else if(event.type === "change"){
+        const eventChange = event as Blockly.Events.BlockChange;
+        const name = eventChange.name;
+        const newValue = eventChange.newValue;
+        const oldValue = eventChange.oldValue;
+      }
+
       console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ event:", event)      
-      const block = this.workspace.getBlockById(event.blockId);
-      console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ block:", block)
+      console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ block:", blockType)
     });
   }
 
