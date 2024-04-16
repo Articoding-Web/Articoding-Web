@@ -1,58 +1,72 @@
 var localStorage: Storage;
 
+interface Category {
+    id: number;
+}
+
+interface Level {
+    id: number;
+    category: number;
+}
+
 interface Play {
-    user: number;
     level: number;
     stars: number;
     attempts: number;
-    category: number;
+    playable: boolean;
 }
 
 const localUtils = {
     async init() {
         localStorage = window.localStorage;
+        console.log("Initialized");
+    },
+
+    async setCategory(category: string, value: Category) {
+        localStorage.setItem(category, JSON.stringify(value));
+    },
+
+    async getCategory(key: string): Promise<Play[] | null> {
+        const stored = localStorage.getItem(key);
+        if (stored) return JSON.parse(stored);
+        return null;
+    },
+
+    async setLevel(level: string, value: Level) {
+        localStorage.setItem(level, JSON.stringify(value));
+    },
+
+    async getLevel(key: string): Promise<Level[] | null> {
+        const stored = localStorage.getItem(key);
+        if (stored) return JSON.parse(stored);
+        return null;
     },
     
     async setPlay(key: string, value: Play[]) {
-        // Convert the value array to a string before storing
         const serializedValue = JSON.stringify(value);
         localStorage.setItem(key, serializedValue);
     },
     
     async getPlay(key: string): Promise<Play[] | null> {
-        // Retrieve the stored string value from localStorage
         const serializedValue = localStorage.getItem(key);
-    
-        if (serializedValue) {
-            // If a value is found, parse it back into an array of Play objects
-            const parsedValue = JSON.parse(serializedValue);
-            return parsedValue;
-        } else {
-            // If no value is found for the specified key, return null
-            return null;
-        }
+        if (serializedValue) return JSON.parse(serializedValue);
+        return null;
     },
-    
-    async getAllPlaysForCategory(category: string): Promise<Play[]> {
-        const keys = Object.keys(localStorage);
-        const playsForCategory: Play[] = [];
-    
-        for (const key of keys) {
-            const value = await this.getPlay(key);
-            if (value) {
-                const levelsInCategory = value.filter(play => play.category === category);
-                playsForCategory.push(...levelsInCategory);
+
+    async getAllCategories(): Promise<Category[]> {
+        const categories: Category[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            console.log("Key:", key); // Debug statement
+            if (key && !isNaN(parseInt(key))) { // Check if the key is a number
+                const category = this.getCategory(key);
+                categories.push(category);
             }
         }
-    
-        return playsForCategory;
-    },
-    
-    async hasPassedCategory(category: string, threshold: number): Promise<boolean> {
-        const playsForCategory = await this.getAllPlaysForCategory(category);
-        // check if all levels in the category have been passed
-        return playsForCategory.every(play => play.stars >= threshold);
+        console.log("All Categories:", categories); // Debug statement
+        return categories;
     }
+
 };
 
 export default localUtils;

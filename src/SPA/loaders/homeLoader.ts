@@ -50,7 +50,7 @@ async function generateCategoryDiv(category) {
 let categoryHTML =  `<div class="col">
                         <div class="card mx-auto border-success border-2 d-flex flex-column h-100">`;
 
-  // Conditionally include the anchor tag based on the 'playable' field
+  // Conditionally include the anchor tag based on the playable field
   if (category.playable) {
     categoryHTML += `<a class="category" href="category/${category.id}">`;
   }
@@ -75,10 +75,10 @@ let categoryHTML =  `<div class="col">
     }
   }
   else {
-    if (!localUtils.hasPassedCategory(category.id, category.count)) {
-      // If the previous category is not completed, paint the category in another color
-      categoryHTML = categoryHTML.replace('border-success', 'border-danger');
-    }
+    // if (!localUtils.canPlayCategory(category.id)) {
+    //   // If the previous category is not completed, paint the category in another color
+    //   categoryHTML = categoryHTML.replace('border-success', 'border-danger');
+    // }
   }
 
   return categoryHTML;
@@ -107,14 +107,22 @@ export default async function loadHome() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
-  const cookie = sessionCookieValue();
-
-  if (!cookie) cookie.id = null;
+  const id: number | null = sessionCookieValue()?.id || null;
 
   const categories = await fetchRequest(
-    `${API_ENDPOINT}/level/categories?user=${cookie.id}`,
+    `${API_ENDPOINT}/level/categories?user=${id}`,
     "GET"
   );
+
+  // Maintain the categories for the user without session
+  if (!sessionCookieValue) {
+    categories.forEach(category => {
+      const addition = { id: category.id };
+      localUtils.setCategory(`${category.id}`, addition);
+    });
+  }
+
+  console.log("CATEGORÍAS:", await localUtils.getAllCategories());
 
   await fillContent(divElement, categories, generateCategoryDiv);
 
