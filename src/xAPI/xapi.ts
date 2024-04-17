@@ -144,7 +144,7 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static changeStatusBlockStatement(userName: string, blockType : string, 
+  public static changeStatusBlockStatement(levelId : string, userName: string, blockType : string, 
     name : string, oldValue: string, newValue: string){
     const myStatement: Statement = {
       actor: {
@@ -162,6 +162,7 @@ class XAPISingleton {
         definition: {
           type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
           extensions: {
+            "https://articoding.e-ucm.es/exts/level-id": levelId,
             "https://articoding.e-ucm.es/exts/name": name,
             "https://articoding.e-ucm.es/exts/old-value": oldValue,
             "https://articoding.e-ucm.es/exts/new-value”": newValue,
@@ -177,7 +178,7 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static deleteBlockStatement(userName: string, blockType : string, deletedBlocks : string){
+  public static deleteBlockStatement(levelId : string, userName: string, blockType : string, deletedBlocks : string){
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -194,6 +195,7 @@ class XAPISingleton {
         definition: {
           type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
           extensions: {
+            "https://articoding.e-ucm.es/exts/level-id": levelId,
             "https://articoding.e-ucm.es/exts/deleted-blocks": deletedBlocks,
           }
         }
@@ -207,7 +209,7 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static moveBlockStatement(userName: string, blockType : string, moveActions : string){
+  public static moveBlockStatement(levelId : string, userName: string, blockType : string, moveActions : string){
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -224,6 +226,7 @@ class XAPISingleton {
         definition: {
           type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
           extensions: {
+            "https://articoding.e-ucm.es/exts/level-id": levelId,
             "https://articoding.e-ucm.es/exts/move-actions": moveActions,
           }
         }

@@ -111,14 +111,15 @@ export default class BlocklyController {
       this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
     }
     let userName = getUserName();
-
+    const urlParams = new URLSearchParams(window.location.search);
+    const levelId = urlParams.get('id');
     let blockType = this.idsMap.get(event.blockId);  
     let statement : Statement = null;
     if(event.type === "delete"){
       const eventDelete = event as Blockly.Events.BlockDelete;
       const blocksDeletedArray = eventDelete.ids.map(clave => this.idsMap.get(clave));
       const deletedBlocks = blocksDeletedArray.join("-");
-      statement = XAPISingleton.deleteBlockStatement(userName, blockType, deletedBlocks);
+      statement = XAPISingleton.deleteBlockStatement(levelId, userName, blockType, deletedBlocks);
     }else if(event.type === "move"){
       if(!this.idsMap.has(event.blockId)){
         this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
@@ -129,7 +130,7 @@ export default class BlocklyController {
       if (eventMove.reason !== undefined && eventMove.reason !== null) {
         moveActions = eventMove.reason.join("-");
       }
-      statement = XAPISingleton.moveBlockStatement(userName, blockType, moveActions);
+      statement = XAPISingleton.moveBlockStatement(levelId, userName, blockType, moveActions);
     }else if(event.type === "change"){
       const eventChange = event as Blockly.Events.BlockChange;
       const name = eventChange.name;
@@ -140,7 +141,7 @@ export default class BlocklyController {
         newValue = JSON.parse(JSON.stringify(eventChange.newValue));
       if(eventChange.oldValue !== undefined && eventChange.oldValue !== undefined)
         oldValue = JSON.parse(JSON.stringify(eventChange.oldValue));
-      statement = XAPISingleton.changeStatusBlockStatement(userName, blockType, name, oldValue, newValue);
+      statement = XAPISingleton.changeStatusBlockStatement(levelId, userName, blockType, name, oldValue, newValue);
     }
     console.log("🚀 ~ BlocklyController ~ blockyxAPI ~ statement:", statement)    
     if(statement !== null)
