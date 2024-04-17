@@ -27,5 +27,9 @@ export default abstract class ArticodingSprite extends Phaser.GameObjects.Sprite
     }
   }
 
+  getId(): string {
+    return this.id;
+  }
+  
   abstract collide(player: Player): void;
 }

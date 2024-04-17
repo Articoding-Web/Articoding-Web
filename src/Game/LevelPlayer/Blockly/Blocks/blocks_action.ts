@@ -1,6 +1,48 @@
 export default [
     // Movement Block
     {
+        "type": "movement_id",
+        "message0": "move the frog %1 a number %2 of blocks %3",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "ID",
+                "check": "String"
+            },
+            {
+                "type": "input_value",
+                "name": "TIMES"
+            },
+            {
+                "type": "field_dropdown",
+                "name": "DIRECTION",
+                "options": [
+                    [
+                        "up",
+                        "UP"
+                    ],
+                    [
+                        "down",
+                        "DOWN"
+                    ],
+                    [
+                        "left",
+                        "LEFT"
+                    ],
+                    [
+                        "right",
+                        "RIGHT"
+                    ]
+                ]
+            }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#745ba5",
+        "tooltip": "Moves the player with a given id in the specified direction",
+        "helpUrl": ""
+    },
+    {
         "type": "movement",
         "message0": "move %1 blocks %2",
         "args0": [

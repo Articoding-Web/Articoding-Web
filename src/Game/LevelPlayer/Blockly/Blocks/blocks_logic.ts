@@ -4,7 +4,7 @@ export default [
     message0: "if %1",
     args0: [
       {
-        type: "input_value",
+        type: "input_s",
         name: "CONDITION",
       },
     ],
