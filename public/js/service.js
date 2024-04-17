@@ -1,7 +1,5 @@
 "use strict";
 
-const logger = require("../logger");
-
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
@@ -12,18 +10,18 @@ const registerServiceWorker = async () => {
         }
       );
       window.addEventListener("load", function () {
-        logger.info("Loading page");
+        console.info("Loading page");
         navigator.serviceWorker.controller.postMessage("clean");
       });
       if (registration.installing) {
-        logger.info("Service worker installing");
+        console.info("Service worker installing");
       } else if (registration.waiting) {
-        logger.info("Service worker installed");
+        console.info("Service worker installed");
       } else if (registration.active) {
-        logger.info("Service worker active");
+        console.info("Service worker active");
       }
     } catch (error) {
-      logger.error(`Registration failed with ${error}`);
+      console.error(`Registration failed with ${error}`);
     }
   }
 };

@@ -1,7 +1,5 @@
 "use strict";
 
-const logger = require("./logger");
-
 const API_ENDPOINT = "http://localhost:3001/api/";
 
 var version = "1.0.9";
@@ -14,13 +12,13 @@ var store = [steady, levels];
 var limit = 2;
 
 const addResourcesToCache = async (resources) => {
-  logger.info("Add resources to cache");
+  console.info("Add resources to cache");
   const cache = await caches.open(steady);
   await cache.addAll(resources);
 };
 
 const putInCache = async (request, response) => {
-  logger.info("Put in cache");
+  console.info("Put in cache");
   let substring = API_ENDPOINT + "level/";
   if (request.url.startsWith(substring)) {
     const id = request.url.replace(substring, "");
@@ -33,7 +31,7 @@ const putInCache = async (request, response) => {
 };
 
 const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
-  logger.info("Cache first");
+  console.info("Cache first");
 
   if (request.cache === "only-if-cached" && request.mode !== "same-origin")
     return;
@@ -47,7 +45,7 @@ const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
   // next try to use the preloaded response, if it's there
   const preloadResponse = await preloadResponsePromise;
   if (preloadResponse) {
-    logger.info("Using preload response", preloadResponse);
+    console.info("Using preload response", preloadResponse);
     putInCache(request, preloadResponse.clone());
     return preloadResponse;
   }
@@ -61,7 +59,7 @@ const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
     putInCache(request, responseFromNetwork.clone());
     return responseFromNetwork;
   } catch (error) {
-    logger.info("Intento cargar el offline");
+    console.info("Intento cargar el offline");
     const fallbackResponse = await caches.match(fallbackUrl);
     if (fallbackResponse) {
       return fallbackResponse;
@@ -87,7 +85,7 @@ var trimCache = function (key, maximum) {
       if (keys.length <= maximum) return;
       cache.delete(keys[0]).then(function () {
         trimCache(key, maximum);
-        logger.warn("Deleted level:", keys[0]);
+        console.warn("Deleted level:", keys[0]);
       });
     });
   });
@@ -118,7 +116,7 @@ self.addEventListener("activate", (event) => {
               return !store.includes(key);
             })
             .map(function (key) {
-              logger.warn("Cache deleted:", key);
+              console.warn("Cache deleted:", key);
               return caches.delete(key);
             })
         );
