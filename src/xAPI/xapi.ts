@@ -1,6 +1,5 @@
 import XAPI, { Statement } from "@xapi/xapi";
 import config from "../Game/config";
-
 class XAPISingleton {
 
   private static instance: XAPI | null = null;
@@ -118,7 +117,7 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static screenAccessedStament(userName: string, url: string){
+  public static screenAccessedStatement(userName: string, url: string){
     const myStatement: Statement = {
       actor: {
         objectType: "Agent",
@@ -145,8 +144,98 @@ class XAPISingleton {
     return myStatement;
   }
 
-  
+  public static changeStatusBlockStatement(userName: string, blockType : string, 
+    name : string, oldValue: string, newValue: string){
+    const myStatement: Statement = {
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "http://adlnet.gov/expapi/verbs/interacted"
+      },
+      object: {
+        id: "https://articoding.e-ucm.es/activity/change-state-block",
+        definition: {
+          type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
+          extensions: {
+            "https://articoding.e-ucm.es/exts/name": name,
+            "https://articoding.e-ucm.es/exts/old-value": oldValue,
+            "https://articoding.e-ucm.es/exts/new-value”": newValue,
+          }
+        }
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
 
+  public static deleteBlockStatement(userName: string, blockType : string, deletedBlocks : string){
+    const myStatement: Statement = {
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "http://adlnet.gov/expapi/verbs/interacted"
+      },
+      object: {
+        id: "https://articoding.e-ucm.es/activity/delete-block",
+        definition: {
+          type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
+          extensions: {
+            "https://articoding.e-ucm.es/exts/deleted-blocks": deletedBlocks,
+          }
+        }
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
+
+  public static moveBlockStatement(userName: string, blockType : string, moveActions : string){
+    const myStatement: Statement = {
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "http://adlnet.gov/expapi/verbs/interacted"
+      },
+      object: {
+        id: "https://articoding.e-ucm.es/activity/move-block",
+        definition: {
+          type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
+          extensions: {
+            "https://articoding.e-ucm.es/exts/move-actions": moveActions,
+          }
+        }
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
 }
 
 export default XAPISingleton;

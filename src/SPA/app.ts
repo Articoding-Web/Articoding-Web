@@ -12,7 +12,7 @@ export async function setPageHome() {
   loadHome();
 }
 
-function getUserName(): string{
+export function getUserName(): string{
   const cookie = sessionCookieValue();
   let userName = "nl";
   if (cookie !== null) {
@@ -26,7 +26,7 @@ export async function setPageOfficalCategoryById(params: URLSearchParams) {
   const idCategory = params.get("id") 
   let urlCategory = `category?id=${idCategory}`;
   loadCategoryById(idCategory);
-  let statement = XAPISingleton.screenAccessedStament(userName, urlCategory);
+  let statement = XAPISingleton.screenAccessedStatement(userName, urlCategory);
   await XAPISingleton.sendStatement(statement);
 }
 
@@ -34,7 +34,7 @@ export async function setPageLevelPlayer(params: URLSearchParams) {
   let userName = getUserName();
   const idLevel = params.get("id") 
   let urlLevel = `level?id=${idLevel}`;
-  let statement = XAPISingleton.screenAccessedStament(userName, urlLevel);
+  let statement = XAPISingleton.screenAccessedStatement(userName, urlLevel);
   await XAPISingleton.sendStatement(statement);
   playLevelById(idLevel);
 }
@@ -42,20 +42,20 @@ export async function setPageLevelPlayer(params: URLSearchParams) {
 export async function setPageLevelEditor(levelId?: number) {
   let userName = getUserName();
   loadLevelEditor();
-  let statement = XAPISingleton.screenAccessedStament(userName, URL_EDITOR);
+  let statement = XAPISingleton.screenAccessedStatement(userName, URL_EDITOR);
   await XAPISingleton.sendStatement(statement);
 }
 
 export async function setPageCommunity() {
   let userName = getUserName();
   loadCommunity();
-  let statement = XAPISingleton.screenAccessedStament(userName, URL_COMMUNITY);
+  let statement = XAPISingleton.screenAccessedStatement(userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
 }
 
 export async function setPageProfile() {
   let userName = getUserName();
   loadProfile();
-  let statement = XAPISingleton.screenAccessedStament(userName, URL_PROFILE);
+  let statement = XAPISingleton.screenAccessedStatement(userName, URL_PROFILE);
   await XAPISingleton.sendStatement(statement);
 }

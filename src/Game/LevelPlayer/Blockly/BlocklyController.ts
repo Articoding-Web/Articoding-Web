@@ -12,7 +12,9 @@ import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 import { incrementStopCodeBtn } from "../../../SPA/Logger";
 import { Block } from "blockly";
 import Level from "../../level";
-
+import { Statement } from "@xapi/xapi";
+import { getUserName } from "../../../SPA/app";
+import XAPISingleton from "../../../xAPI/xapi";
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
 
@@ -99,39 +101,50 @@ export default class BlocklyController {
       if (!this.blocklyEvents.includes(event.type)) return;
 
       this.code = this.generateCode();
-      if(event.type === "create"){
-        this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
-      }
 
-      let blockType = this.idsMap.get(event.blockId);  
-
-      if(event.type === "delete"){
-        const eventDelete = event as Blockly.Events.BlockDelete;
-        const blocksDeletedArray = eventDelete.ids.map(clave => this.idsMap.get(clave));
-        const deletedBlocks = blocksDeletedArray.join("-");
-        console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ deletedBlocks:", deletedBlocks)
-
-      }else if(event.type === "move"){
-        if(!this.idsMap.has(event.blockId)){
-          this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
-          blockType = this.idsMap.get(event.blockId)
-        }
-        const eventMove = event as Blockly.Events.BlockMove;
-        let moveActions = "initialize";
-        if (eventMove.reason !== undefined && eventMove.reason !== null) {
-          moveActions = eventMove.reason.join("-");
-        }
-        console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ moveActions:", moveActions);
-      }else if(event.type === "change"){
-        const eventChange = event as Blockly.Events.BlockChange;
-        const name = eventChange.name;
-        const newValue = eventChange.newValue;
-        const oldValue = eventChange.oldValue;
-      }
-
-      console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ event:", event)      
-      console.log("🚀 ~ BlocklyController ~ this.workspace.addChangeListener ~ block:", blockType)
+      this.blockyxAPI(event);
     });
+  }
+
+  private static blockyxAPI(event: Blockly.Events.BlockBase){
+    if(event.type === "create"){
+      this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
+    }
+    let userName = getUserName();
+
+    let blockType = this.idsMap.get(event.blockId);  
+    let statement : Statement = null;
+    if(event.type === "delete"){
+      const eventDelete = event as Blockly.Events.BlockDelete;
+      const blocksDeletedArray = eventDelete.ids.map(clave => this.idsMap.get(clave));
+      const deletedBlocks = blocksDeletedArray.join("-");
+      statement = XAPISingleton.deleteBlockStatement(userName, blockType, deletedBlocks);
+    }else if(event.type === "move"){
+      if(!this.idsMap.has(event.blockId)){
+        this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
+        blockType = this.idsMap.get(event.blockId)
+      }
+      const eventMove = event as Blockly.Events.BlockMove;
+      let moveActions = "initialize";
+      if (eventMove.reason !== undefined && eventMove.reason !== null) {
+        moveActions = eventMove.reason.join("-");
+      }
+      statement = XAPISingleton.moveBlockStatement(userName, blockType, moveActions);
+    }else if(event.type === "change"){
+      const eventChange = event as Blockly.Events.BlockChange;
+      const name = eventChange.name;
+
+      let newValue = "none";
+      let oldValue = "none";
+      if(eventChange.newValue !== undefined && eventChange.newValue !== undefined)
+        newValue = JSON.parse(JSON.stringify(eventChange.newValue));
+      if(eventChange.oldValue !== undefined && eventChange.oldValue !== undefined)
+        oldValue = JSON.parse(JSON.stringify(eventChange.oldValue));
+      statement = XAPISingleton.changeStatusBlockStatement(userName, blockType, name, oldValue, newValue);
+    }
+    console.log("🚀 ~ BlocklyController ~ blockyxAPI ~ statement:", statement)    
+    if(statement !== null)
+      XAPISingleton.sendStatement(statement);
   }
 
   static highlightBlock(id: string | null) {
