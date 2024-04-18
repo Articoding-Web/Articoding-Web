@@ -1,31 +1,25 @@
-"use strict";
+"use strict"
 
-// Display a list of cached levels
-function display() {
-  caches.open(levels).then(function (cache) {
-    cache.keys().then(function (keys) {
-      // get the HTML element
-      let offline = document.querySelector("#content");
+const main = document.getElementById('principal');
+main.innerHTML=`<div><strong>Contenido dinámico OFFLINE</strong></div>`;
 
-      // Inject a list of URLs into the DOM
-      offline.innerHTML = `<ul>
-          ${keys
-            .map(function (key) {
-              // if the item isn't an HTML file, skip to the next one
-              // this is only needed if you're keeping everything in one cache
-              if (
-                !key.headers.get("Accept").includes("text/html") ||
-                key.url.includes("/offline")
-              )
-                return "";
-
-              // otherwise, create a list item with a link to the page
-              return `<li><a href="${key.url}">${key.url}</a></li>`;
-            })
-            .join("")}
-        </ul>`;
+(function () {
+    if (!navigator || !navigator.serviceWorker) return;
+    caches.keys().then(function (keys) {
+        return keys.filter(function (key) {
+            return key.includes('_levels');
+        }).forEach(function (key) {
+            const list = document.querySelector('#principal');
+            list.innerHTML = '';
+            caches.open(key).then(function (cache) {
+                cache.keys().then(function (keys) {
+                    list.innerHTML = "<ul>" +
+                            keys.map(function(key) {
+                                return '<li><a href="' + key.url + '">' + key.url + '</a></li>';
+                            }).join('')
+                            + "</ul>"
+                });
+            });
+        });
     });
-  });
-}
-
-display();
+})();

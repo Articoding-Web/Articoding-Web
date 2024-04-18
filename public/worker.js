@@ -2,7 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.9";
+var version = "1.0.5";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -10,6 +10,50 @@ var levels = version + "_levels";
 var store = [steady, levels];
 
 var limit = 2;
+
+const resources = [
+  "/",
+  "/client.js",
+  "/index.html",
+  "/offline.html",
+  "/css/bootstrap-icons.min.css",
+  "/css/bootstrap.min.css",
+  "/css/style.css",
+  "/css/fonts/bootstrap-icons.woff",
+  "/css/fonts/bootstrap-icons.woff2",
+  "/images/logo.png",
+  "/images/logo.ico",
+  "/images/profile.png",
+  "/assets/sprites/default/background.json",
+  "/assets/sprites/default/background.png",
+  "/assets/sprites/default/chest.png",
+  "/assets/sprites/default/door.json",
+  "/assets/sprites/default/door.png",
+  "/assets/sprites/default/enemy.json",
+  "/assets/sprites/default/enemy.png",
+  "/assets/sprites/default/exit.png",
+  "/assets/sprites/default/player.json",
+  "/assets/sprites/default/player.png",
+  "/assets/sprites/default/trap.json",
+  "/assets/sprites/default/trap.png",
+  "/assets/sprites/default/wall.png",
+  "/assets/ui/button_green_pressed.png",
+  "/assets/ui/button_green.png",
+  "/assets/ui/button_red_preseed.png",
+  "/assets/ui/button_red.png",
+  "/assets/ui/minus_pressed.png",
+  "/assets/ui/minus.png",
+  "/assets/ui/plus_pressed.png",
+  "/assets/ui/plus.png",
+  "/js/offline.js",
+  "/js/popper.min.js",
+  "/js/service.js",
+];
+
+const fallbackResourceUrls = {
+  'html': '/offline.html',
+  'image': '/images/logo.ico',
+}
 
 const addResourcesToCache = async (resources) => {
   console.info("Add resources to cache");
@@ -30,42 +74,40 @@ const putInCache = async (request, response) => {
   }
 };
 
-const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
-  console.info("Cache first");
+const cacheFirst = async ({ request }) => {
+  console.log("Cache first");
 
   if (request.cache === "only-if-cached" && request.mode !== "same-origin")
     return;
 
-  // first try to get the resource from the cache
+  // First try to get the resource from the cache
   const responseFromCache = await caches.match(request);
   if (responseFromCache) {
     return responseFromCache;
   }
 
-  // next try to use the preloaded response, if it's there
-  const preloadResponse = await preloadResponsePromise;
-  if (preloadResponse) {
-    console.info("Using preload response", preloadResponse);
-    putInCache(request, preloadResponse.clone());
-    return preloadResponse;
-  }
-
-  // next try to get the resource from the network
+  // Next try to get the resource from the network
   try {
     const responseFromNetwork = await fetch(request);
-    // response may be used only once
+    // Response may be used only once
     // we need to save clone to put one copy in cache
     // and serve second one
     putInCache(request, responseFromNetwork.clone());
     return responseFromNetwork;
   } catch (error) {
-    console.info("Intento cargar el offline");
+    console.log("Intento cargar el offline");
+    let fallbackType = request.destination;
+    if (fallbackType === 'document')
+      fallbackType = 'html';
+    else if (fallbackType === '')
+      fallbackType = 'html';
+    const fallbackUrl = fallbackResourceUrls[fallbackType];
     const fallbackResponse = await caches.match(fallbackUrl);
+    console.log("Fallback response:", fallbackResponse);
     if (fallbackResponse) {
       return fallbackResponse;
     }
-    // when even the fallback response is not available,
-    // there is nothing we can do, but we must always
+    // When even the fallback response is not available,
     // return a Response object
     return new Response("Network error happened", {
       status: 408,
@@ -91,21 +133,14 @@ var trimCache = function (key, maximum) {
   });
 };
 
-// Trim caches when clean message is posted
-self.addEventListener("message", function (event) {
-  if (event.data !== "clean") return;
-  trimCache(levels, 2);
+// Manage posted messages
+self.addEventListener("message", event => {
+  if (event.data === "skip") return skipWaiting();
+  if (event.data === "clean") trimCache(levels, 2);
 });
 
-const enableNavigationPreload = async () => {
-  if (self.registration.navigationPreload) {
-    await self.registration.navigationPreload.enable();
-  }
-};
-
 self.addEventListener("activate", (event) => {
-  event.waitUntil(enableNavigationPreload());
-  // remove old caches
+  // Remove old caches
   event.waitUntil(
     caches
       .keys()
@@ -128,44 +163,8 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("install", (event) => {
-  // activate right away
-  self.skipWaiting();
   event.waitUntil(
-    addResourcesToCache([
-      "./",
-      "./client.js",
-      "./index.html",
-      "./offline.html",
-      "./css/style.css",
-      "./css/bootstrap.min.css",
-      "./images/logo.png",
-      "./images/logo.ico",
-      "./images/profile.png",
-      "./assets/sprites/default/background.json",
-      "./assets/sprites/default/background.png",
-      "./assets/sprites/default/chest.png",
-      "./assets/sprites/default/door.json",
-      "./assets/sprites/default/door.png",
-      "./assets/sprites/default/enemy.json",
-      "./assets/sprites/default/enemy.png",
-      "./assets/sprites/default/exit.png",
-      "./assets/sprites/default/player.json",
-      "./assets/sprites/default/player.png",
-      "./assets/sprites/default/trap.json",
-      "./assets/sprites/default/trap.png",
-      "./assets/sprites/default/wall.png",
-      "./assets/ui/button_green_pressed.png",
-      "./assets/ui/button_green.png",
-      "./assets/ui/button_red_preseed.png",
-      "./assets/ui/button_red.png",
-      "./assets/ui/minus_pressed.png",
-      "./assets/ui/minus.png",
-      "./assets/ui/plus_pressed.png",
-      "./assets/ui/plus.png",
-      "./js/bootstrap.min.js",
-      "./js/offline.js",
-      "./js/service.js",
-    ])
+    addResourcesToCache(resources)
   );
 });
 
@@ -173,8 +172,6 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     cacheFirst({
       request: event.request,
-      preloadResponsePromise: event.preloadResponse,
-      fallbackUrl: "./offline.html",
     })
   );
 });
