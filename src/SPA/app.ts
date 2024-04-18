@@ -62,3 +62,6 @@ export async function setPageProfile() {
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_PROFILE);
   await XAPISingleton.sendStatement(statement);
 }
+export async function exitToCategory(categoryIndex: string) {
+  window.location.href = "/category?id=" + categoryIndex;//testing
+}
