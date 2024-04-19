@@ -4,10 +4,12 @@ import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
 import config from "../../Game/config";
 import Level from "../../Game/level";
+import Tour from "../webtour/TourController";
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let currentLevelJSON: Level.Level;
+let currentFromLevelEditor: boolean = false;
 
 /**
  *
@@ -33,6 +35,9 @@ function getLevelPlayerHTML(fromLevelEditor?: boolean) {
                         <button class="btn btn-warning" id="speedModifierBtn" value="1">
                             1x
                         </button>
+                        <button class="btn btn-light" id="levelPlayerTourBtn">
+                            <i class="bi bi-question"></i>
+                        </button>
                   </div>
               </div>
             </div>`;
@@ -51,21 +56,27 @@ function getEditButton(fromLevelEditor: boolean) {
 export default async function playLevelById(id: string) {
     let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
     loadLevel(JSON.parse(level.data));
+
+    if (id === "1") {
+        Tour.startIfNotFinished("LevelPlayer");
+    }
+
+    document.getElementById("levelPlayerTourBtn").onclick = () => { Tour.start("LevelPlayer") };
 }
 
 export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean) {
     document.getElementById("content").innerHTML = getLevelPlayerHTML(fromLevelEditor);
     currentLevelJSON = levelJSON;
+    fromLevelEditor === undefined ? fromLevelEditor = false : currentFromLevelEditor = fromLevelEditor;
 
     const toolbox = levelJSON.blockly.toolbox;
     const maxInstances = currentLevelJSON.blockly.maxInstances;
     const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
 
-    PhaserController.init("LevelPlayer", LevelPlayer, {levelJSON, fromLevelEditor});
+    PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON, fromLevelEditor });
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 
 export function restartCurrentLevel() {
-    const phaserJSON = currentLevelJSON.phaser;
-    PhaserController.init("LevelPlayer", LevelPlayer, phaserJSON);
+    PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON: currentLevelJSON, fromLevelEditor: currentFromLevelEditor });
 }

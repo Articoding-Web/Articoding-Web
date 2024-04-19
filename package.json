@@ -28,8 +28,10 @@
   },
   "dependencies": {
     "@blockly/zoom-to-fit": "^5.0.12",
+    "@sjmc11/tourguidejs": "^0.0.16",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
-    "ejs": "^3.1.9"
+    "ejs": "^3.1.9",
+    "rollup-plugin-postcss": "^4.0.2"
   }
 }

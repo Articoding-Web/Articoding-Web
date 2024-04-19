@@ -4,6 +4,7 @@ import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import json from '@rollup/plugin-json';
+import postcss from 'rollup-plugin-postcss';
 
 export default [
     {
@@ -24,6 +25,10 @@ export default [
         },
 
         plugins: [
+            postcss({
+                extract: true, // extract CSS to separate file
+                minimize: true, // minify CSS
+            }),
 
             //  Toggle the booleans here to enable / disable Phaser 3 features:
             replace({
@@ -34,7 +39,7 @@ export default [
                 'typeof EXPERIMENTAL': JSON.stringify(true),
                 'typeof PLUGIN_CAMERA3D': JSON.stringify(false),
                 'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
-                'typeof FEATURE_SOUND': JSON.stringify(true),
+                'typeof FEATURE_SOUND': JSON.stringify(true)
             }),
 
             // API Config

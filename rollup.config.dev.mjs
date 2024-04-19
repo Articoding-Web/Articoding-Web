@@ -4,6 +4,7 @@ import replace from "@rollup/plugin-replace";
 import serve from "rollup-plugin-serve";
 import typescript from "@rollup/plugin-typescript";
 import json from '@rollup/plugin-json';
+import postcss from 'rollup-plugin-postcss';
 
 export default [
   // Phaser
@@ -23,6 +24,11 @@ export default [
     },
 
     plugins: [
+      postcss({
+        extract: true, // extract CSS to separate file
+        minimize: true, // minify CSS
+      }),
+
       //  Toggle the booleans here to enable / disable Phaser 3 features:
       replace({
         preventAssignment: true,
@@ -32,7 +38,7 @@ export default [
         "typeof EXPERIMENTAL": JSON.stringify(true),
         "typeof PLUGIN_CAMERA3D": JSON.stringify(false),
         "typeof PLUGIN_FBINSTANT": JSON.stringify(false),
-        "typeof FEATURE_SOUND": JSON.stringify(true),
+        "typeof FEATURE_SOUND": JSON.stringify(true)
       }),
 
       // API Config
@@ -40,9 +46,9 @@ export default [
         preventAssignment: true,
         include: ['src/Game/config.ts'],
         values: {
-            'ENV_API_PROTOCOL': 'http',
-            'ENV_API_DOMAIN': 'localhost',
-            'ENV_API_PORT': '3001'
+          'ENV_API_PROTOCOL': 'http',
+          'ENV_API_DOMAIN': 'localhost',
+          'ENV_API_PORT': '3001'
         }
       }),
 

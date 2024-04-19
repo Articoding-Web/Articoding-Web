@@ -63,7 +63,7 @@ export default class BlocklyController {
 
     Blockly.defineBlocksWithJsonArray(blocks);
 
-    this.startBlock = this.workspace.newBlock("start");
+    this.startBlock = this.workspace.newBlock("start", "start");
     this.startBlock.initSvg();
     this.startBlock.render();
     this.startBlock.setDeletable(false);
@@ -73,7 +73,7 @@ export default class BlocklyController {
       offset += BLOCK_OFFSET;
 
       // Create block
-      const block = this.workspace.newBlock(workspaceBlock.id);
+      const block = this.workspace.newBlock(workspaceBlock.id, workspaceBlock.id);
       block.initSvg();
       block.render();
       block.moveBy(BLOCK_OFFSET, offset);
