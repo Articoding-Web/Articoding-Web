@@ -29,5 +29,5 @@ export async function setPageProfile() {
   loadProfile();
 }
 export async function exitToCategory(categoryIndex: string) {
-  window.location.href = "/category?id=" + categoryIndex;//testing
+  window.location.href = `/category?id=${categoryIndex}`;
 }
