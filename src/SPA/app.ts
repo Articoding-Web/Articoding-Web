@@ -63,5 +63,5 @@ export async function setPageProfile() {
   await XAPISingleton.sendStatement(statement);
 }
 export async function exitToCategory(categoryIndex: string) {
-  window.location.href = "/category?id=" + categoryIndex;//testing
+  window.location.href = `/category?id=${categoryIndex}`;
 }
