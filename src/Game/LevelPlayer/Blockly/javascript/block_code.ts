@@ -179,7 +179,21 @@ export function defineAllBlocks() {
   
     return JSON.stringify(code);
   });
-
+  
+  javascriptGenerator.forBlock["if_else_do"] = wrapBlockFunction("if_else_do", function (block: Block, generator: any) {
+    let condition = generator.valueToCode(block, "CONDITION", Order.NONE);
+    let events = `[`;
+    if(condition){
+      let doStatement = generator.statementToCode(block, "DO");
+      events += doStatement;
+    }
+    else{
+      let elseStatement = generator.statementToCode(block, "ELSE");
+      events += elseStatement;
+    }
+    events += "]";
+    return events;
+  });
   // Variable blocks
   javascriptGenerator.forBlock["variables_set"] = wrapBlockFunction("variables_set", function (block: Block, generator: any) {
     // Variable setter.
