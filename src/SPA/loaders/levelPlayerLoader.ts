@@ -50,22 +50,21 @@ function getEditButton(fromLevelEditor: boolean) {
  */
 export default async function playLevelById(id: string) {
     let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
-    loadLevel(JSON.parse(level.data),false,level.category);
+    loadLevel(JSON.parse(level.data), false, level.category);
 }
 
 export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean, category?: string) {
-    if(category){
-        document.getElementById("content").setAttribute("categoryIndex",category);
+    if (category) {
+        document.getElementById("content").setAttribute("categoryIndex", category);
     }
     document.getElementById("content").innerHTML = getLevelPlayerHTML(fromLevelEditor);
-    //document.getElementById("content").setAttribute("categoryIndex",)
     currentLevelJSON = levelJSON;
 
     const toolbox = levelJSON.blockly.toolbox;
     const maxInstances = currentLevelJSON.blockly.maxInstances;
     const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
 
-    PhaserController.init("LevelPlayer", LevelPlayer, {levelJSON, fromLevelEditor});
+    PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON, fromLevelEditor });
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 
