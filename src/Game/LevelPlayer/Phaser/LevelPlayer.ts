@@ -32,7 +32,7 @@ export default class LevelPlayer extends Phaser.Scene {
   private mapCoordY: number;
   private scaleFactor: number;
 
-  private players: Player[] = [];
+  private static players: Player[] = [];
   private objects: ArticodingSprite[] = [];
   private numChests = 0;
 
@@ -151,7 +151,7 @@ export default class LevelPlayer extends Phaser.Scene {
       this.scaleSprite(sprite, player.x, player.y);
       sprite.setDepth(this.playersLayerJson.depth);
 
-      this.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(player.x, player.y), this.scaleFactor));
+      LevelPlayer.players.push(new Player(sprite, this.gridPhysics, new Phaser.Math.Vector2(player.x, player.y), this.scaleFactor));
     }
 
     this.cameras.main.roundPixels = true;
@@ -274,8 +274,8 @@ export default class LevelPlayer extends Phaser.Scene {
     let hasLost = false;
     let playerBounced = false;
 
-    for (let x in this.players) {
-      const player = this.players[x];
+    for (let x in LevelPlayer.players) {
+      const player = LevelPlayer.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
         player.die();
         hasLost = true;
@@ -344,8 +344,8 @@ export default class LevelPlayer extends Phaser.Scene {
     if (this.fromLevelEditor)
       document.getElementById("editButton").removeEventListener("click", this.loadLevelEditor);
 
-    while (this.players.length) {
-      this.players.pop().destroy();
+    while (LevelPlayer.players.length) {
+      LevelPlayer.players.pop().destroy();
     }
 
     while (this.objects.length) {
@@ -362,6 +362,6 @@ export default class LevelPlayer extends Phaser.Scene {
   }
 
   getPlayers(): Player[] {
-    return this.players;
+    return LevelPlayer.players;
   }
 }

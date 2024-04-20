@@ -79,10 +79,10 @@ export function defineAllBlocks() {
   javascriptGenerator.forBlock["block_pos"] = wrapBlockFunction("block_pos", function (block: Block, generator: any) {
     let dropdown_direction = block.getFieldValue("DIRECTION");
     let blockType = block.getFieldValue("TYPE");
-    if(BlocklyController.checkPosition(dropdown_direction, blockType)){
-      return true;
-    } else{
-      return false;
+    if (BlocklyController.checkPosition(dropdown_direction, blockType)) {
+      return [true, Order.ATOMIC];
+    } else {
+      return [false, Order.ATOMIC];
     }
   });
   //number block:

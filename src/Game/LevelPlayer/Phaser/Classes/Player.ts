@@ -23,10 +23,29 @@ export class Player {
         const currentTilePos = this.getTilePos();
         let adjacentTilePos = this.gridPhysics.tilePosInDirection(currentTilePos, Direction[direction]);
         //esto es un poco sus
-        if (this.gridPhysics.getTileContent(adjacentTilePos) instanceof eval(type)){
-            return true;
+        switch (type) {
+            case "SPIKES":
+                if (this.gridPhysics.getTileContent(adjacentTilePos) instanceof TrapObject) {
+                    return true;
+                }
+                break;
+            case "SKELETON":
+                if (this.gridPhysics.getTileContent(adjacentTilePos) instanceof EnemyObject) {
+                    return true;
+                }
+                break;
+            case "WALL":
+                //en seguida lo hago
+                break;
+            case "FROG":
+                if (this.gridPhysics.getTileContent(adjacentTilePos) instanceof Player) {
+                    return true;
+                }
+                break;
+            default:
+                return false;
         }
-        else return false;
+        return false;
     }
     private movePlayer(direction: Direction): void {
         if (!this.isAlive || this.reachedExit)
@@ -46,7 +65,7 @@ export class Player {
         const pixelsToMove = config.TILE_SIZE * this.scaleFactor;
         const movementDistance = this.gridPhysics.getMovementDistance(direction, pixelsToMove);
         const newPlayerPos = this.getPosition().add(movementDistance);
-        
+
         this.updatePlayerTilePos(direction);
 
         const speedModifier = parseInt((document.getElementById("speedModifierBtn") as HTMLInputElement).value);
@@ -157,7 +176,7 @@ export class Player {
         this.sprite.destroy();
     }
 
-    getHasBounced(): boolean { 
+    getHasBounced(): boolean {
         return this.hasBounced;
     }
 }
