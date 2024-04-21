@@ -2,7 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.5";
+var version = "1.0.3";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -16,11 +16,8 @@ const resources = [
   "/client.js",
   "/index.html",
   "/offline.html",
-  "/css/bootstrap-icons.min.css",
   "/css/bootstrap.min.css",
   "/css/style.css",
-  "/css/fonts/bootstrap-icons.woff",
-  "/css/fonts/bootstrap-icons.woff2",
   "/images/logo.png",
   "/images/logo.ico",
   "/images/profile.png",
@@ -48,11 +45,15 @@ const resources = [
   "/js/offline.js",
   "/js/popper.min.js",
   "/js/service.js",
+  "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css",
 ];
 
 const fallbackResourceUrls = {
   'html': '/offline.html',
+  'font': 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
   'image': '/images/logo.ico',
+  'script': '/client.js',
+  'module': '/js/offline.js',
 }
 
 const addResourcesToCache = async (resources) => {
@@ -97,10 +98,11 @@ const cacheFirst = async ({ request }) => {
   } catch (error) {
     console.log("Intento cargar el offline");
     let fallbackType = request.destination;
-    if (fallbackType === 'document')
+    if (fallbackType === 'document' || fallbackType === '')
       fallbackType = 'html';
-    else if (fallbackType === '')
-      fallbackType = 'html';
+    else if (fallbackType === 'script') {
+      if (request.url.startsWith(API_ENDPOINT + 'js')) fallbackType = 'module';
+    }
     const fallbackUrl = fallbackResourceUrls[fallbackType];
     const fallbackResponse = await caches.match(fallbackUrl);
     console.log("Fallback response:", fallbackResponse);
