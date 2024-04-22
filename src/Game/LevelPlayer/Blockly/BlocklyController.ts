@@ -143,7 +143,6 @@ export default class BlocklyController {
         oldValue = JSON.parse(JSON.stringify(eventChange.oldValue));
       statement = XAPISingleton.changeStatusBlockStatement(levelId, userName, blockType, name, oldValue, newValue);
     }
-    console.log("🚀 ~ BlocklyController ~ blockyxAPI ~ statement:", statement)    
     if(statement !== null)
       XAPISingleton.sendStatement(statement);
   }
@@ -228,7 +227,8 @@ export default class BlocklyController {
         BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
-        const event = new CustomEvent("execution-finished");
+        const numberBlocks = this.workspace.getAllBlocks(false).length
+        const event = new CustomEvent("execution-finished", {detail: {numberBlocks}});
         document.dispatchEvent(event);
       }
     };

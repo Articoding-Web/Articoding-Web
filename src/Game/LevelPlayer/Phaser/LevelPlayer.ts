@@ -272,10 +272,9 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  private checkWinCondition = async (e: Event) => {
+  private checkWinCondition = async (e: CustomEvent) => {
     let hasLost = false;
     let playerBounced = false;
-
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
@@ -304,7 +303,8 @@ export default class LevelPlayer extends Phaser.Scene {
         document.dispatchEvent(event);
       }
 
-      const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars, speed,  nAttempt, playerBounced} });
+      const nBlocks = e.detail.numberBlocks;
+      const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars, speed,  nAttempt, playerBounced, nBlocks} });
       document.dispatchEvent(statisticEvent);
 
     } else {

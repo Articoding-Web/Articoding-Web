@@ -19,6 +19,7 @@ export default async function initLogger() {
     const speed : integer = event.detail.speed;
     const nAttempt : integer = event.detail.nAttempt;
     const playerBounced: boolean = event.detail.playerBounced;
+    const nBlocks : integer = event.detail.nBlocks;
     let userName = "nl";
     const urlParams = new URLSearchParams(window.location.search);
     const levelId = urlParams.get('id');
@@ -53,10 +54,10 @@ export default async function initLogger() {
     let statement : Statement;
     if(win)
       statement = XAPISingleton.levelCompletedStatement(
-        userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn);
+        userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn, nBlocks);
     else
       statement = XAPISingleton.levelFailedStatement(
-        userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn);
+        userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn, nBlocks);
     await XAPISingleton.sendStatement(statement);
     nClicksStopCodeBtn = 0;
   });
