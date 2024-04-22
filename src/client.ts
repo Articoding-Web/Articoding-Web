@@ -59,7 +59,10 @@ function setNavbarListeners() {
 
 (function () {
   window.addEventListener("popstate", route);
-
+  window.addEventListener("beforeunload", function(event) {
+    localStorage.removeItem('MY_UUID');
+  });
+  
   setNavbarListeners();
 
   route();

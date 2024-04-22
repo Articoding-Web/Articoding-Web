@@ -2,10 +2,10 @@ import * as bootstrap from 'bootstrap';
 
 import config from '../../Game/config.js';
 import { fetchRequest } from '../utils';
-
+import XAPISingleton from '../../xAPI/xapi.js';
+import { getUserNameAndUUID, setPageHome } from '../app.js';
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
-
 // Variable para controlar si el evento click ya se agregó al botón
 let registerSubmitBtnAdded = false;
 
@@ -63,7 +63,10 @@ async function userLogin(modal : bootstrap.Modal) {
       'include',
     );
     modal.hide();
-    window.location.href = "/"; 
+    const [userName, uuid] = getUserNameAndUUID();
+    const statement = XAPISingleton.loginStatement(uuid, username);
+    XAPISingleton.sendStatement(statement);
+    setPageHome();
   } catch (error) {
       if (error.status === 401 || error.status === 404) {
         const errorElement = document.getElementById("text-error-login");
@@ -78,7 +81,6 @@ async function userLogin(modal : bootstrap.Modal) {
 async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
-    console.log("🚀 ~ useRegister ~ userName.length:", userName.length)  
   if (userName.length < 3) {
     const errorElement = document.getElementById("text-error-register");
     errorElement.innerText = "El nombre de usuario debe tener al menos 3 letras";
@@ -285,7 +287,7 @@ function generateProfileDiv(user) {
   
 }
 
-function logout(){
+async function logout(){
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();
@@ -295,7 +297,11 @@ function logout(){
       null,
       'include'
     );
-    window.location.href = "/"; 
+    const [userName, uuid] = getUserNameAndUUID();
+    const statement = XAPISingleton.logoutStatement(uuid, userName);
+    XAPISingleton.sendStatement(statement);
+    localStorage.removeItem('MY_UUID');
+    setPageHome();
   });
 }
 

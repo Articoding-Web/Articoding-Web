@@ -13,7 +13,7 @@ import { incrementStopCodeBtn } from "../../../SPA/Logger";
 import { Block } from "blockly";
 import Level from "../../level";
 import { Statement } from "@xapi/xapi";
-import { getUserName } from "../../../SPA/app";
+import { getUserNameAndUUID } from "../../../SPA/app";
 import XAPISingleton from "../../../xAPI/xapi";
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
@@ -110,17 +110,19 @@ export default class BlocklyController {
     if(event.type === "create"){
       this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
     }
-    let userName = getUserName();
+    const [userName, uuid] = getUserNameAndUUID();
     const urlParams = new URLSearchParams(window.location.search);
     const levelId = urlParams.get('id');
     let blockType = this.idsMap.get(event.blockId);  
     let statement : Statement = null;
+
     if(event.type === "delete"){
       const eventDelete = event as Blockly.Events.BlockDelete;
       const blocksDeletedArray = eventDelete.ids.map(clave => this.idsMap.get(clave));
       const deletedBlocks = blocksDeletedArray.join("-");
-      statement = XAPISingleton.deleteBlockStatement(levelId, userName, blockType, deletedBlocks);
-    }else if(event.type === "move"){
+      statement = XAPISingleton.deleteBlockStatement(uuid, levelId, userName, blockType, deletedBlocks);
+    }
+    else if(event.type === "move"){
       if(!this.idsMap.has(event.blockId)){
         this.idsMap.set(event.blockId, this.workspace.getBlockById(event.blockId).type);
         blockType = this.idsMap.get(event.blockId)
@@ -130,8 +132,9 @@ export default class BlocklyController {
       if (eventMove.reason !== undefined && eventMove.reason !== null) {
         moveActions = eventMove.reason.join("-");
       }
-      statement = XAPISingleton.moveBlockStatement(levelId, userName, blockType, moveActions);
-    }else if(event.type === "change"){
+      statement = XAPISingleton.moveBlockStatement(uuid,levelId, userName, blockType, moveActions);
+    }
+    else if(event.type === "change"){
       const eventChange = event as Blockly.Events.BlockChange;
       const name = eventChange.name;
 
@@ -141,7 +144,7 @@ export default class BlocklyController {
         newValue = JSON.parse(JSON.stringify(eventChange.newValue));
       if(eventChange.oldValue !== undefined && eventChange.oldValue !== undefined)
         oldValue = JSON.parse(JSON.stringify(eventChange.oldValue));
-      statement = XAPISingleton.changeStatusBlockStatement(levelId, userName, blockType, name, oldValue, newValue);
+      statement = XAPISingleton.changeStatusBlockStatement(uuid,levelId, userName, blockType, name, oldValue, newValue);
     }
     if(statement !== null)
       XAPISingleton.sendStatement(statement);
@@ -197,7 +200,6 @@ export default class BlocklyController {
         if (index < this.code.length) {
           BlocklyController.isRunningCode = true;
           let code = this.code[index];
-          console.log("running code", code);
           this.highlightBlock(code.blockId);
 
           let times = 0;

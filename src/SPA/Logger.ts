@@ -1,6 +1,6 @@
 import config from '../Game/config.js';
 import { sessionCookieValue } from './loaders/profileLoader';
-import { fetchRequest } from './utils';
+import { fetchRequest, getSpecificUUID } from './utils';
 import XAPISingleton from '../xAPI/xapi.js';
 import { Statement } from '@xapi/xapi';
 
@@ -20,7 +20,8 @@ export default async function initLogger() {
     const nAttempt : integer = event.detail.nAttempt;
     const playerBounced: boolean = event.detail.playerBounced;
     const nBlocks : integer = event.detail.nBlocks;
-    let userName = "nl";
+    const uuid: string = getSpecificUUID();
+    let userName = uuid;
     const urlParams = new URLSearchParams(window.location.search);
     const levelId = urlParams.get('id');
 
@@ -54,10 +55,10 @@ export default async function initLogger() {
     let statement : Statement;
     if(win)
       statement = XAPISingleton.levelCompletedStatement(
-        userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn, nBlocks);
+        uuid, userName, levelId, stars, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn, nBlocks);
     else
       statement = XAPISingleton.levelFailedStatement(
-        userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn, nBlocks);
+        uuid, userName, levelId, speed, nAttempt, playerBounced, totalOfficialLevels, userLevelsCompleted, nClicksStopCodeBtn, nBlocks);
     await XAPISingleton.sendStatement(statement);
     nClicksStopCodeBtn = 0;
   });

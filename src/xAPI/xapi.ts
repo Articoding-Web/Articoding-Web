@@ -28,9 +28,10 @@ class XAPISingleton {
   }
 
   public static levelCompletedStatement(
-    userName: string, levelId: string, stars: number, speed: number, attempts: number, 
+    uuid: string, userName: string, levelId: string, stars: number, speed: number, attempts: number, 
     playerBounced: boolean, totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number) : Statement{
     const myStatement: Statement = {
+      id: uuid,
       actor: {
         objectType: "Agent",
         account: {
@@ -76,9 +77,10 @@ class XAPISingleton {
     return myStatement;
   }
   public static levelFailedStatement(
-    userName: string, levelId: string, speed: number, attempt: number, playerBounced: boolean, 
+    uuid: string, userName: string, levelId: string, speed: number, attempt: number, playerBounced: boolean, 
     totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number): Statement {
     const myStatement: Statement = {
+      id: uuid,
       actor: {
         objectType: "Agent",
         account: {
@@ -117,8 +119,9 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static screenAccessedStatement(userName: string, url: string){
+  public static screenAccessedStatement(uuid: string, userName: string, url: string){
     const myStatement: Statement = {
+      id: uuid,
       actor: {
         objectType: "Agent",
         account: {
@@ -144,9 +147,10 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static changeStatusBlockStatement(levelId : string, userName: string, blockType : string, 
+  public static changeStatusBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, 
     name : string, oldValue: string, newValue: string){
     const myStatement: Statement = {
+      id: uuid,
       actor: {
         objectType: "Agent",
         account: {
@@ -178,8 +182,9 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static deleteBlockStatement(levelId : string, userName: string, blockType : string, deletedBlocks : string){
+  public static deleteBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, deletedBlocks : string){
     const myStatement: Statement = {
+      id: uuid,
       actor: {
         objectType: "Agent",
         account: {
@@ -209,8 +214,9 @@ class XAPISingleton {
     return myStatement;
   }
 
-  public static moveBlockStatement(levelId : string, userName: string, blockType : string, moveActions : string){
+  public static moveBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, moveActions : string){
     const myStatement: Statement = {
+      id: uuid,
       actor: {
         objectType: "Agent",
         account: {
@@ -230,6 +236,56 @@ class XAPISingleton {
             "https://articoding.e-ucm.es/exts/move-actions": moveActions,
           }
         }
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
+
+  public static loginStatement(uuid: string, userName: string): Statement{
+    const myStatement: Statement = {
+      id: uuid,
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "https://w3id.org/xapi/adl/verbs/logged-in"
+      },
+      object: {
+        id: "https://articoding.e-ucm.es/",
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
+
+  public static logoutStatement(uuid: string, userName: string): Statement{
+    const myStatement: Statement = {
+      id: uuid,
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "https://w3id.org/xapi/adl/verbs/logged-out"
+      },
+      object: {
+        id: "https://articoding.e-ucm.es/profile",
       },
       context: {
         extensions: {
