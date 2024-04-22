@@ -1,9 +1,8 @@
-import XAPI, { Statement } from "@xapi/xapi";
+import XAPI, { Agent, Context, Statement } from "@xapi/xapi";
 import config from "../Game/config";
 class XAPISingleton {
 
   private static instance: XAPI | null = null;
-
   private constructor() {}
 
   public static getInstance(): XAPI {
@@ -21,6 +20,24 @@ class XAPISingleton {
     return XAPISingleton.instance;
   }
 
+  private static createActor(userName: string): Agent {
+    return {
+      objectType: "Agent",
+      account: {
+        homePage: "https://articoding.e-ucm.es/",
+        name: userName
+      }
+    };
+  }
+
+  private static createContext(uuid: string): Context {
+    return {
+      extensions: {
+        "https://articoding.e-ucm.es/game-version": config.GAME_VERSION,
+        "https://articoding.e-ucm.es/session":uuid 
+      }
+    };
+  }
   public static sendStatement(statement : Statement ){
     XAPISingleton.getInstance().sendStatement({
       statement
@@ -30,15 +47,10 @@ class XAPISingleton {
   public static levelCompletedStatement(
     uuid: string, userName: string, levelId: string, stars: number, speed: number, attempts: number, 
     playerBounced: boolean, totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number) : Statement{
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor ,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/completed"
       },
@@ -68,26 +80,17 @@ class XAPISingleton {
           "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/exts/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
   public static levelFailedStatement(
     uuid: string, userName: string, levelId: string, speed: number, attempt: number, playerBounced: boolean, 
     totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number): Statement {
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/failed"
       },
@@ -110,25 +113,16 @@ class XAPISingleton {
           "https://articoding.e-ucm.es/exts/code": '...' //TODO
         }
       },
-      "context": {
-        "extensions": {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static screenAccessedStatement(uuid: string, userName: string, url: string){
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/accessed"
       },
@@ -138,25 +132,16 @@ class XAPISingleton {
           type: "https://w3id.org/xapi/seriousgames/activity-types/screen"
         }
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static iconInteractedStatement(uuid: string, userName: string, url: string){
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/interacted"
       },
@@ -166,26 +151,17 @@ class XAPISingleton {
           type: "https://w3id.org/xapi/seriousgames/activity-types/screen"
         }
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static changeStatusBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, 
     name : string, oldValue: string, newValue: string){
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/interacted"
       },
@@ -201,25 +177,16 @@ class XAPISingleton {
           }
         }
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static deleteBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, deletedBlocks : string){
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/interacted"
       },
@@ -233,25 +200,16 @@ class XAPISingleton {
           }
         }
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static moveBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, moveActions : string){
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "http://adlnet.gov/expapi/verbs/interacted"
       },
@@ -265,61 +223,39 @@ class XAPISingleton {
           }
         }
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static loginStatement(uuid: string, userName: string): Statement{
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "https://w3id.org/xapi/adl/verbs/logged-in"
       },
       object: {
         id: "https://articoding.e-ucm.es/",
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
 
   public static logoutStatement(uuid: string, userName: string): Statement{
+    const actor = XAPISingleton.createActor(userName);
+    const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
-      id: uuid,
-      actor: {
-        objectType: "Agent",
-        account: {
-          homePage: "https://articoding.e-ucm.es/",
-          name: userName
-        }
-      },
+      actor,
       verb: {
         id: "https://w3id.org/xapi/adl/verbs/logged-out"
       },
       object: {
         id: "https://articoding.e-ucm.es/profile",
       },
-      context: {
-        extensions: {
-          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
-        }
-      }
+      context
     }
     return myStatement;
   }
