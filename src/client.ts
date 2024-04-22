@@ -1,5 +1,6 @@
 import BlocklyController from './Game/LevelPlayer/Blockly/BlocklyController';
 import PhaserController from './Game/PhaserController';
+import { getUserNameAndUUID } from './SPA/app';
 import {
   appendLoginModal,
   checkSessionCookie,
@@ -7,7 +8,7 @@ import {
 import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
-
+import XAPISingleton from './xAPI/xapi';
 export async function route() {
   // Always destroy phaser game
   await PhaserController.destroyGame();
@@ -30,22 +31,30 @@ function routeIfNewPath(newRoute: string, e: MouseEvent) {
     history.pushState({}, "", newRoute);
     route();
   }
-
+  const [userName, uuid] = getUserNameAndUUID();
+  const statement = XAPISingleton.iconInteractedStatement(uuid,userName,newRoute);
+  XAPISingleton.sendStatement(statement);
   (e.currentTarget as HTMLElement).classList.add("active");
   e.stopPropagation();
 }
 
 function setNavbarListeners() {
   // Official Levels
-  document.getElementById("official").addEventListener("click", (e: MouseEvent) => routeIfNewPath("/", e));
+  document.getElementById("official").addEventListener("click", (e: MouseEvent) =>{ 
+    routeIfNewPath("/", e)}
+  );
 
   // TODO: Manual
 
   // Editor
-  document.getElementById("editor").addEventListener("click", (e: MouseEvent) => routeIfNewPath("/editor", e));
+  document.getElementById("editor").addEventListener("click", (e: MouseEvent) =>{ 
+    routeIfNewPath("/editor", e)}
+  );
 
   // Community Levels
-  document.getElementById("community").addEventListener("click", (e: MouseEvent) => routeIfNewPath("/community", e));
+  document.getElementById("community").addEventListener("click", (e: MouseEvent) =>{ 
+    routeIfNewPath("/community", e)}
+  );
 
   // Profile
   document.getElementById("profile").addEventListener("click", (e: MouseEvent) => {

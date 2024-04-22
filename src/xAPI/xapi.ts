@@ -147,6 +147,34 @@ class XAPISingleton {
     return myStatement;
   }
 
+  public static iconInteractedStatement(uuid: string, userName: string, url: string){
+    const myStatement: Statement = {
+      id: uuid,
+      actor: {
+        objectType: "Agent",
+        account: {
+          homePage: "https://articoding.e-ucm.es/",
+          name: userName
+        }
+      },
+      verb: {
+        id: "http://adlnet.gov/expapi/verbs/interacted"
+      },
+      object: {
+        id: `https://articoding.e-ucm.es${url}`,
+        definition: {
+          type: "https://w3id.org/xapi/seriousgames/activity-types/screen"
+        }
+      },
+      context: {
+        extensions: {
+          "https://articoding.e-ucm.es/game-version": config.GAME_VERSION
+        }
+      }
+    }
+    return myStatement;
+  }
+
   public static changeStatusBlockStatement(uuid: string, levelId : string, userName: string, blockType : string, 
     name : string, oldValue: string, newValue: string){
     const myStatement: Statement = {
