@@ -177,8 +177,11 @@ export default class BlocklyController {
         BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
-        const numberBlocks = this.workspace.getAllBlocks(false).length
-        console.log("🚀 ~ BlocklyController ~ executeNextBlock ~ numberBlocks:", numberBlocks)
+        const topBlocks = this.workspace.getTopBlocks(false).length - 1; //Siempre restar bloque start
+        const workspaceBlocks = this.workspace.getAllBlocks(false).length;
+        const totalBlocks = workspaceBlocks - topBlocks;
+        console.log("🚀 ~ BlocklyController ~ executeNextBlock ~ totalBlocks:", totalBlocks)
+                
         const event = new CustomEvent("execution-finished");
         document.dispatchEvent(event);
       }
