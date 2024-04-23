@@ -56,7 +56,7 @@ async function userLogin(modal : bootstrap.Modal) {
   };
 
   try {
-    const responseData = await fetchRequest(
+    await fetchRequest(
       `${API_ENDPOINT}/user/login`,
       "POST",
       JSON.stringify(postData),
@@ -284,7 +284,7 @@ function generateProfileDiv(user) {
   
 }
 
-function logout(){
+function logout() {
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();

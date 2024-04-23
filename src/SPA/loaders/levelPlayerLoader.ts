@@ -49,8 +49,15 @@ function getEditButton(fromLevelEditor: boolean) {
  * @param {String} id - The ID of the level to start
  */
 export default async function playLevelById(id: string) {
-    let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
-    loadLevel(JSON.parse(level.data));
+    const response = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
+    if (response.headers.get('content-type').includes('text/html')) {
+        // Estamos en modo offline
+        const content = await response.text();
+        document.getElementById("content").innerHTML = content;
+    } else { // Si no es HTML asumimos que es JSON
+        const level = await response.json();
+        loadLevel(JSON.parse(level.data));
+    }
 }
 
 export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean) {

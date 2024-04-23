@@ -85,14 +85,24 @@ export default async function loadHome() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
-  const categories = await fetchRequest(
+  let categories = [];
+  const response = await fetchRequest(
     `${API_ENDPOINT}/level/categories`,
     "GET"
   );
 
-  await fillContent(divElement, categories, generateCategoryDiv);
+  if (response.headers.get('content-type').includes('text/html')) {
+    // Estamos en modo offline
+    const content = await response.text();
+    document.getElementById("content").innerHTML = content;
+  } else { // Si no es HTML asumimos que es JSON
 
-  document.querySelectorAll("a.category").forEach((anchorTag) => {
-    anchorTag.addEventListener("click", loadCategoryLevels);
-  });
+    categories = await response.json();
+
+    await fillContent(divElement, categories, generateCategoryDiv);
+
+    document.querySelectorAll("a.category").forEach((anchorTag) => {
+      anchorTag.addEventListener("click", loadCategoryLevels);
+    });
+  }
 }

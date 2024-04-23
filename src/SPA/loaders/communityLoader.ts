@@ -116,41 +116,51 @@ export default async function loadCommunity() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
-  const levels = await fetchRequest(
+  let levels = [];
+  const response = await fetchRequest(
     `${API_ENDPOINT}/level/community/levels`,
     "GET"
   );
 
-  const cookie = sessionCookieValue();
+  if (response.headers.get('content-type').includes('text/html')) {
+    // Estamos en modo offline
+    const content = await response.text();
+    document.getElementById("content").innerHTML = content;
+  } else { // Si no es HTML asumimos que es JSON
+    levels = await response.json();
 
-  let statistics = [];
-  if (cookie !== null) {
-    statistics = await fetchRequest(
-      `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
-      "GET"
-    );
+    const cookie = sessionCookieValue();
+
+    let statistics = [];
+    if (cookie !== null) {
+      const response = await fetchRequest(
+        `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
+        "GET"
+      );
+      statistics = await response.json();
+    }
+    const statisticsMap = statistics.reduce((map, statistic) => {
+      map[statistic.level] = {
+        stars: statistic.stars,
+        attempts: statistic.attempts,
+      };
+      return map;
+    }, {});
+
+    const levelsWithStatistics = levels.map((level) => {
+      const levelId = level.id;
+      const statistic = statisticsMap[levelId];
+      return {
+        ...level,
+        statistics: statistic || { stars: 0, attempts: 0 },
+      };
+    });
+
+    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+
+    // Add getLevel event listener
+    document.querySelectorAll("a.getLevel").forEach((level) => {
+      level.addEventListener("click", playLevel);
+    });
   }
-  const statisticsMap = statistics.reduce((map, statistic) => {
-    map[statistic.level] = {
-      stars: statistic.stars,
-      attempts: statistic.attempts,
-    };
-    return map;
-  }, {});
-
-  const levelsWithStatistics = levels.map((level) => {
-    const levelId = level.id;
-    const statistic = statisticsMap[levelId];
-    return {
-      ...level,
-      statistics: statistic || { stars: 0, attempts: 0 },
-    };
-  });
-
-  await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-
-  // Add getLevel event listener
-  document.querySelectorAll("a.getLevel").forEach((level) => {
-    level.addEventListener("click", playLevel);
-  });
 }

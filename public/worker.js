@@ -1,5 +1,6 @@
 "use strict";
 
+const LOCAL = "http://localhost:3001/";
 const API_ENDPOINT = "http://localhost:3001/api/";
 
 var version = "1.0.3";
@@ -101,7 +102,8 @@ const cacheFirst = async ({ request }) => {
     if (fallbackType === 'document' || fallbackType === '')
       fallbackType = 'html';
     else if (fallbackType === 'script') {
-      if (request.url.startsWith(API_ENDPOINT + 'js')) fallbackType = 'module';
+      if (request.url.startsWith(`${LOCAL}js`))
+        fallbackType = 'module';
     }
     const fallbackUrl = fallbackResourceUrls[fallbackType];
     const fallbackResponse = await caches.match(fallbackUrl);
