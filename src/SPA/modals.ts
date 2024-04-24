@@ -2,7 +2,7 @@ import * as bootstrap from 'bootstrap';
 
 import { route } from '../client';
 import { restartCurrentLevel } from './loaders/levelPlayerLoader';
-
+import {exitToCategory} from './app';
 let victoryModalInstance;
 let defeatModalInstance;
 
@@ -21,7 +21,8 @@ export default async function registerModals() {
 
   const vExitLevelBtn = document.querySelector("#victoryModal .btn-secondary");
   vExitLevelBtn.addEventListener("click", (event) => {
-    window.history.back();
+    let categoryIndex = document.getElementById("content").getAttribute("categoryIndex");
+    exitToCategory(categoryIndex);
   });
 
   document.addEventListener("win", (event) => {
@@ -42,7 +43,8 @@ export default async function registerModals() {
 
   const dExitLevelBtn = document.querySelector("#defeatModal .btn-secondary");
   dExitLevelBtn.addEventListener("click", (event) => {
-    window.history.back();
+    let categoryIndex = document.getElementById("content").getAttribute("categoryIndex");
+    exitToCategory(categoryIndex);
   });
 
   document.addEventListener("lose", (e) => {
