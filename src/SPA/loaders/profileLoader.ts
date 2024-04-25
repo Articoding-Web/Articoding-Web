@@ -78,7 +78,6 @@ async function userLogin(modal : bootstrap.Modal) {
 async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const userName = (document.getElementById("userName") as HTMLInputElement)
     .value;
-    console.log("🚀 ~ useRegister ~ userName.length:", userName.length)  
   if (userName.length < 3) {
     const errorElement = document.getElementById("text-error-register");
     errorElement.innerText = "El nombre de usuario debe tener al menos 3 letras";

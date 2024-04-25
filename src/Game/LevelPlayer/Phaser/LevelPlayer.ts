@@ -314,7 +314,6 @@ export default class LevelPlayer extends Phaser.Scene {
             minBlocks: null,
             description: null,
           };
-          console.log("Nivel:", levelData);
           await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
           alert("Nivel creado");
         }        

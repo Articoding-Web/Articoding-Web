@@ -147,7 +147,6 @@ export default class BlocklyController {
         if (index < this.code.length) {
           BlocklyController.isRunningCode = true;
           let code = this.code[index];
-          console.log("running code", code);
           this.highlightBlock(code.blockId);
 
           let times = 0;
@@ -180,8 +179,6 @@ export default class BlocklyController {
         const topBlocks = this.workspace.getTopBlocks(false).length - 1; //Siempre restar bloque start
         const workspaceBlocks = this.workspace.getAllBlocks(false).length;
         const totalBlocks = workspaceBlocks - topBlocks;
-        console.log("🚀 ~ BlocklyController ~ executeNextBlock ~ totalBlocks:", totalBlocks)
-                
         const event = new CustomEvent("execution-finished");
         document.dispatchEvent(event);
       }

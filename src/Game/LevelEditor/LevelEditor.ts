@@ -172,8 +172,6 @@ export default class LevelEditor extends Phaser.Scene {
       console.error("Does not have player or exit");
       return;
     }
-    console.log("🚀 ~ LevelEditor ~ saveLevel ~ levelJSON:", JSON.stringify(levelJSON))
-
     await PhaserController.destroyGame();
     loadLevel(levelJSON, true);
   }
