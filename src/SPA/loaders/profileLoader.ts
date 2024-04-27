@@ -1,4 +1,5 @@
 import * as bootstrap from 'bootstrap';
+import { route } from "../../client";
 
 import config from '../../Game/config.js';
 import { fetchRequest } from '../utils';
@@ -14,7 +15,7 @@ let registerSubmitBtnAdded = false;
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 w-100 h-100" id="categories"></div>';
+  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
 }
 
 export function sessionCookieValue() {
@@ -261,30 +262,75 @@ function generateProfilePlaceholder() {}
  * @param {Object} user with id, name and role
  * @returns String of HTMLDivElement
  */
-function generateProfileDiv(user) {
-  return `<div class="row">
-            <div class="col col-6 offset-3">
-              <div class="row tag">
-                <div class="col col-3 offset-1 m-auto">
-                  <img src="./images/profile.png" class="rounded-circle">
-                </div>
-                <div class="col col-7 offset-1 text-center mx-auto my-auto">
-                  <p class="username">${user.name}</p>
-                </div>
-              </div>
-              <div class="row mt-3 h-20">
-                <div class="col col-6 offset-3 tag text-center">
-                  <div class="row mx-auto my-auto">
-                    <p class="role">${user.role}</p>
+async function generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted) {
+  const levelDivs = await Promise.all(userLevels.map(level => generateLevelDiv(level)));
+
+  return `
+      <div class="col">
+        <div class="card mx-auto border-dark d-flex flex-column h-100">
+          <h5 class="card-header card-title text-dark">
+            Tus Datos
+          </h5>
+          <div class="card-body text-dark">
+            <p> Nombre: ${user.name}</p>
+            <p> Rol: ${user.role}</p>
+            <p class="card-subtitle mb-2 text-muted">
+              Niveles Oficiales Completados: ${officialLevelCompleted}
+            </p>
+            <p class="card-subtitle mb-2 text-muted">
+              Estrellas totales conseguidas: ${totalStars}
+            </p>
+            <button type="submit" class="btn btn-danger" id="logoutBtn">
+                Cerrar Sesion
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mx-auto border-dark d-flex flex-column h-100">
+          <h5 class="card-header card-title text-dark">
+            Tus niveles que has creado
+          </h5>
+        </div>
+      </div>
+      ${levelDivs.join("")}
+      `;
+  
+}
+
+async function generateLevelDiv(level) {
+  if (!level) {
+    throw new Error("Invalid level data");
+  }
+
+  const { id, miniature, title, description = "EditorLevel" } = level;
+
+  return `
+    <div class="col">
+      <div class="card mx-auto border-dark">
+        <a class="getLevel" href="${API_ENDPOINT}/level/${id}">
+          <div class="row g-0 text-dark">
+            <div class="col-md-3">
+              ${
+                miniature
+                  ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">`
+                  : ""
+              }
+            </div>
+            <div class="col-md-9">
+              <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-2">
+                  <div class="col">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${description}</p>
                   </div>
-                  <button type="submit" class="btn btn-danger" id="logoutBtn">
-                    Cerrar Sesion
-                  </button>
                 </div>
               </div>
             </div>
-          </div>`;
-  
+          </div>
+        </a>
+      </div>
+    </div>`;
 }
 
 async function logout(){
@@ -305,6 +351,14 @@ async function logout(){
   });
 }
 
+async function playLevel(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.getLevel");
+  const id = anchorTag.href.split("level/")[1];
+  history.pushState({ id }, "", `level?id=${id}`);
+
+  route();
+}
 export default async function loadProfile() {
     document.getElementById("content").innerHTML = getRowHTML();
     const divElement = document.getElementById("categories");
@@ -313,6 +367,28 @@ export default async function loadProfile() {
     // divElement.innerHTML = generateProfilePlaceholder();
 
     const user = sessionCookieValue();
-    divElement.innerHTML = generateProfileDiv(user);
+    const officialLevelCompleted = await fetchRequest(
+      `${API_ENDPOINT}/user/officialLevelsCompleted`,
+      "GET",
+      null,
+      'include',
+    );
+    const totalStars = await fetchRequest(
+      `${API_ENDPOINT}/user/totalStars/${user.id}`,
+      "GET"
+    );
+    const userLevels = await fetchRequest(
+      `${API_ENDPOINT}/level/userLevels/${user.id}`,
+      "GET"
+    );
+    console.log("🚀 ~ loadProfile ~ userLevels:", userLevels)
+    console.log("🚀 ~ loadProfile ~ totalStars:", totalStars)    
+    console.log("🚀 ~ loadProfile ~ officialLevelCompleted:", officialLevelCompleted)
+
+    divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
+     // Add getLevel event listener
+  document.querySelectorAll("a.getLevel").forEach((level) => {
+    level.addEventListener("click", playLevel);
+  });
     logout();
 }
