@@ -380,10 +380,6 @@ export default async function loadProfile() {
       `${API_ENDPOINT}/level/userLevels/${user.id}`,
       "GET"
     );
-    console.log("🚀 ~ loadProfile ~ userLevels:", userLevels)
-    console.log("🚀 ~ loadProfile ~ totalStars:", totalStars)    
-    console.log("🚀 ~ loadProfile ~ officialLevelCompleted:", officialLevelCompleted)
-
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
   document.querySelectorAll("a.getLevel").forEach((level) => {
