@@ -67,7 +67,6 @@ async function userLogin(modal : bootstrap.Modal) {
     const [userName, uuid] = getUserNameAndUUID();
     const statement = XAPISingleton.loginStatement(uuid, username);
     XAPISingleton.sendStatement(statement);
-    setPageHome();
   } catch (error) {
       if (error.status === 401 || error.status === 404) {
         const errorElement = document.getElementById("text-error-login");
@@ -118,7 +117,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
       JSON.stringify(postData)
     );
     modal.hide();
-    window.location.href = "/"; 
+    alert("Registro correcto, inicia sesión")
   }
   catch(error){
     if (error.status === 409) {
@@ -153,8 +152,8 @@ export function appendLoginModal() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
-                        <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close" id="loginReq">Iniciar Sesión</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" id="registerBtn">¿No tienes cuenta?</button>
                         <span id="text-error-login"></span>
                     </div>
                 </div>
@@ -202,6 +201,7 @@ function appendRegisterModal() {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class = "text-success" >Nombre con más de 3 letras. La contraseña debe contener al menos 1 mayúscula, 1 número y tener más de 5 letras </p>
                         <form id="registerForm">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">Nombre</label>
@@ -220,7 +220,6 @@ function appendRegisterModal() {
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <span >Tras registrarte, deberás hacer login</span>
                         <span id="text-error-register"></span>
                     </div>
                 </div>
