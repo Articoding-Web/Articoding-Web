@@ -24,7 +24,8 @@
 /* Navbar END */
 
 /* General START */
-a, .card a {
+a,
+.card a {
     text-decoration: none;
 }
 
@@ -35,6 +36,7 @@ a, .card a {
 .gold-star {
     color: var(--google-yellow);
 }
+
 /* General END */
 
 /* Category levels START */
@@ -58,3 +60,11 @@ a, .card a {
 }
 
 /* Level Editor END */
+
+/* Offline file START */
+
+.title {
+    color: white;
+}
+
+/* Offline file END */

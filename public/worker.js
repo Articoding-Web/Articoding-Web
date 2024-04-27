@@ -3,7 +3,7 @@
 const LOCAL = "http://localhost:3001/";
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.3";
+var version = "1.0.0";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -54,7 +54,6 @@ const fallbackResourceUrls = {
   'font': 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
   'image': '/images/logo.ico',
   'script': '/client.js',
-  'module': '/js/offline.js',
 }
 
 const addResourcesToCache = async (resources) => {
@@ -101,10 +100,6 @@ const cacheFirst = async ({ request }) => {
     let fallbackType = request.destination;
     if (fallbackType === 'document' || fallbackType === '')
       fallbackType = 'html';
-    else if (fallbackType === 'script') {
-      if (request.url.startsWith(`${LOCAL}js`))
-        fallbackType = 'module';
-    }
     const fallbackUrl = fallbackResourceUrls[fallbackType];
     const fallbackResponse = await caches.match(fallbackUrl);
     console.log("Fallback response:", fallbackResponse);
