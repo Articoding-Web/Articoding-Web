@@ -56,11 +56,14 @@ export default async function playLevelById(id: string) {
         document.getElementById("content").innerHTML = content;
     } else { // Si no es HTML asumimos que es JSON
         const level = await response.json();
-        loadLevel(JSON.parse(level.data));
+        loadLevel(JSON.parse(level.data), false, level.category);
     }
 }
 
-export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean) {
+export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean, category?: string) {
+    if (category) {
+        document.getElementById("content").setAttribute("categoryIndex", category);
+    }
     document.getElementById("content").innerHTML = getLevelPlayerHTML(fromLevelEditor);
     currentLevelJSON = levelJSON;
 
@@ -68,7 +71,7 @@ export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolea
     const maxInstances = currentLevelJSON.blockly.maxInstances;
     const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
 
-    PhaserController.init("LevelPlayer", LevelPlayer, {levelJSON, fromLevelEditor});
+    PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON, fromLevelEditor });
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }
 
