@@ -42,7 +42,11 @@ export default [
         values: {
             'ENV_API_PROTOCOL': 'http',
             'ENV_API_DOMAIN': 'localhost',
-            'ENV_API_PORT': '3001'
+            'ENV_API_PORT': '3001',
+            'ENV_LRS_ENDPOINT': 'https://watershedlrs.com/api/organizations/25302/lrs/',
+            'ENV_LRS_USERNAME': 'f4597ef587ad94',
+            'ENV_LRS_PASSWORD': 'd24b133cd8bac3',
+            'ENV_GAME_VERSION': '1.0.0'
         }
       }),
 

@@ -304,7 +304,8 @@ export default class LevelPlayer extends Phaser.Scene {
       }
 
       const nBlocks = e.detail.numberBlocks;
-      const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars, speed,  nAttempt, playerBounced, nBlocks} });
+      const solution = e.detail.solutionCode;
+      const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars, speed,  nAttempt, playerBounced, nBlocks, solution} });
       document.dispatchEvent(statisticEvent);
 
     } else {

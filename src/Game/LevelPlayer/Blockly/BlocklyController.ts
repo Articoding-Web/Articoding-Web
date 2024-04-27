@@ -2,7 +2,7 @@ import * as Blockly from "blockly";
 import { ZoomToFitControl } from "@blockly/zoom-to-fit";
 import { javascriptGenerator } from "blockly/javascript";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
-import { BlockCode } from "./types/BlockCode";
+import { BlockCode, stringifyBlockCode } from "./types/BlockCode";
 
 import * as block_code from "./javascript/block_code";
 import blocks from "./Blocks/blocks";
@@ -12,9 +12,9 @@ import { restartCurrentLevel } from "../../../SPA/loaders/levelPlayerLoader";
 import { incrementStopCodeBtn } from "../../../SPA/Logger";
 import { Block } from "blockly";
 import Level from "../../level";
-import { Statement } from "@xapi/xapi";
 import { getUserNameAndUUID } from "../../../SPA/app";
 import XAPISingleton from "../../../xAPI/xapi";
+import { Statement } from "@xapi/xapi";
 // TODO: Eliminar numero magico
 const BLOCK_OFFSET = 50;
 
@@ -33,6 +33,7 @@ export default class BlocklyController {
     Blockly.Events.BLOCK_MOVE,
   ];
   private static idsMap: Map<string, string> = new Map();
+  private static codeResult : Array<string> = new Array();
   
   static init(container: string | Element, toolbox?: string | ToolboxDefinition | Element, maxInstances?: Level.MaxInstances, workspaceBlocks?: Level.WorkspaceBlock[]) {
     this.createWorkspace(container, toolbox, maxInstances, workspaceBlocks);
@@ -187,7 +188,7 @@ export default class BlocklyController {
         this.shouldAbort = false; // Reset flag
       } else if (BlocklyController.isRunningCode)
         return;
-
+      BlocklyController.codeResult = [];
       let index = 0;
       const executeNextBlock = () => {
         if (this.shouldAbort) {
@@ -200,6 +201,7 @@ export default class BlocklyController {
         if (index < this.code.length) {
           BlocklyController.isRunningCode = true;
           let code = this.code[index];
+          BlocklyController.codeResult.push(stringifyBlockCode(code))
           this.highlightBlock(code.blockId);
 
           let times = 0;
@@ -229,8 +231,11 @@ export default class BlocklyController {
         BlocklyController.isRunningCode = false;
         // Finished code execution
         this.highlightBlock(null);
-        const numberBlocks = this.workspace.getAllBlocks(false).length
-        const event = new CustomEvent("execution-finished", {detail: {numberBlocks}});
+        const topBlocks = this.workspace.getTopBlocks(false).length - 1; //Siempre restar bloque start
+        const workspaceBlocks = this.workspace.getAllBlocks(false).length;
+        const numberBlocks = workspaceBlocks - topBlocks;
+        const solutionCode: string = BlocklyController.codeResult.join(" | ");
+        const event = new CustomEvent("execution-finished", {detail: {numberBlocks, solutionCode}});
         document.dispatchEvent(event);
       }
     };

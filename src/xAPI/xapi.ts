@@ -46,7 +46,7 @@ class XAPISingleton {
 
   public static levelCompletedStatement(
     uuid: string, userName: string, levelId: string, stars: number, speed: number, attempts: number, 
-    playerBounced: boolean, totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number) : Statement{
+    playerBounced: boolean, totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number, code: string) : Statement{
     const actor = XAPISingleton.createActor(userName);
     const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
@@ -69,7 +69,6 @@ class XAPISingleton {
           max: 3
         },
         extensions: {
-          "https://articoding.e-ucm.es/exts/minimum-blocks": true, //TODO
           "https://articoding.e-ucm.es/exts/blocks-used": nBlocks, 
           "https://articoding.e-ucm.es/exts/game-velocity": speed,
           "https://articoding.e-ucm.es/exts/attempts-until-win": attempts,
@@ -77,7 +76,7 @@ class XAPISingleton {
           "https://articoding.e-ucm.es/exts/total-official-levels": totalLevels,
           "https://articoding.e-ucm.es/exts/user-levels-completed": userLevels,
           "https://articoding.e-ucm.es/exts/clicks-stop-btn": clickStopBtn,
-          "https://articoding.e-ucm.es/exts/code": '...' //TODO
+          "https://articoding.e-ucm.es/exts/code": code
         }
       },
       context
@@ -86,7 +85,7 @@ class XAPISingleton {
   }
   public static levelFailedStatement(
     uuid: string, userName: string, levelId: string, speed: number, attempt: number, playerBounced: boolean, 
-    totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number): Statement {
+    totalLevels: number, userLevels: number, clickStopBtn: number, nBlocks: number, code: string): Statement {
     const actor = XAPISingleton.createActor(userName);
     const context: Context = XAPISingleton.createContext(uuid);
     const myStatement: Statement = {
@@ -110,7 +109,7 @@ class XAPISingleton {
           "https://articoding.e-ucm.es/exts/total-official-levels": totalLevels,
           "https://articoding.e-ucm.es/exts/user-levels-completed": userLevels,
           "https://articoding.e-ucm.es/exts/clicks-stop-Btn": clickStopBtn,
-          "https://articoding.e-ucm.es/exts/code": '...' //TODO
+          "https://articoding.e-ucm.es/exts/code": code
         }
       },
       context
