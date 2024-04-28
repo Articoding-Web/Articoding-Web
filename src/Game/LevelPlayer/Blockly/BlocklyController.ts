@@ -3,6 +3,11 @@ import { ZoomToFitControl } from "@blockly/zoom-to-fit";
 import { javascriptGenerator } from "blockly/javascript";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { BlockCode } from "./types/BlockCode";
+import {ObservableProcedureModel} from '@blockly/block-shareable-procedures';
+import {
+  ObservableParameterModel,
+  isProcedureBlock
+} from '@blockly/block-shareable-procedures';
 
 import * as block_code from "./javascript/block_code";
 import blocks from "./Blocks/blocks";
@@ -62,7 +67,160 @@ export default class BlocklyController {
     onresize();
 
     Blockly.defineBlocksWithJsonArray(blocks);
+    Blockly.Blocks['my_procedure_def'] = {
+      init: function() {
+        //pending
+        this.model = new ObservableProcedureModel(this.workspace,'default name');
+        this.workspace.getProcedureMap().add(this.model);
 
+      },
+      destroy: function() {
+        this.workspace.getProcedureMap().delete(this.model.getId());
+      },
+      doProcedureUpdate() {
+        this.setFieldValue('NAME', this.model.getName());
+        this.setFieldValue(
+            'PARAMS',
+            this.model.getParameters()
+                .map((p) => p.getName())
+                .join(','));
+        this.setFieldValue(
+            'RETURN', this.model.getReturnTypes().join(','));
+      },
+      getProcedureModel() {
+        return this.model;
+      },
+    
+      isProcedureDef() {
+        return true;
+      },
+    
+      getVarModels() {
+        return [];
+      },
+      saveExtraState() {
+        return {
+          'procedureId': this.model.getId(),
+    
+          // These properties are only necessary for pasting.
+          'name': this.model.getName(),
+          'parameters': this.model.getParameters().map((p) => {
+            return {name: p.getName(), id: p.getId()};
+          }),
+          'returnTypes': this.model.getReturnTypes(),
+        };
+      },
+      loadExtraState(state) {
+        const id = state['procedureId']
+        const map = this.workspace.getProcedureMap();
+    
+        // Grab a reference to the existing procedure model.
+        if (this.model.getId() != id && map.has(id) &&
+            (this.isInsertionMarker || this.noBlockHasClaimedModel_(id))) {
+          // Delete the existing model (created in init).
+          this.workspace.getProcedureMap().delete(this.model.getId());
+          // Grab a reference to the new model.
+          this.model = this.workspace.getProcedureMap()
+              .get(state['procedureId']);
+          this.doProcedureUpdate();
+          return;
+        }
+    
+        // There is no existing procedure model (we are likely pasting), so
+        // generate it from JSON.
+        this.model
+            .setName(state['name'])
+            .setReturnTypes(state['returnTypes']);
+        for (const [i, param] of state['parameters'].entries()) {
+          this.model.insertParameter(
+              i,
+              new ObservableParameterModel(
+                  this.workspace, param['name'], param['id']));
+        }
+      },
+      noBlockHasClaimedModel_(procedureId) {
+        const model =
+          this.workspace.getProcedureMap().get(procedureId);
+        return this.workspace.getAllBlocks(false).every(
+          (block) =>
+            !isProcedureBlock(block) ||
+            !block.isProcedureDef() ||
+            block.getProcedureModel() !== model);
+      }
+    };
+
+
+    Blockly.Blocks['my_procedure_call'] = {
+      doProcedureUpdate() {
+        this.setFieldValue('NAME', this.model.getName());
+        this.setFieldValue(
+            'PARAMS',
+            this.model.getParameters()
+                .map((p) => p.getName())
+                .join(','));
+        this.setFieldValue(
+            'RETURN', this.model.getReturnTypes().join(','));
+      },
+      getProcedureModel() {
+        return this.model;
+      },
+    
+      isProcedureDef() {
+        return false;
+      },
+    
+      getVarModels() {
+        // If your procedure references variables
+        // then you should return those models here.
+        return [];
+      },
+      saveExtraState() {
+        return {
+          'procedureId': this.model.getId(),
+        };
+      },
+    
+      loadExtraState(state) {
+        // Delete our existing model (created in init).
+        this.workspace.getProcedureMap().delete(this.model.getId());
+        // Grab a reference to the new model.
+        this.model = this.workspace.getProcedureMap()
+            .get(state['procedureId']);
+        if (this.model) this.doProcedureUpdate();
+      },
+    
+      // Handle pasting after the procedure definition has been deleted.
+      onchange(event) {
+        if (event.type === Blockly.Events.BLOCK_CREATE &&
+            event.blockId === this.id) {
+          if(!this.model) { // Our procedure definition doesn't exist =(
+            this.dispose();
+          }
+        }
+      }
+    };
+    const proceduresFlyoutCallback = function(workspace) {
+      const blockList = [];
+      blockList.push({
+        'kind': 'block',
+        'type': 'my_procedure_def',
+      });
+      for (const model of
+            workspace.getProcedureMap().getProcedures()) {
+        blockList.push({
+          'kind': 'block',
+          'type': 'my_procedure_call',
+          'extraState': {
+            'procedureId': model.getId(),
+          },
+        });
+      }
+      return blockList;
+    };
+    
+    this.workspace.registerToolboxCategoryCallback(
+        'MY_PROCEDURES', proceduresFlyoutCallback);
+        //i mtesting this (do not touch yet)
     this.startBlock = this.workspace.newBlock("start");
     this.startBlock.initSvg();
     this.startBlock.render();
@@ -183,7 +341,7 @@ export default class BlocklyController {
     };
     executeNextBlock();
   }
-
+  
   private static abortAndReset() {
     this.shouldAbort = true;
     restartCurrentLevel();
