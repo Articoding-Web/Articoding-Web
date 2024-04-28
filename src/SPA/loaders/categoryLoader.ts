@@ -129,8 +129,7 @@ export default async function loadCategoryById(id: string) {
 
   if (response.headers.get('content-type').includes('text/html')) {
     // Estamos en modo offline
-    const content = await response.text();
-    document.getElementById("content").innerHTML = content;
+    await response.text();
   } else { // Si no es HTML asumimos que es JSON
     levels = await response.json();
 

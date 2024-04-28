@@ -1,9 +1,8 @@
 "use strict";
 
-const LOCAL = "http://localhost:3001/";
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.2";
+var version = "1.0.6";
 
 var steady = version + "_steady";
 var levels = version + "_levels";

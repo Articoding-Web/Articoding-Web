@@ -1,8 +1,3 @@
-"use strict"
-
-const main = document.getElementById('principal');
-main.innerHTML=`<div><strong>Contenido dinámico OFFLINE</strong></div>`;
-
 (function () {
     if (!navigator || !navigator.serviceWorker) return;
     caches.keys().then(function (keys) {
