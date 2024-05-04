@@ -1,21 +1,16 @@
-import XAPI, { Agent, Context, Statement } from "@xapi/xapi";
+import { Agent, Context, Statement } from "@xapi/xapi";
 import config from "../Game/config";
+import { fetchRequest } from "../SPA/utils";
+const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
+
 class XAPISingleton {
 
-  private static instance: XAPI | null = null;
+  private static instance: XAPISingleton | null = null;
   private constructor() {}
 
-  public static getInstance(): XAPI {
+  public static getInstance(): XAPISingleton {
     if (!XAPISingleton.instance) {
-      const endpoint = config.LRS_ENDPOINT;
-      const username = config.LRS_USERNAME;
-      const password = config.LRS_PASSWORD;
-
-      const auth = XAPI.toBasicAuth(username, password);
-      XAPISingleton.instance = new XAPI({
-        endpoint: endpoint,
-        auth: auth
-      });
+        XAPISingleton.instance = new XAPISingleton();
     }
     return XAPISingleton.instance;
   }
@@ -38,10 +33,12 @@ class XAPISingleton {
       }
     };
   }
-  public static sendStatement(statement : Statement ){
-    XAPISingleton.getInstance().sendStatement({
-      statement
-    });
+  public static async sendStatement(statement : Statement ){
+    fetchRequest(
+      `${API_ENDPOINT}/statistics/`,
+      "POST",
+      JSON.stringify(statement)
+    );
   }
 
   public static levelCompletedStatement(
