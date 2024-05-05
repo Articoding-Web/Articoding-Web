@@ -116,17 +116,13 @@ export default async function loadCommunity() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
-  let levels = [];
-  const response = await fetchRequest(
-    `${API_ENDPOINT}/level/community/levels`,
-    "GET"
-  );
+  try {
+    let levels = [];
+    const response = await fetchRequest(
+      `${API_ENDPOINT}/level/community/levels`,
+      "GET"
+    );
 
-  if (response.headers.get('content-type').includes('text/html')) {
-    // Estamos en modo offline
-    const content = await response.text();
-    document.getElementById("content").innerHTML = content;
-  } else { // Si no es HTML asumimos que es JSON
     levels = await response.json();
 
     const cookie = sessionCookieValue();
@@ -162,5 +158,10 @@ export default async function loadCommunity() {
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
     });
+  } catch(error) {
+    if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      location.reload();
+    }
   }
 }

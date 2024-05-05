@@ -2,7 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.6";
+var version = "1.0.1";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -89,9 +89,7 @@ const cacheFirst = async ({ request }) => {
   // Next try to get the resource from the network
   try {
     const responseFromNetwork = await fetch(request);
-    // Response may be used only once
-    // we need to save clone to put one copy in cache
-    // and serve second one
+    // We need to save clone to put one copy in cache and serve second one
     putInCache(request, responseFromNetwork.clone());
     return responseFromNetwork;
   } catch (error) {
@@ -105,10 +103,9 @@ const cacheFirst = async ({ request }) => {
     if (fallbackResponse) {
       return fallbackResponse;
     }
-    // When even the fallback response is not available,
-    // return a Response object
-    return new Response("Network error happened", {
-      status: 408,
+    // When even the fallback response is not available
+    return new Response("Service Unavailable", {
+      status: 503,
       headers: { "Content-Type": "text/plain" },
     });
   }

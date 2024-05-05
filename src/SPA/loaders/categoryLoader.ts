@@ -120,17 +120,13 @@ export default async function loadCategoryById(id: string) {
     generateCategoryLevelsDivPlaceholder
   );
 
-  let levels = [];
+  try {
+    let levels = [];
+    const response = await fetchRequest(
+      `${API_ENDPOINT}/level/levelsByCategory/${id}`,
+      "GET"
+    );
 
-  const response = await fetchRequest(
-    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
-    "GET"
-  );
-
-  if (response.headers.get('content-type').includes('text/html')) {
-    // Estamos en modo offline
-    await response.text();
-  } else { // Si no es HTML asumimos que es JSON
     levels = await response.json();
 
     const cookie = sessionCookieValue();
@@ -166,5 +162,10 @@ export default async function loadCategoryById(id: string) {
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
     });
+  } catch(error) {
+    if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      location.reload();
+    }
   }
 }

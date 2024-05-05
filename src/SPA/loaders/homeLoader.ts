@@ -85,18 +85,12 @@ export default async function loadHome() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
-  let categories = [];
-  const response = await fetchRequest(
-    `${API_ENDPOINT}/level/categories`,
-    "GET"
-  );
-
-  if (response.headers.get('content-type').includes('text/html')) {
-    // Estamos en modo offline
-    const content = await response.text();
-    document.getElementById("content").innerHTML = content;
-  } else { // Si no es HTML asumimos que es JSON
-
+  try {
+    let categories = [];
+    const response = await fetchRequest(
+      `${API_ENDPOINT}/level/categories`,
+      "GET"
+    );
     categories = await response.json();
 
     await fillContent(divElement, categories, generateCategoryDiv);
@@ -104,5 +98,10 @@ export default async function loadHome() {
     document.querySelectorAll("a.category").forEach((anchorTag) => {
       anchorTag.addEventListener("click", loadCategoryLevels);
     });
+  } catch(error) {
+    if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      location.reload();
+    }
   }
 }

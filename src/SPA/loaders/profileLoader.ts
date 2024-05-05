@@ -69,7 +69,12 @@ async function userLogin(modal : bootstrap.Modal) {
         const errorElement = document.getElementById("text-error-login");
         errorElement.innerText = "Error con el username o contraseña";
         errorElement.style.color = "red";
-      } else {
+      }
+      else if (error.status === 503) { // Offline mode
+        console.log("Received a 503 web error");
+        location.reload();
+      }
+      else {
       console.error('Error general:', error);
     }
   }
@@ -116,13 +121,18 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
     modal.hide();
     window.location.href = "/"; 
   }
-  catch(error){
+  catch(error) {
     if (error.status === 409) {
       const errorElement = document.getElementById("text-error-register");
       errorElement.innerText = "El username ya existe";
       errorElement.style.color = "red";
-    } else {
-    console.error('Error general:', error);
+    }
+    else if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      location.reload();
+    }
+    else {
+      console.error('Error general:', error);
     }
   }
 }
@@ -288,24 +298,32 @@ function logout() {
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();
-    await fetchRequest(
-      `${API_ENDPOINT}/user/logout`,
-      "DELETE",
-      null,
-      'include'
-    );
-    window.location.href = "/"; 
+    try {
+      await fetchRequest(
+        `${API_ENDPOINT}/user/logout`,
+        "DELETE",
+        null,
+        'include'
+      );
+      window.location.href = "/";
+      }
+      catch(error) {
+        if (error.status === 503) { // Offline mode
+          console.log("Received a 503 web error");
+          location.reload();
+        }
+      }
   });
 }
 
 export default async function loadProfile() {
-    document.getElementById("content").innerHTML = getRowHTML();
-    const divElement = document.getElementById("categories");
+  document.getElementById("content").innerHTML = getRowHTML();
+  const divElement = document.getElementById("categories");
 
-    // Load placeholders
-    // divElement.innerHTML = generateProfilePlaceholder();
+  // Load placeholders
+  // divElement.innerHTML = generateProfilePlaceholder();
 
-    const user = sessionCookieValue();
-    divElement.innerHTML = generateProfileDiv(user);
-    logout();
+  const user = sessionCookieValue();
+  divElement.innerHTML = generateProfileDiv(user);
+  logout();
 }
