@@ -28,8 +28,10 @@
   },
   "dependencies": {
     "@blockly/zoom-to-fit": "^5.0.12",
+    "@xapi/xapi": "^2.2.5",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
-    "ejs": "^3.1.9"
+    "ejs": "^3.1.9",
+    "uuid": "^9.0.1"
   }
 }

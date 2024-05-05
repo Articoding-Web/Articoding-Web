@@ -1,11 +1,12 @@
 import * as bootstrap from 'bootstrap';
+import { route } from "../../client";
 
 import config from '../../Game/config.js';
 import { fetchRequest } from '../utils';
-
+import XAPISingleton from '../../xAPI/xapi.js';
+import { getUserNameAndUUID, setPageHome } from '../app.js';
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
-
 // Variable para controlar si el evento click ya se agregó al botón
 let registerSubmitBtnAdded = false;
 
@@ -14,7 +15,7 @@ let registerSubmitBtnAdded = false;
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 w-100 h-100" id="categories"></div>';
+  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
 }
 
 export function sessionCookieValue() {
@@ -63,7 +64,9 @@ async function userLogin(modal : bootstrap.Modal) {
       'include',
     );
     modal.hide();
-    window.location.href = "/"; 
+    const [userName, uuid] = getUserNameAndUUID();
+    const statement = XAPISingleton.loginStatement(uuid, username);
+    XAPISingleton.sendStatement(statement);
   } catch (error) {
       if (error.status === 401 || error.status === 404) {
         const errorElement = document.getElementById("text-error-login");
@@ -119,7 +122,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
       JSON.stringify(postData)
     );
     modal.hide();
-    window.location.href = "/"; 
+    alert("Registro correcto, inicia sesión")
   }
   catch(error) {
     if (error.status === 409) {
@@ -159,8 +162,8 @@ export function appendLoginModal() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="loginReq">Iniciar Sesión</button>
-                        <button type="button" class="btn btn-secondary" id="registerBtn">¿No tienes cuenta?</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close" id="loginReq">Iniciar Sesión</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" id="registerBtn">¿No tienes cuenta?</button>
                         <span id="text-error-login"></span>
                     </div>
                 </div>
@@ -208,6 +211,7 @@ function appendRegisterModal() {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class = "text-success" >Nombre con más de 3 letras. La contraseña debe contener al menos 1 mayúscula, 1 número y tener más de 5 letras </p>
                         <form id="registerForm">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">Nombre</label>
@@ -226,7 +230,6 @@ function appendRegisterModal() {
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Registrarse</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <span >Tras registrarte, deberás hacer login</span>
                         <span id="text-error-register"></span>
                     </div>
                 </div>
@@ -268,54 +271,103 @@ function generateProfilePlaceholder() {}
  * @param {Object} user with id, name and role
  * @returns String of HTMLDivElement
  */
-function generateProfileDiv(user) {
-  return `<div class="row">
-            <div class="col col-6 offset-3">
-              <div class="row tag">
-                <div class="col col-3 offset-1 m-auto">
-                  <img src="./images/profile.png" class="rounded-circle">
-                </div>
-                <div class="col col-7 offset-1 text-center mx-auto my-auto">
-                  <p class="username">${user.name}</p>
-                </div>
-              </div>
-              <div class="row mt-3 h-20">
-                <div class="col col-6 offset-3 tag text-center">
-                  <div class="row mx-auto my-auto">
-                    <p class="role">${user.role}</p>
-                  </div>
-                  <button type="submit" class="btn btn-danger" id="logoutBtn">
-                    Cerrar Sesion
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>`;
+async function generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted) {
+  const levelDivs = await Promise.all(userLevels.map(level => generateLevelDiv(level)));
+
+  return `
+      <div class="col">
+        <div class="card mx-auto border-dark d-flex flex-column h-100">
+          <h5 class="card-header card-title text-dark">
+            Tus Datos
+          </h5>
+          <div class="card-body text-dark">
+            <p> Nombre: ${user.name}</p>
+            <p> Rol: ${user.role}</p>
+            <p class="card-subtitle mb-2 text-muted">
+              Niveles Oficiales Completados: ${officialLevelCompleted}
+            </p>
+            <p class="card-subtitle mb-2 text-muted">
+              Estrellas totales conseguidas: ${totalStars}
+            </p>
+            <button type="submit" class="btn btn-danger" id="logoutBtn">
+                Cerrar Sesion
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mx-auto border-dark d-flex flex-column h-100">
+          <h5 class="card-header card-title text-dark">
+            Tus niveles que has creado
+          </h5>
+        </div>
+      </div>
+      ${levelDivs.join("")}
+      `;
   
 }
 
-function logout() {
+async function generateLevelDiv(level) {
+  if (!level) {
+    throw new Error("Invalid level data");
+  }
+
+  const { id, miniature, title, description = "EditorLevel" } = level;
+
+  return `
+    <div class="col">
+      <div class="card mx-auto border-dark">
+        <a class="getLevel" href="${API_ENDPOINT}/level/${id}">
+          <div class="row g-0 text-dark">
+            <div class="col-md-3">
+              ${
+                miniature
+                  ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">`
+                  : ""
+              }
+            </div>
+            <div class="col-md-9">
+              <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-2">
+                  <div class="col">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${description}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>`;
+}
+
+async function logout(){
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();
-    try {
-      await fetchRequest(
-        `${API_ENDPOINT}/user/logout`,
-        "DELETE",
-        null,
-        'include'
-      );
-      window.location.href = "/";
-      }
-      catch(error) {
-        if (error.status === 503) { // Offline mode
-          console.log("Received a 503 web error");
-          location.reload();
-        }
-      }
+    await fetchRequest(
+      `${API_ENDPOINT}/user/logout`,
+      "DELETE",
+      null,
+      'include'
+    );
+    const [userName, uuid] = getUserNameAndUUID();
+    const statement = XAPISingleton.logoutStatement(uuid, userName);
+    XAPISingleton.sendStatement(statement);
+    localStorage.removeItem('MY_UUID');
+    setPageHome();
   });
 }
 
+async function playLevel(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.getLevel");
+  const id = anchorTag.href.split("level/")[1];
+  history.pushState({ id }, "", `level?id=${id}`);
+
+  route();
+}
 export default async function loadProfile() {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
@@ -323,7 +375,25 @@ export default async function loadProfile() {
   // Load placeholders
   // divElement.innerHTML = generateProfilePlaceholder();
 
-  const user = sessionCookieValue();
-  divElement.innerHTML = generateProfileDiv(user);
-  logout();
+    const user = sessionCookieValue();
+    const officialLevelCompleted = await fetchRequest(
+      `${API_ENDPOINT}/user/officialLevelsCompleted`,
+      "GET",
+      null,
+      'include',
+    );
+    const totalStars = await fetchRequest(
+      `${API_ENDPOINT}/user/totalStars/${user.id}`,
+      "GET"
+    );
+    const userLevels = await fetchRequest(
+      `${API_ENDPOINT}/level/userLevels/${user.id}`,
+      "GET"
+    );
+    divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
+     // Add getLevel event listener
+  document.querySelectorAll("a.getLevel").forEach((level) => {
+    level.addEventListener("click", playLevel);
+  });
+    logout();
 }
