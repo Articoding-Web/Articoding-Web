@@ -41,6 +41,8 @@ export default class LevelPlayer extends Phaser.Scene {
   private levelJSON: Level.Level;
   private fromLevelEditor: boolean;
 
+  private gameSpeed = 1;
+  private attempts = 0;
   constructor() {
     super("LevelPlayer");
   }
@@ -270,10 +272,9 @@ export default class LevelPlayer extends Phaser.Scene {
     });
   }
 
-  private checkWinCondition = async (e: Event) => {
+  private checkWinCondition = async (e: CustomEvent) => {
     let hasLost = false;
     let playerBounced = false;
-
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
@@ -285,7 +286,11 @@ export default class LevelPlayer extends Phaser.Scene {
 
       this.numChests -= player.getCollectedChest();
     }
+    let nAttempt = ++this.attempts;
     
+    let stars = 0;
+    let speed = this.gameSpeed;
+
     if(!this.fromLevelEditor) {
       // Official Level
       let stars = 0;
@@ -298,8 +303,11 @@ export default class LevelPlayer extends Phaser.Scene {
         document.dispatchEvent(event);
       }
 
-      const statisticEvent = new CustomEvent("updateStatistic", { detail: { hasLost: hasLost, stars } });
+      const nBlocks = e.detail.numberBlocks;
+      const solution = e.detail.solutionCode;
+      const statisticEvent = new CustomEvent("updateStatistic", { detail: { win: !hasLost, stars, speed,  nAttempt, playerBounced, nBlocks, solution} });
       document.dispatchEvent(statisticEvent);
+
     } else {
       // From Level Editor
       const object = sessionCookieValue();
@@ -312,8 +320,8 @@ export default class LevelPlayer extends Phaser.Scene {
             title: "Editor",
             data: JSON.stringify(this.levelJSON),
             minBlocks: null,
+            description: null,
           };
-          console.log("Nivel:", levelData);
           await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
           alert("Nivel creado");
         }        
@@ -324,7 +332,7 @@ export default class LevelPlayer extends Phaser.Scene {
   private changeAnimSpeed = (e: Event) => {
     const val = parseInt((e.currentTarget as HTMLInputElement).value);
     const newVal = (val % 3) + 1;  // between 1 - 3
-
+    this.gameSpeed = newVal;
     (e.currentTarget as HTMLDivElement).innerHTML = `${newVal}x`;
     (e.currentTarget as HTMLInputElement).value = `${newVal}`;
   }

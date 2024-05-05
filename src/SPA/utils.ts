@@ -1,3 +1,20 @@
+import { v4 as uuidv4 } from 'uuid';
+
+let MY_UUID: string | null = localStorage.getItem('MY_UUID');
+
+if (!MY_UUID) {
+  MY_UUID = uuidv4();
+  localStorage.setItem('MY_UUID', MY_UUID);
+}
+
+export function getSpecificUUID(): string {
+  if (!MY_UUID) {
+    MY_UUID = uuidv4();
+    localStorage.setItem('MY_UUID', MY_UUID);
+  }
+  return MY_UUID;
+}
+
 export class HTTPError extends Error {
   status: number;
 
@@ -47,3 +64,5 @@ export async function fillContent(divElement, items, htmlGenerator) {
     divElement.insertAdjacentHTML("beforeend", await htmlGenerator(item));
   }
 }
+
+uuidv4();
