@@ -346,17 +346,24 @@ async function logout(){
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();
-    await fetchRequest(
-      `${API_ENDPOINT}/user/logout`,
-      "DELETE",
-      null,
-      'include'
-    );
-    const [userName, uuid] = getUserNameAndUUID();
-    const statement = XAPISingleton.logoutStatement(uuid, userName);
-    XAPISingleton.sendStatement(statement);
-    localStorage.removeItem('MY_UUID');
-    setPageHome();
+    try {
+      await fetchRequest(
+        `${API_ENDPOINT}/user/logout`,
+        "DELETE",
+        null,
+        'include'
+      );
+      const [userName, uuid] = getUserNameAndUUID();
+      const statement = XAPISingleton.logoutStatement(uuid, userName);
+      XAPISingleton.sendStatement(statement);
+      localStorage.removeItem('MY_UUID');
+      setPageHome();
+    } catch(error) {
+      if (error.status === 503) { // Offline mode
+        console.log("Received a 503 web error");
+        location.reload();
+      }
+    }
   });
 }
 
@@ -375,7 +382,7 @@ export default async function loadProfile() {
   // Load placeholders
   // divElement.innerHTML = generateProfilePlaceholder();
 
-    const user = sessionCookieValue();
+  try {const user = sessionCookieValue();
     const officialLevelCompleted = await fetchRequest(
       `${API_ENDPOINT}/user/officialLevelsCompleted`,
       "GET",
@@ -392,8 +399,14 @@ export default async function loadProfile() {
     );
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
-  document.querySelectorAll("a.getLevel").forEach((level) => {
-    level.addEventListener("click", playLevel);
-  });
+    document.querySelectorAll("a.getLevel").forEach((level) => {
+      level.addEventListener("click", playLevel);
+    });
     logout();
+  } catch(error) {
+    if (error.status === 503) {
+      console.log("Received a 503 web error");
+      location.reload();
+    }
+  }
 }
