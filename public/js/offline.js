@@ -1,4 +1,4 @@
-(function () {
+/* (function () {
     if (!navigator || !navigator.serviceWorker) return;
     caches.keys().then(function (keys) {
         return keys.filter(function (key) {
@@ -17,12 +17,9 @@
             });
         });
     });
-})();
+})(); */
 
-/*import { loadLevel } from "../../src/SPA/loaders/levelPlayerLoader";
-
-const main = document.getElementById('principal');
-main.innerHTML=`<div><strong>Contenido dinámico OFFLINE</strong></div>`;
+import { loadLevel } from "../../src/SPA/loaders/levelPlayerLoader";
 
 function setContent() {
     if (!navigator || !navigator.serviceWorker) return;
@@ -65,4 +62,3 @@ export default async function load() {
     setContent();
     load();
 })()
-*/

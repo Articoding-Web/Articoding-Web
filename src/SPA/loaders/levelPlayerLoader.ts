@@ -50,8 +50,7 @@ function getEditButton(fromLevelEditor: boolean) {
  */
 export default async function playLevelById(id: string) {
     try {
-        const response = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
-        const level = await response.json();
+        const level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
         loadLevel(JSON.parse(level.data), false, level.category);
     } catch(error) {
         if (error.status === 503) { // Offline mode

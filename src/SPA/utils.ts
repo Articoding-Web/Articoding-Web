@@ -34,6 +34,9 @@ export async function fetchRequest(endpoint, method, data?, credentials?) {
   try {
     const response = await fetch(endpoint, {
       method,
+      headers: {
+        "Content-Type": "application/json",
+      },
       credentials: credentials,
       body: data,
     });
@@ -42,7 +45,7 @@ export async function fetchRequest(endpoint, method, data?, credentials?) {
       throw new HTTPError(response.status, `Fetch request failed with status ${response.status}`);
     }
 
-    return response;
+    return await response.json();
   } catch (error) {
     console.error('Error occurred during fetch request:', error);
     throw error;

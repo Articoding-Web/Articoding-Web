@@ -117,23 +117,19 @@ export default async function loadCommunity() {
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
   try {
-    let levels = [];
-    const response = await fetchRequest(
+    const levels = await fetchRequest(
       `${API_ENDPOINT}/level/community/levels`,
       "GET"
     );
-
-    levels = await response.json();
 
     const cookie = sessionCookieValue();
 
     let statistics = [];
     if (cookie !== null) {
-      const response = await fetchRequest(
+      statistics = await fetchRequest(
         `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
         "GET"
       );
-      statistics = await response.json();
     }
     const statisticsMap = statistics.reduce((map, statistic) => {
       map[statistic.level] = {

@@ -121,23 +121,19 @@ export default async function loadCategoryById(id: string) {
   );
 
   try {
-    let levels = [];
-    const response = await fetchRequest(
+    const levels = await fetchRequest(
       `${API_ENDPOINT}/level/levelsByCategory/${id}`,
       "GET"
     );
-
-    levels = await response.json();
 
     const cookie = sessionCookieValue();
 
     let statistics = [];
     if (cookie !== null) {
-      const response = await fetchRequest(
+      statistics = await fetchRequest(
         `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
         "GET"
       );
-      statistics = await response.json();
     }
     const statisticsMap = statistics.reduce((map, statistic) => {
       map[statistic.level] = {

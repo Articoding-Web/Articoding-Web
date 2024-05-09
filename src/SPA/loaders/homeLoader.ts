@@ -86,12 +86,10 @@ export default async function loadHome() {
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
   try {
-    let categories = [];
-    const response = await fetchRequest(
+    const categories = await fetchRequest(
       `${API_ENDPOINT}/level/categories`,
       "GET"
     );
-    categories = await response.json();
 
     await fillContent(divElement, categories, generateCategoryDiv);
 
@@ -101,7 +99,7 @@ export default async function loadHome() {
   } catch(error) {
     if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
-      location.reload();
+      window.location.reload();
     }
   }
 }

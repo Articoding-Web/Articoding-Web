@@ -2,7 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.2";
+var version = "1.0.3";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -95,7 +95,7 @@ const cacheFirst = async ({ request }) => {
   } catch (error) {
     console.log("Intento cargar el offline");
     let fallbackType = request.destination;
-    if (fallbackType === 'document' || fallbackType === '')
+    if (fallbackType === 'document')
       fallbackType = 'html';
     const fallbackUrl = fallbackResourceUrls[fallbackType];
     const fallbackResponse = await caches.match(fallbackUrl);

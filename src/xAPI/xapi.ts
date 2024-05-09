@@ -34,7 +34,7 @@ class XAPISingleton {
     };
   }
   public static async sendStatement(statement : Statement ){
-    fetchRequest(
+    await fetchRequest(
       `${API_ENDPOINT}/statistics/`,
       "POST",
       JSON.stringify(statement)
