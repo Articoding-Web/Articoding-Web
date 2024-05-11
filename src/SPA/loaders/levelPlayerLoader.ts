@@ -55,7 +55,7 @@ export default async function playLevelById(id: string) {
     } catch(error) {
         if (error.status === 503) { // Offline mode
             console.log("Received a 503 web error");
-            location.reload();
+            // window.location.reload();
         }
     }
 }

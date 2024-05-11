@@ -42,12 +42,12 @@ export async function fetchRequest(endpoint, method, data?, credentials?) {
     });
 
     if (!response.ok) {
-      throw new HTTPError(response.status, `Fetch request failed with status ${response.status}`);
+      throw new HTTPError(response.status, `${method} request to ${endpoint} failed with status ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error occurred during fetch request:', error);
+    console.error(error);
     throw error;
   }
 }

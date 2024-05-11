@@ -75,7 +75,7 @@ async function userLogin(modal : bootstrap.Modal) {
       }
       else if (error.status === 503) { // Offline mode
         console.log("Received a 503 web error");
-        location.reload();
+        window.location.reload();
       }
       else {
       console.error('Error general:', error);
@@ -132,7 +132,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
     }
     else if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
-      location.reload();
+      window.location.reload();
     }
     else {
       console.error('Error general:', error);
@@ -361,7 +361,7 @@ async function logout(){
     } catch(error) {
       if (error.status === 503) { // Offline mode
         console.log("Received a 503 web error");
-        location.reload();
+        window.location.reload();
       }
     }
   });
@@ -406,7 +406,7 @@ export default async function loadProfile() {
   } catch(error) {
     if (error.status === 503) {
       console.log("Received a 503 web error");
-      location.reload();
+      window.location.reload();
     }
   }
 }

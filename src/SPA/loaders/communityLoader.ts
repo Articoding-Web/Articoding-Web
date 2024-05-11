@@ -100,7 +100,7 @@ async function generateLevelDiv(level) {
  * Sets content and starts phaser LevelPlayer
  * @param {Event} event - click event of <a> to href with level id
  */
-async function playLevel(event) {
+export async function playLevel(event) {
   event.preventDefault();
   const anchorTag = event.target.closest("a.getLevel");
   const id = anchorTag.href.split("level/")[1];
@@ -157,7 +157,7 @@ export default async function loadCommunity() {
   } catch(error) {
     if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
-      location.reload();
+      window.location.reload();
     }
   }
 }

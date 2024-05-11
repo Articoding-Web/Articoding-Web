@@ -34,11 +34,16 @@ class XAPISingleton {
     };
   }
   public static async sendStatement(statement : Statement ){
-    await fetchRequest(
-      `${API_ENDPOINT}/statistics/`,
-      "POST",
-      JSON.stringify(statement)
-    );
+    try {
+      await fetchRequest(
+        `${API_ENDPOINT}/statistics/`,
+        "POST",
+        JSON.stringify(statement)
+      );
+    } catch (error) {
+      console.error("Failed to send stats to server");
+      console.error(error);
+    }
   }
 
   public static levelCompletedStatement(

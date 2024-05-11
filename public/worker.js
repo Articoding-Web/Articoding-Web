@@ -2,7 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.3";
+var version = "1.0.15";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -12,9 +12,7 @@ var store = [steady, levels];
 var limit = 2;
 
 const resources = [
-  "/",
   "/client.js",
-  "/index.html",
   "/offline.html",
   "/css/bootstrap.min.css",
   "/css/style.css",
@@ -43,6 +41,7 @@ const resources = [
   "/assets/ui/plus_pressed.png",
   "/assets/ui/plus.png",
   "/js/offline.js",
+  "/js/offline.js.map",
   "/js/popper.min.js",
   "/js/service.js",
   "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css",
