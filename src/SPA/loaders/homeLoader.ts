@@ -85,14 +85,21 @@ export default async function loadHome() {
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCategoryDivPlaceholder);
 
-  const categories = await fetchRequest(
-    `${API_ENDPOINT}/level/categories`,
-    "GET"
-  );
+  try {
+    const categories = await fetchRequest(
+      `${API_ENDPOINT}/level/categories`,
+      "GET"
+    );
 
-  await fillContent(divElement, categories, generateCategoryDiv);
+    await fillContent(divElement, categories, generateCategoryDiv);
 
-  document.querySelectorAll("a.category").forEach((anchorTag) => {
-    anchorTag.addEventListener("click", loadCategoryLevels);
-  });
+    document.querySelectorAll("a.category").forEach((anchorTag) => {
+      anchorTag.addEventListener("click", loadCategoryLevels);
+    });
+  } catch(error) {
+    if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      window.location.reload();
+    }
+  }
 }

@@ -57,7 +57,7 @@ async function userLogin(modal : bootstrap.Modal) {
   };
 
   try {
-    const responseData = await fetchRequest(
+    await fetchRequest(
       `${API_ENDPOINT}/user/login`,
       "POST",
       JSON.stringify(postData),
@@ -72,7 +72,12 @@ async function userLogin(modal : bootstrap.Modal) {
         const errorElement = document.getElementById("text-error-login");
         errorElement.innerText = "Error con el username o contraseña";
         errorElement.style.color = "red";
-      } else {
+      }
+      else if (error.status === 503) { // Offline mode
+        console.log("Received a 503 web error");
+        window.location.reload();
+      }
+      else {
       console.error('Error general:', error);
     }
   }
@@ -119,13 +124,18 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
     modal.hide();
     alert("Registro correcto, inicia sesión")
   }
-  catch(error){
+  catch(error) {
     if (error.status === 409) {
       const errorElement = document.getElementById("text-error-register");
       errorElement.innerText = "El username ya existe";
       errorElement.style.color = "red";
-    } else {
-    console.error('Error general:', error);
+    }
+    else if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      window.location.reload();
+    }
+    else {
+      console.error('Error general:', error);
     }
   }
 }
@@ -336,17 +346,24 @@ async function logout(){
   let logoutSubmitBtn = document.getElementById("logoutBtn");
   logoutSubmitBtn.addEventListener("click", async function (event) {
     event.preventDefault();
-    await fetchRequest(
-      `${API_ENDPOINT}/user/logout`,
-      "DELETE",
-      null,
-      'include'
-    );
-    const [userName, uuid] = getUserNameAndUUID();
-    const statement = XAPISingleton.logoutStatement(uuid, userName);
-    XAPISingleton.sendStatement(statement);
-    localStorage.removeItem('MY_UUID');
-    setPageHome();
+    try {
+      await fetchRequest(
+        `${API_ENDPOINT}/user/logout`,
+        "DELETE",
+        null,
+        'include'
+      );
+      const [userName, uuid] = getUserNameAndUUID();
+      const statement = XAPISingleton.logoutStatement(uuid, userName);
+      XAPISingleton.sendStatement(statement);
+      localStorage.removeItem('MY_UUID');
+      setPageHome();
+    } catch(error) {
+      if (error.status === 503) { // Offline mode
+        console.log("Received a 503 web error");
+        window.location.reload();
+      }
+    }
   });
 }
 
@@ -359,13 +376,13 @@ async function playLevel(event) {
   route();
 }
 export default async function loadProfile() {
-    document.getElementById("content").innerHTML = getRowHTML();
-    const divElement = document.getElementById("categories");
+  document.getElementById("content").innerHTML = getRowHTML();
+  const divElement = document.getElementById("categories");
 
-    // Load placeholders
-    // divElement.innerHTML = generateProfilePlaceholder();
+  // Load placeholders
+  // divElement.innerHTML = generateProfilePlaceholder();
 
-    const user = sessionCookieValue();
+  try {const user = sessionCookieValue();
     const officialLevelCompleted = await fetchRequest(
       `${API_ENDPOINT}/user/officialLevelsCompleted`,
       "GET",
@@ -382,8 +399,14 @@ export default async function loadProfile() {
     );
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
-  document.querySelectorAll("a.getLevel").forEach((level) => {
-    level.addEventListener("click", playLevel);
-  });
+    document.querySelectorAll("a.getLevel").forEach((level) => {
+      level.addEventListener("click", playLevel);
+    });
     logout();
+  } catch(error) {
+    if (error.status === 503) {
+      console.log("Received a 503 web error");
+      window.location.reload();
+    }
+  }
 }

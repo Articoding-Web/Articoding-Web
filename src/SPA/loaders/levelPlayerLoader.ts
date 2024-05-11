@@ -49,8 +49,15 @@ function getEditButton(fromLevelEditor: boolean) {
  * @param {String} id - The ID of the level to start
  */
 export default async function playLevelById(id: string) {
-    let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
-    loadLevel(JSON.parse(level.data), false, level.category);
+    try {
+        const level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
+        loadLevel(JSON.parse(level.data), false, level.category);
+    } catch(error) {
+        if (error.status === 503) { // Offline mode
+            console.log("Received a 503 web error");
+            window.location.reload();
+        }
+    }
 }
 
 export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean, category?: string) {

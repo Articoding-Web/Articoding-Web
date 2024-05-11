@@ -7,7 +7,7 @@ import { Statement } from '@xapi/xapi';
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 let nClicksStopCodeBtn = 0;
 
-export function incrementStopCodeBtn(){
+export function incrementStopCodeBtn() {
   nClicksStopCodeBtn++;
 }
 
@@ -26,10 +26,14 @@ export default async function initLogger() {
     const urlParams = new URLSearchParams(window.location.search);
     const levelId = urlParams.get('id');
 
-    const totalOfficialLevels = await fetchRequest(
+    let totalOfficialLevels = 0;
+
+    const response = await fetchRequest(
       `${API_ENDPOINT}/level/totalOfficialLevels`,
       "GET",
     )
+    totalOfficialLevels = await response.json();
+
     let userLevelsCompleted = 0;
 
     if (cookie !== null) {
@@ -46,12 +50,13 @@ export default async function initLogger() {
         JSON.stringify(postData)
       );
 
-      userLevelsCompleted = await fetchRequest(
+      const response = await fetchRequest(
         `${API_ENDPOINT}/user/officialLevelsCompleted`,
         "GET",
         null,
         "include"
-      )      
+      );
+      userLevelsCompleted = await response.json();
     }
     let statement : Statement;
     if(win)

@@ -6,7 +6,7 @@ import typescript from "@rollup/plugin-typescript";
 import serve from "rollup-plugin-serve";
 
 export default [
-  // Phaser
+  // SPA
   {
     //  Our game entry point (edit as required)
     input: ["./src/client.ts"],
@@ -40,9 +40,9 @@ export default [
         preventAssignment: true,
         include: ['src/Game/config.ts'],
         values: {
-            'ENV_API_PROTOCOL': 'http',
-            'ENV_API_DOMAIN': 'localhost',
-            'ENV_API_PORT': '3001'
+          'ENV_API_PROTOCOL': 'http',
+          'ENV_API_DOMAIN': 'localhost',
+          'ENV_API_PORT': '3001'
         }
       }),
 
@@ -74,5 +74,5 @@ export default [
         },
       }),
     ],
-  },
+  }
 ];

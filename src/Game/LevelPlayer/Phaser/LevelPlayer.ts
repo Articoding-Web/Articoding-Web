@@ -1,4 +1,4 @@
-import * as Phaser from 'phaser';
+import * as Phaser from "phaser";
 
 import config from '../../config.js';
 import ArticodingSprite from './Classes/ArticodingSprite.js';
@@ -322,10 +322,14 @@ export default class LevelPlayer extends Phaser.Scene {
             minBlocks: null,
             description: null,
           };
-          await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
-          alert("Nivel creado");
+          try {
+            await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
+            alert("Nivel creado");
+          } catch (error) {
+            alert("Connection to server failed");
+          }
         }        
-      } else alert("Necesitas iniciar sesión");
+      } else alert("You need to sign in before saving a level");
     }
   };
 

@@ -52,7 +52,7 @@ function generateCategoryLevelsDivPlaceholder() {
  * @param {Object} level with id, title, etc
  * @returns String of HTMLDivElement
  */
-async function generateLevelDiv(level) {
+export async function generateLevelDiv(level) {
   if (!level || !level.statistics) {
     throw new Error("Invalid level data");
   }
@@ -100,7 +100,7 @@ async function generateLevelDiv(level) {
  * Sets content and starts phaser LevelPlayer
  * @param {Event} event - click event of <a> to href with level id
  */
-async function playLevel(event) {
+export async function playLevel(event) {
   event.preventDefault();
   const anchorTag = event.target.closest("a.getLevel");
   const id = anchorTag.href.split("level/")[1];
@@ -120,41 +120,48 @@ export default async function loadCategoryById(id: string) {
     generateCategoryLevelsDivPlaceholder
   );
 
-  const levels = await fetchRequest(
-    `${API_ENDPOINT}/level/levelsByCategory/${id}`,
-    "GET"
-  );
-
-  const cookie = sessionCookieValue();
-
-  let statistics = [];
-  if (cookie !== null) {
-    statistics = await fetchRequest(
-      `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
+  try {
+    const levels = await fetchRequest(
+      `${API_ENDPOINT}/level/levelsByCategory/${id}`,
       "GET"
     );
+
+    const cookie = sessionCookieValue();
+
+    let statistics = [];
+    if (cookie !== null) {
+      statistics = await fetchRequest(
+        `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
+        "GET"
+      );
+    }
+    const statisticsMap = statistics.reduce((map, statistic) => {
+      map[statistic.level] = {
+        stars: statistic.stars,
+        attempts: statistic.attempts,
+      };
+      return map;
+    }, {});
+
+    const levelsWithStatistics = levels.map((level) => {
+      const levelId = level.id;
+      const statistic = statisticsMap[levelId];
+      return {
+        ...level,
+        statistics: statistic || { stars: 0, attempts: 0 },
+      };
+    });
+
+    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+
+    // Add getLevel event listener
+    document.querySelectorAll("a.getLevel").forEach((level) => {
+      level.addEventListener("click", playLevel);
+    });
+  } catch(error) {
+    if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      window.location.reload();
+    }
   }
-  const statisticsMap = statistics.reduce((map, statistic) => {
-    map[statistic.level] = {
-      stars: statistic.stars,
-      attempts: statistic.attempts,
-    };
-    return map;
-  }, {});
-
-  const levelsWithStatistics = levels.map((level) => {
-    const levelId = level.id;
-    const statistic = statisticsMap[levelId];
-    return {
-      ...level,
-      statistics: statistic || { stars: 0, attempts: 0 },
-    };
-  });
-
-  await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-
-  // Add getLevel event listener
-  document.querySelectorAll("a.getLevel").forEach((level) => {
-    level.addEventListener("click", playLevel);
-  });
 }

@@ -13,6 +13,7 @@ const router = {
   "/level": setPageLevelPlayer,
   "/editor": setPageLevelEditor,
   "/profile": setPageProfile,
+  "/offline": () => {},
   "/": setPageHome,
 };
 
