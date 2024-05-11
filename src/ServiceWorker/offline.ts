@@ -1,27 +1,5 @@
-/* (function () {
-    if (!navigator || !navigator.serviceWorker) return;
-    caches.keys().then(function (keys) {
-        return keys.filter(function (key) {
-            return key.includes('_levels');
-        }).forEach(function (key) {
-            const list = document.querySelector('#principal');
-            list.innerHTML = '';
-            caches.open(key).then(function (cache) {
-                cache.keys().then(function (keys) {
-                    list.innerHTML = "<ul>" +
-                            keys.map(function(key) {
-                                return '<li><a href="' + key.url + '">' + key.url + '</a></li>';
-                            }).join('')
-                            + "</ul>"
-                });
-            });
-        });
-    });
-})(); */
-
 import { fetchRequest } from "../SPA/utils";
-
-// import playLevelById from "../SPA/loaders/levelPlayerLoader";
+import playLevelById from "../SPA/loaders/levelPlayerLoader";
 
 function generateLevelDiv(level) {
     if (!level) {
@@ -33,14 +11,10 @@ function generateLevelDiv(level) {
       return `
         <div class="col">
           <div class="card mx-auto border-dark">
-            <a class="getLevel" href="/level/${id}">
+            <a class="offlineLevel" href="/level/${id}">
               <div class="row g-0 text-dark">
                 <div class="col-md-3">
-                  ${
-                    miniature
-                      ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">`
-                      : ""
-                  }
+                  ${ miniature ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">` : "" }
                 </div>
                 <div class="col-md-9">
                   <div class="card-body">
@@ -58,27 +32,30 @@ function generateLevelDiv(level) {
         </div>`;
 }
 
-async function setContent() {
-    history.pushState({}, "", "offline.html");
+async function createLevelDivs(cachedLevelKeys) {
+  const contentDiv = document.getElementById("levels");
+  for(const key of cachedLevelKeys) {
+    try {
+      const level = await fetchRequest(key.url, "GET");
+      contentDiv.insertAdjacentHTML("beforeend", generateLevelDiv(level));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}
+
+async function setOfflinePage() {
+    history.pushState({}, "", "offline");
     
     if (!navigator || !navigator.serviceWorker) return;
-    console.warn("Llego a setContent");
     await caches.keys().then(function (keys) {
         return keys.filter(function (key) {
             return key.includes('_levels');
-        }).forEach(function (key) {
-            console.log("Cache name:", key);
-            const list = document.getElementById("principal");
-            console.log(list);
+        }).forEach(function (key) {            
             caches.open(key).then(function (cache) {
-                cache.keys().then(function (keys) {
-                    list.innerHTML = "<ul>" +
-                            keys.map(async function(key) {
-                                console.log(key);
-                                const level = await fetchRequest(key.url, "GET");
-                                return `<li>${generateLevelDiv(level)}</li>`;
-                            }).join('')
-                            + "</ul>"
+                cache.keys().then(async function (keys) {
+                  await createLevelDivs(keys);
+                  addLevelEventListeners();
                 });
             });
         });
@@ -86,15 +63,15 @@ async function setContent() {
 };
 
 // Add click event listener for each level
-async function load() {
-    const levels = document.querySelectorAll(".offlineLevel");
+async function addLevelEventListeners() {
+    const levels = document.querySelectorAll("a.offlineLevel");
     levels.forEach(level => level.addEventListener("click", function(event) {
         event.preventDefault();
         const id = this.href.split("level/")[1];
+        playLevelById(id);
     }));
 }
 
-(async function() {
-    await setContent();
-    load();
-})()
+(function() {
+  setOfflinePage();
+})();

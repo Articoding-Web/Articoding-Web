@@ -9,6 +9,7 @@ import { getSpecificUUID } from "./utils";
 const URL_EDITOR = "editor" 
 const URL_PROFILE= "profile"
 const URL_COMMUNITY = "community"
+
 export async function setPageHome() {
   loadHome();
 }
@@ -62,6 +63,7 @@ export async function setPageProfile() {
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_PROFILE);
   await XAPISingleton.sendStatement(statement);
 }
+
 export async function exitToCategory(categoryIndex: string) {
   window.location.href = `/category?id=${categoryIndex}`;
 }

@@ -2,17 +2,16 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.15";
+var version = "1.0.0";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
 
 var store = [steady, levels];
 
-var limit = 2;
+var limit = 10;
 
 const resources = [
-  "/client.js",
   "/offline.html",
   "/css/bootstrap.min.css",
   "/css/style.css",
@@ -50,8 +49,7 @@ const resources = [
 const fallbackResourceUrls = {
   'html': '/offline.html',
   'font': 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
-  'image': '/images/logo.ico',
-  'script': '/client.js',
+  'image': '/images/logo.ico'
 }
 
 const addResourcesToCache = async (resources) => {
@@ -96,6 +94,9 @@ const cacheFirst = async ({ request }) => {
     let fallbackType = request.destination;
     if (fallbackType === 'document')
       fallbackType = 'html';
+
+    console.log(request);
+
     const fallbackUrl = fallbackResourceUrls[fallbackType];
     const fallbackResponse = await caches.match(fallbackUrl);
     console.log("Fallback response:", fallbackResponse);

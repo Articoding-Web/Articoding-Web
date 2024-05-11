@@ -53,7 +53,7 @@ export default [
             typescript(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
-            terser()
+            // terser()
         ]
     },
     // SPA
@@ -118,7 +118,7 @@ export default [
             typescript(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
-            terser()
+            // terser()
         ]
     }
 ];

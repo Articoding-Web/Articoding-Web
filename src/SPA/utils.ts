@@ -30,7 +30,9 @@ export class HTTPError extends Error {
  * @param {String} method "GET" is the only method supported
  * @returns json response
  */
-export async function fetchRequest(endpoint, method, data?, credentials?) {
+export async function fetchRequest(endpoint, method, body?, credentials?) {
+  console.debug(`${method} request to ${endpoint}`);
+  
   try {
     const response = await fetch(endpoint, {
       method,
@@ -38,7 +40,7 @@ export async function fetchRequest(endpoint, method, data?, credentials?) {
         "Content-Type": "application/json",
       },
       credentials: credentials,
-      body: data,
+      body
     });
 
     if (!response.ok) {

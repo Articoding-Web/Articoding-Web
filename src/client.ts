@@ -9,6 +9,7 @@ import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
 import XAPISingleton from './xAPI/xapi';
+
 export async function route() {
   // Always destroy phaser game
   await PhaserController.destroyGame();
