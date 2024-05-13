@@ -169,13 +169,15 @@ class XAPISingleton {
       object: {
         id: "https://articoding.e-ucm.es/activity/change-state-block",
         definition: {
-          type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
-          extensions: {
-            "https://articoding.e-ucm.es/exts/level-id": levelId,
-            "https://articoding.e-ucm.es/exts/name": name,
-            "https://articoding.e-ucm.es/exts/old-value": oldValue,
-            "https://articoding.e-ucm.es/exts/new-value”": newValue,
-          }
+          type: `https://articoding.e-ucm.es/activity-type/${blockType}`
+        }
+      },
+      result: {
+        extensions: {
+          "https://articoding.e-ucm.es/exts/level-id": levelId,
+          "https://articoding.e-ucm.es/exts/name": name,
+          "https://articoding.e-ucm.es/exts/old-value": oldValue,
+          "https://articoding.e-ucm.es/exts/new-value”": newValue
         }
       },
       context
@@ -194,11 +196,13 @@ class XAPISingleton {
       object: {
         id: "https://articoding.e-ucm.es/activity/delete-block",
         definition: {
-          type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
-          extensions: {
-            "https://articoding.e-ucm.es/exts/level-id": levelId,
-            "https://articoding.e-ucm.es/exts/deleted-blocks": deletedBlocks,
-          }
+          type: `https://articoding.e-ucm.es/activity-type/${blockType}`
+        }
+      },
+      result:{
+        extensions: {
+          "https://articoding.e-ucm.es/exts/level-id": levelId,
+          "https://articoding.e-ucm.es/exts/deleted-blocks": deletedBlocks,
         }
       },
       context
@@ -217,11 +221,13 @@ class XAPISingleton {
       object: {
         id: "https://articoding.e-ucm.es/activity/move-block",
         definition: {
-          type: `https://articoding.e-ucm.es/activity-type/${blockType}`,
-          extensions: {
-            "https://articoding.e-ucm.es/exts/level-id": levelId,
-            "https://articoding.e-ucm.es/exts/move-actions": moveActions,
-          }
+          type: `https://articoding.e-ucm.es/activity-type/${blockType}`
+        }
+      },
+      result:{
+        extensions: {
+          "https://articoding.e-ucm.es/exts/level-id": levelId,
+          "https://articoding.e-ucm.es/exts/move-actions": moveActions,
         }
       },
       context
