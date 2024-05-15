@@ -2,7 +2,7 @@
 
 const API_ENDPOINT = "http://localhost:3001/api/";
 
-var version = "1.0.1";
+var version = "1.0.2";
 
 var steady = version + "_steady";
 var levels = version + "_levels";
@@ -15,6 +15,7 @@ const resources = [
   "/offline.html",
   "/css/bootstrap.min.css",
   "/css/style.css",
+  "/css/tourguide.css",
   "/images/logo.png",
   "/images/logo.ico",
   "/images/profile.png",

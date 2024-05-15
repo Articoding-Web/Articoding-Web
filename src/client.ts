@@ -9,6 +9,7 @@ import initLogger from './SPA/Logger';
 import registerModals from './SPA/modals';
 import router from './SPA/router';
 import XAPISingleton from './xAPI/xapi';
+import TourController from './SPA/webtour/TourController';
 
 export async function route() {
   // Always destroy phaser game
@@ -80,4 +81,6 @@ function setNavbarListeners() {
   registerModals();
 
   initLogger();
+
+  TourController.init();
 })()

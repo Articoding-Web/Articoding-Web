@@ -4,6 +4,8 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
+import postcss from 'rollup-plugin-postcss';
+import path from 'path';
 
 export default [
     // Offline
@@ -21,8 +23,11 @@ export default [
             format: "es",
             sourcemap: true,
         },
-
         plugins: [
+            postcss({
+                extract: false, // ignore scss
+            }),
+
             // API Config
             replace({
                 preventAssignment: true,
@@ -53,7 +58,7 @@ export default [
             typescript(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
-            // terser()
+            terser()
         ]
     },
     // SPA
@@ -75,6 +80,11 @@ export default [
         },
 
         plugins: [
+            postcss({
+                extract: true, // extract CSS to separate file
+                extract: 'css/tourguide.css',
+                minimize: true, // minify CSS
+            }),
 
             //  Toggle the booleans here to enable / disable Phaser 3 features:
             replace({
@@ -85,7 +95,7 @@ export default [
                 'typeof EXPERIMENTAL': JSON.stringify(true),
                 'typeof PLUGIN_CAMERA3D': JSON.stringify(false),
                 'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
-                'typeof FEATURE_SOUND': JSON.stringify(true),
+                'typeof FEATURE_SOUND': JSON.stringify(true)
             }),
 
             // API Config
@@ -118,7 +128,7 @@ export default [
             typescript(),
 
             //  See https://github.com/rollup/plugins/tree/master/packages/terser for config options
-            // terser()
+            terser()
         ]
     }
 ];

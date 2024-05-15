@@ -4,10 +4,12 @@ import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
 import config from "../../Game/config";
 import Level from "../../Game/level";
+import TourController from "../webtour/TourController";
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
 let currentLevelJSON: Level.Level;
+let currentFromLevelEditor: boolean = false;
 
 /**
  *
@@ -33,6 +35,9 @@ function getLevelPlayerHTML(fromLevelEditor?: boolean) {
                         <button class="btn btn-warning" id="speedModifierBtn" value="1">
                             1x
                         </button>
+                        <button class="btn btn-light" id="levelPlayerTourBtn">
+                            <i class="bi bi-question"></i>
+                        </button>
                   </div>
               </div>
             </div>`;
@@ -52,6 +57,12 @@ export default async function playLevelById(id: string) {
     try {
         const level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
         loadLevel(JSON.parse(level.data), false, level.category);
+
+        if (id === "1") {
+            TourController.startIfNotFinished("LevelPlayer");
+        }
+    
+        document.getElementById("levelPlayerTourBtn").onclick = () => { TourController.start("LevelPlayer") };
     } catch(error) {
         if (error.status === 503) { // Offline mode
             console.log("Received a 503 web error");
@@ -66,6 +77,7 @@ export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolea
     }
     document.getElementById("content").innerHTML = getLevelPlayerHTML(fromLevelEditor);
     currentLevelJSON = levelJSON;
+    fromLevelEditor === undefined ? fromLevelEditor = false : currentFromLevelEditor = fromLevelEditor;
 
     const toolbox = levelJSON.blockly.toolbox;
     const maxInstances = currentLevelJSON.blockly.maxInstances;
@@ -76,6 +88,5 @@ export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolea
 }
 
 export function restartCurrentLevel() {
-    const phaserJSON = currentLevelJSON.phaser;
-    PhaserController.init("LevelPlayer", LevelPlayer, phaserJSON);
+    PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON: currentLevelJSON, fromLevelEditor: currentFromLevelEditor });
 }
