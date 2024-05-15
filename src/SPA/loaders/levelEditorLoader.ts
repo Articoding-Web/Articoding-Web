@@ -1,6 +1,7 @@
 import LevelEditor from "../../Game/LevelEditor/LevelEditor";
 import PhaserController from "../../Game/PhaserController";
 import Level from "../../Game/level";
+import { sessionCookieValue } from "./profileLoader";
 
 /**
  *
@@ -44,6 +45,8 @@ function getLevelEditorHTML() {
 
 export default function loadLevelEditor(levelJSON?: Level.Phaser) {
     document.getElementById("content").innerHTML = getLevelEditorHTML();
-
+    const cookie = sessionCookieValue();
+    if(!cookie)
+        alert("Inicia sesin para poder guardar niveles")
     PhaserController.init("LevelEditor", LevelEditor, { levelJSON });
 }

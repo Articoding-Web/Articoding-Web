@@ -4,7 +4,7 @@ import PhaserController from "../../Game/PhaserController";
 import { fetchRequest } from "../utils";
 import config from "../../Game/config";
 import Level from "../../Game/level";
-import Tour from "../webtour/TourController";
+import TourController from "../webtour/TourController";
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const BLOCKLY_DIV_ID = "blocklyDiv";
 
@@ -54,17 +54,27 @@ function getEditButton(fromLevelEditor: boolean) {
  * @param {String} id - The ID of the level to start
  */
 export default async function playLevelById(id: string) {
-    let level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
-    loadLevel(JSON.parse(level.data));
+    try {
+        const level = await fetchRequest(`${API_ENDPOINT}/level/${id}`, "GET");
+        loadLevel(JSON.parse(level.data), false, level.category);
 
-    if (id === "1") {
-        Tour.startIfNotFinished("LevelPlayer");
+        if (id === "1") {
+            TourController.startIfNotFinished("LevelPlayer");
+        }
+    
+        document.getElementById("levelPlayerTourBtn").onclick = () => { TourController.start("LevelPlayer") };
+    } catch(error) {
+        if (error.status === 503) { // Offline mode
+            console.log("Received a 503 web error");
+            window.location.reload();
+        }
     }
-
-    document.getElementById("levelPlayerTourBtn").onclick = () => { Tour.start("LevelPlayer") };
 }
 
-export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean) {
+export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean, category?: string) {
+    if (category) {
+        document.getElementById("content").setAttribute("categoryIndex", category);
+    }
     document.getElementById("content").innerHTML = getLevelPlayerHTML(fromLevelEditor);
     currentLevelJSON = levelJSON;
     fromLevelEditor === undefined ? fromLevelEditor = false : currentFromLevelEditor = fromLevelEditor;

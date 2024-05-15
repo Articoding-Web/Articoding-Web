@@ -1,3 +1,20 @@
+import { v4 as uuidv4 } from 'uuid';
+
+let MY_UUID: string | null = localStorage.getItem('MY_UUID');
+
+if (!MY_UUID) {
+  MY_UUID = uuidv4();
+  localStorage.setItem('MY_UUID', MY_UUID);
+}
+
+export function getSpecificUUID(): string {
+  if (!MY_UUID) {
+    MY_UUID = uuidv4();
+    localStorage.setItem('MY_UUID', MY_UUID);
+  }
+  return MY_UUID;
+}
+
 export class HTTPError extends Error {
   status: number;
 
@@ -13,7 +30,9 @@ export class HTTPError extends Error {
  * @param {String} method "GET" is the only method supported
  * @returns json response
  */
-export async function fetchRequest(endpoint, method, data?, credentials?) {
+export async function fetchRequest(endpoint, method, body?, credentials?) {
+  console.debug(`${method} request to ${endpoint}`);
+  
   try {
     const response = await fetch(endpoint, {
       method,
@@ -21,16 +40,16 @@ export async function fetchRequest(endpoint, method, data?, credentials?) {
         "Content-Type": "application/json",
       },
       credentials: credentials,
-      body: data,
+      body
     });
 
     if (!response.ok) {
-      throw new HTTPError(response.status, `Fetch request failed with status ${response.status}`);
+      throw new HTTPError(response.status, `${method} request to ${endpoint} failed with status ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error occurred during fetch request:', error);
+    console.error(error);
     throw error;
   }
 }
@@ -47,3 +66,5 @@ export async function fillContent(divElement, items, htmlGenerator) {
     divElement.insertAdjacentHTML("beforeend", await htmlGenerator(item));
   }
 }
+
+uuidv4();
