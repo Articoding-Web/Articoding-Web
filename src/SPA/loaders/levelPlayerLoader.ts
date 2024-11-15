@@ -32,6 +32,7 @@ function getLevelPlayerHTML(fromLevelEditor?: boolean) {
                   <canvas id="phaserCanvas"></canvas>
                   <div class="position-absolute top-0 end-0 mt-2 me-2">
                         ${getEditButton(fromLevelEditor)}
+                        ${getBlockLimitButton(fromLevelEditor)}
                         <button class="btn btn-warning" id="speedModifierBtn" value="1">
                             1x
                         </button>
@@ -40,7 +41,9 @@ function getLevelPlayerHTML(fromLevelEditor?: boolean) {
                         </button>
                   </div>
               </div>
-            </div>`;
+            </div>
+            ${getBlockLimitMenu(fromLevelEditor)}`
+            ;
 }
 
 function getEditButton(fromLevelEditor: boolean) {
@@ -48,7 +51,43 @@ function getEditButton(fromLevelEditor: boolean) {
                 <i class="bi ${fromLevelEditor ? "bi-pencil-square" : "bi-copy"}"></i>
             </button>`;
 }
+function getBlockLimitButton(fromLevelEditor: boolean) {
+    
+    return fromLevelEditor ? `<button class="btn btn-primary" id="blockLimitButton" data-bs-toggle="offcanvas" 
+    data-bs-target="#offcanvasBlockLimit" aria-controls="offcanvasBlockLimit">
+                <i class="bi bi-ui-checks"></i>
+            </button>` :'';
+}
+function getBlockLimitMenu(fromLevelEditor: boolean) {
+    
+    return fromLevelEditor ? `<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBlockLimit" aria-labelledby="offcanvasBlockLimitLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasBlockLimitLabel">Blocks limits</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div><h5>Move block</h5></div>
+    <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="movementSwitchCheck" checked>
+            <label class="form-check-label" for="movementSwitchCheck">Enable</label>
+    </div>
+    <div>
+    <label class="form-check-label" for="MoveNumberCheck">Usage Limit</label>
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-text">
+        <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Check limit for Move block" id="MoveNumberCheck">
+        </div>
+        <form class="form-floating">
+        <input type="number" class="form-control" aria-label="limit for Move block"  id="MoveNumberLimit" min="1" value="1">
+        <label class="form-check-label" for="MoveNumberLimit">Move Number Limit</label>
+        </form>
+    </div>
 
+  </div>
+</div>` 
+:'';
+}                              
 /**
  * Fetches a level by its ID and starts it
  * @param {String} id - The ID of the level to start

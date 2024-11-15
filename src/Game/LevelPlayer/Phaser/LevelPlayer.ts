@@ -50,16 +50,14 @@ export default class LevelPlayer extends Phaser.Scene {
   init(data: { levelJSON: Level.Level, fromLevelEditor?: boolean }) {
     this.levelJSON = data.levelJSON;
     this.fromLevelEditor = data.fromLevelEditor;
-
     const { theme, height, width, layers } = this.levelJSON.phaser;
     const { background, players, objects } = layers;
-    
     this.theme = theme;
     this.height = height;
     this.width = width;
     this.backgroundLayerJson = background;
     this.playersLayerJson = players;
-    this.objectsLayers = objects;    
+    this.objectsLayers = objects;   
   }
 
   preload() {
@@ -97,6 +95,14 @@ export default class LevelPlayer extends Phaser.Scene {
     
     document.getElementById("speedModifierBtn").addEventListener("click", this.changeAnimSpeed);
     document.getElementById("editButton").addEventListener("click", this.loadLevelEditor);
+
+    //Block limits checks
+    if(document.contains(document.getElementById("movementSwitchCheck"))){
+      document.getElementById("movementSwitchCheck").addEventListener("click", this.setBlockEnabled);
+    } 
+    if(document.contains(document.getElementById("MoveNumberCheck"))){
+      document.getElementById("MoveNumberCheck").addEventListener("click", this.setMaxBlockLimit);
+    }
 
     // this.zoom();
     this.createBackground(); // create un tilemap
@@ -312,6 +318,7 @@ export default class LevelPlayer extends Phaser.Scene {
       // From Level Editor
       const object = sessionCookieValue();
       if (object !== null) {
+        console.log(JSON.stringify(this.levelJSON));
         if (window.confirm("Save Level?")) {
           const levelData = {
             user: object.id,
@@ -344,6 +351,37 @@ export default class LevelPlayer extends Phaser.Scene {
   private loadLevelEditor = async () => {
     await PhaserController.destroyGame();
     loadLevelEditor(this.levelJSON.phaser);
+  }
+
+  private setMaxBlockLimit= async()=> {
+    var check=(document.getElementById("MoveNumberCheck") as HTMLInputElement);
+    var maxInstances= this.levelJSON.blockly.maxInstances;
+    if(check.checked){
+      maxInstances["movement"]=Number((document.getElementById("MoveNumberLimit") as HTMLInputElement).value);
+    }else{
+      delete maxInstances["movement"];
+    }
+    console.log(JSON.stringify(this.levelJSON.blockly));
+
+  }
+
+  private setBlockEnabled= async()=> {
+    var check=(document.getElementById("movementSwitchCheck") as HTMLInputElement);
+    var toolboxContent= this.levelJSON.blockly.toolbox.contents;
+    if(check.checked){
+      var i=toolboxContent.findIndex(cat => cat.name === "Actions");
+      if(i!==-1){
+        var j=toolboxContent[i].contents.findIndex(block=> block.type === "movement");
+        if(j===-1) toolboxContent[i].contents.push({"type": "movement","kind": "block"});
+      }
+    }else{
+      var i=toolboxContent.findIndex(cat => cat.name === "Actions");
+      if(i!==-1){
+        var j=toolboxContent[i].contents.findIndex(block=> block.type === "movement");
+        if(j!==-1) toolboxContent[i].contents.splice(j);
+      }
+    }
+    console.log(JSON.stringify(toolboxContent));
   }
 
   rotate(direction: string) {
