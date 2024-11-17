@@ -18,12 +18,19 @@ export default async function registerModals() {
     history.pushState({ id }, "", `level?id=${id}`);
     route();
   });
+  
+  const retryVictoryButton = document.querySelector("#victoryModal #retryLevelButton1");
+  retryVictoryButton.addEventListener("click", (event) => {
+    restartCurrentLevel(); // Calls the function to restart the level
+  });
 
   const vExitLevelBtn = document.querySelector("#victoryModal .btn-secondary");
   vExitLevelBtn.addEventListener("click", (event) => {
     let categoryIndex = document.getElementById("content").getAttribute("categoryIndex");
     exitToCategory(categoryIndex);
   });
+  
+  
 
   document.addEventListener("win", (event) => {
     const { stars } = (<CustomEvent>event).detail;

@@ -40,6 +40,8 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private levelJSON: Level.Level;
   private fromLevelEditor: boolean;
+//stars container
+  private starIcons: Phaser.GameObjects.Image[] = [];
 
   private gameSpeed = 1;
   private attempts = 0;
@@ -74,6 +76,9 @@ export default class LevelPlayer extends Phaser.Scene {
       let objJson = this.objectsLayers[x];
       this.loadAssetFromLayer(objJson);
     }
+
+    //load chest2
+    this.load.image('chest2', '/assets/sprites/default/chest2.png');
   }
 
   loadAssetFromLayer(layerJson: Level.Layer) {
@@ -102,6 +107,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createBackground(); // create un tilemap
     this.createPlayers(); // create sprites y obj jugadores
     this.createObjects(); // create sprites obj, incl. cofres
+    this.createStarDisplay(); // create stars container
 
     document.addEventListener("execution-finished", this.checkWinCondition);
   }
@@ -201,9 +207,11 @@ export default class LevelPlayer extends Phaser.Scene {
 
         let createdObject;
         if (obj.type === "chest") {
+          //this.createChestAnim();
           createdObject = new ChestObject(this, obj.x, obj.y, objectJson.spriteSheet);
           this.numChests++;
-        } else if (obj.type === "trap") {
+        } 
+          else if (obj.type === "trap") {
           this.createTrapAnim();
           createdObject = new TrapObject(this, obj.x, obj.y, objectJson.spriteSheet);
           if (obj.properties.enabled) createdObject.enable();
@@ -230,6 +238,28 @@ export default class LevelPlayer extends Phaser.Scene {
           this.objects.push(createdObject);
         }
       }
+    }
+  }
+
+  private createStarDisplay() {
+    //container in the upper right part 
+    const starContainer = this.add.container(this.cameras.main.width - 100, 50);
+    starContainer.setDepth(10);
+
+     // create initial stars in black
+     for (let i = 0; i < 3; i++) {
+      const star = this.add.image(i * 30, 0, "star").setOrigin(0.5);
+      star.setTint(0x555555); 
+      star.setScale(0.5); 
+      this.starIcons.push(star);
+      starContainer.add(star);
+    }
+  }
+  private updateStarDisplay(stars: number) {
+    // CHange stars color when the player gets one
+    for (let i = 0; i < this.starIcons.length; i++) {
+      const color = i < stars ? 0xffd700 : 0x555555; 
+      this.starIcons[i].setTint(color);
     }
   }
 
@@ -271,10 +301,19 @@ export default class LevelPlayer extends Phaser.Scene {
       }
     });
   }
-
   private checkWinCondition = async (e: CustomEvent) => {
     let hasLost = false;
     let playerBounced = false;
+    //verify players state
+    for(let player of this.players){
+      if (!player.getIsAlive() || !player.hasReachedExit()) {
+        player.die();
+        hasLost = true;
+      } else if (player.getHasBounced()) {
+        playerBounced = true;
+      }
+      this.numChests -= player.getCollectedChest();
+    }
     for (let x in this.players) {
       const player = this.players[x];
       if (!player.getIsAlive() || !player.hasReachedExit()) {
@@ -287,18 +326,57 @@ export default class LevelPlayer extends Phaser.Scene {
       this.numChests -= player.getCollectedChest();
     }
     let nAttempt = ++this.attempts;
-    
+    //ESTRELLAS AQUI
     let stars = 0;
+    const totalCofres = this.numChests + this.players.reduce((acc,player) => acc + player.getCollectedChest(), 0);
     let speed = this.gameSpeed;
 
+    //rules for stars depends of chests
+    if (totalCofres > 0) {
+      const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
+      const estrellasPorCofres = Math.floor((cofresRecogidos / totalCofres) * 3); // Proporcional a cofres recogidos
+      stars += estrellasPorCofres;
+    }
+    //theres no enough chests to complete all stars
+    const estrellasMaximas = 3;
+    if (stars < estrellasMaximas) {
+        const bloquesUsados = e.detail.numUsedBlocks;
+
+        const minBloquesRequeridos = this.levelJSON.blockly.maxInstances || Number.MAX_SAFE_INTEGER;
+
+        // 1. Specific block for specific levels
+
+        //change the specific block depends of the level and when you create a level
+        if (this.levelJSON.blockly.toolbox.contents.some(category =>
+            category.contents.some(block => block.type === "snBlockspecificLoopBlock" && bloquesUsados.includes(block.type)))) {
+            stars++;
+        }
+
+        // 2. Eficience (min blocks)
+        if (stars < estrellasMaximas && bloquesUsados <= minBloquesRequeridos) {
+          stars++;
+      }
+
+      // 3. not crash to the wall or quiqk time
+      if (stars < estrellasMaximas) {
+        if (!playerBounced) {
+            stars++;
+        } else if (e.detail.shortestPath && bloquesUsados <= e.detail.shortestPath) {
+            stars++;
+        }
+      }
+    }
+    this.updateStarDisplay(stars);
+    this.attempts++;
     if(!this.fromLevelEditor) {
       // Official Level
-      let stars = 0;
       if (hasLost) {
         const event = new CustomEvent("lose");
         document.dispatchEvent(event);
       } else {
-        stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+        // stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+        // const event = new CustomEvent("win", { detail: { stars } });
+        // document.dispatchEvent(event);
         const event = new CustomEvent("win", { detail: { stars } });
         document.dispatchEvent(event);
       }
@@ -309,22 +387,26 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(statisticEvent);
 
     } else {
+      //save level if its in the editor
       // From Level Editor
       const object = sessionCookieValue();
       if (object !== null) {
         if (window.confirm("Save Level?")) {
+          // Preguntar al usuario el nombre del nivel
+          const levelName = window.prompt("Ingrese un nombre para el nivel:", "Nombre");
+          const levelDescription= window.prompt("Ingrese una descripción para el nivel:", "");
           const levelData = {
             user: object.id,
             category: null,
             self: null,
-            title: "Editor",
+            title: levelName,
             data: JSON.stringify(this.levelJSON),
             minBlocks: null,
-            description: null,
+            description: levelDescription,
           };
           try {
             await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
-            alert("Nivel creado");
+            alert(`Nivel ${levelName} creado exitosamente.`);
           } catch (error) {
             alert("Connection to server failed");
           }
