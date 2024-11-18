@@ -59,34 +59,66 @@ function getBlockLimitButton(fromLevelEditor: boolean) {
             </button>` :'';
 }
 function getBlockLimitMenu(fromLevelEditor: boolean) {
-    
-    return fromLevelEditor ? `<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBlockLimit" aria-labelledby="offcanvasBlockLimitLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasBlockLimitLabel">Blocks limits</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div><h5>Move block</h5></div>
-    <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="movementSwitchCheck" checked>
-            <label class="form-check-label" for="movementSwitchCheck">Enable</label>
-    </div>
-    <div>
-    <label class="form-check-label" for="MoveNumberCheck">Usage Limit</label>
-    </div>
-    <div class="input-group mb-3">
-        <div class="input-group-text">
-        <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Check limit for Move block" id="MoveNumberCheck">
+    var blockMap={"movement":"Actions", "math_number":"Numbers","for_X_times":"Loops", "changeStatus":"Actions"};
+    var menu=
+    `<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBlockLimit" aria-labelledby="offcanvasBlockLimitLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasBlockLimitLabel">Blocks limits</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <form class="form-floating">
-        <input type="number" class="form-control" aria-label="limit for Move block"  id="MoveNumberLimit" min="1" value="1">
-        <label class="form-check-label" for="MoveNumberLimit">Move Number Limit</label>
-        </form>
-    </div>
+        <div class="offcanvas-body">`
 
-  </div>
-</div>` 
-:'';
+    //adding normal blocks limiters
+    for(var block in blockMap) {
+        var mayus=block.charAt(0).toUpperCase()+block.slice(1);
+        menu+=`
+                <div><h5>${mayus} block</h5></div>
+                <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="${block}SwitchCheck" checked>
+                        <label class="form-check-label" for="${block}SwitchCheck">Enable</label>
+                </div>
+                <div>
+                <label class="form-check-label" for="${block}NumberCheck">Usage Limit</label>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Check limit for ${block} block" id="${block}NumberCheck">
+                    </div>
+                    <form class="form-floating">
+                    <input type="number" class="form-control" aria-label="limit for ${block} block"  id="${block}NumberLimit" min="1" value="1">
+                    <label class="form-check-label" for="${block}NumberLimit">${block} Number Limit</label>
+                    </form>
+                </div>`
+    }
+
+    //adding variable block limiters
+    var variableBlocks=["variables_set","variables_get","math_change"];
+    menu+= `
+                <div><h5>Variable blocks</h5></div>
+                <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="VariablesSwitchCheck" checked>
+                        <label class="form-check-label" for="VariablesSwitchCheck">Enable</label>
+                </div>`
+    for(var block of variableBlocks){
+        var mayus=block.charAt(0).toUpperCase()+block.slice(1);
+        menu+=
+                `<div>
+                <label class="form-check-label" for="${block}NumberCheck">${mayus} Usage Limit</label>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Check limit for ${block} block" id="${block}NumberCheck">
+                    </div>
+                    <form class="form-floating">
+                    <input type="number" class="form-control" aria-label="limit for ${block} block"  id="${block}NumberLimit" value="1">
+                    <label class="form-check-label" for="${block}NumberLimit">${block} Number Limit</label>
+                    </form>
+                </div>`
+    }
+    menu+=`
+        </div>
+    </div>` 
+    return fromLevelEditor ? menu:'';
 }                              
 /**
  * Fetches a level by its ID and starts it

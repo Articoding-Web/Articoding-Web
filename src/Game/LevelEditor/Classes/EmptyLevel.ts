@@ -33,6 +33,10 @@ export default <Level.Level>{
                         {
                             "type": "movement",
                             "kind": "block"
+                        },
+                        {
+                           "type":"changeStatus",
+                           "kind":"block"
                         }
                     ]
                 },
@@ -46,12 +50,30 @@ export default <Level.Level>{
                             "kind": "block"
                         }
                     ]
+                },
+                {
+                    "kind":"category",
+                    "name":"Loops",
+                    "colour":"#5ba55b",
+                    "contents":[
+                       {
+                          "type":"for_X_times",
+                          "kind":"block"
+                       }
+                    ]
+                },
+                {
+                    "kind":"category",
+                    "name":"Variables",
+                    "custom":"VARIABLE",
+                    "colour":"#a55b80"
                 }
             ]
         },
         "maxInstances": {
             "start": 1,
         },
-        "workspaceBlocks": []
+        "workspaceBlocks": [
+        ]
     }
 };

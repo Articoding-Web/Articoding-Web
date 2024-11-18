@@ -32,6 +32,9 @@ export default class LevelPlayer extends Phaser.Scene {
   private mapCoordY: number;
   private scaleFactor: number;
 
+  private blockMap={"movement":"Actions", "math_number":"Numbers","for_X_times":"Loops", "changeStatus":"Actions", "variables_set":"Variables","variables_get":"Variables",
+    "math_change": "Variables"};
+
   private players: Player[] = [];
   private objects: ArticodingSprite[] = [];
   private numChests = 0;
@@ -97,12 +100,13 @@ export default class LevelPlayer extends Phaser.Scene {
     document.getElementById("editButton").addEventListener("click", this.loadLevelEditor);
 
     //Block limits checks
-    if(document.contains(document.getElementById("movementSwitchCheck"))){
-      document.getElementById("movementSwitchCheck").addEventListener("click", this.setBlockEnabled);
-    } 
-    if(document.contains(document.getElementById("MoveNumberCheck"))){
-      document.getElementById("MoveNumberCheck").addEventListener("click", this.setMaxBlockLimit);
+    for(var block in this.blockMap){
+      this.setLimitMenuEventListener(block);
     }
+    //Variable category limit check
+    if(document.contains(document.getElementById("VariablesSwitchCheck"))){
+      document.getElementById("VariablesSwitchCheck").addEventListener("click", ()=>{this.setCategoryEnabled("Variables")});
+    } 
 
     // this.zoom();
     this.createBackground(); // create un tilemap
@@ -353,32 +357,64 @@ export default class LevelPlayer extends Phaser.Scene {
     loadLevelEditor(this.levelJSON.phaser);
   }
 
-  private setMaxBlockLimit= async()=> {
-    var check=(document.getElementById("MoveNumberCheck") as HTMLInputElement);
-    var maxInstances= this.levelJSON.blockly.maxInstances;
-    if(check.checked){
-      maxInstances["movement"]=Number((document.getElementById("MoveNumberLimit") as HTMLInputElement).value);
-    }else{
-      delete maxInstances["movement"];
-    }
-    console.log(JSON.stringify(this.levelJSON.blockly));
 
+  private setLimitMenuEventListener=async(block:string)=>{
+    if(document.contains(document.getElementById(block+"SwitchCheck"))){
+      document.getElementById(block+"SwitchCheck").addEventListener("click", ()=>{this.setBlockEnabled(block)});
+    } 
+    if(document.contains(document.getElementById(block+"NumberCheck"))){
+      document.getElementById(block+"NumberCheck").addEventListener("click", ()=>{this.setMaxBlockLimit(block)});
+    }
+    if(document.contains(document.getElementById(block+"NumberLimit"))){
+      document.getElementById(block+"NumberLimit").addEventListener("change", ()=>{this.setMaxBlockLimit(block)});
+    }
   }
 
-  private setBlockEnabled= async()=> {
-    var check=(document.getElementById("movementSwitchCheck") as HTMLInputElement);
+  private setMaxBlockLimit(block:string) {
+    var check=(document.getElementById(block+"NumberCheck") as HTMLInputElement);
+    var maxInstances= this.levelJSON.blockly.maxInstances;
+    if(check.checked){
+      maxInstances[block]=Number((document.getElementById(block+"NumberLimit") as HTMLInputElement).value);
+    }else{
+      delete maxInstances[block];
+    }
+    console.log(JSON.stringify(this.levelJSON.blockly));
+  }
+
+  private setBlockEnabled= async(block: string)=> {
+    var category= this.blockMap[block];
+    var check=(document.getElementById(block+"SwitchCheck") as HTMLInputElement);
     var toolboxContent= this.levelJSON.blockly.toolbox.contents;
     if(check.checked){
-      var i=toolboxContent.findIndex(cat => cat.name === "Actions");
+      var i=toolboxContent.findIndex(cat => cat.name === category);
       if(i!==-1){
-        var j=toolboxContent[i].contents.findIndex(block=> block.type === "movement");
-        if(j===-1) toolboxContent[i].contents.push({"type": "movement","kind": "block"});
+        var j=toolboxContent[i].contents.findIndex(b=> b.type === block);
+        if(j===-1) toolboxContent[i].contents.push({"type": block,"kind": "block"});
       }
     }else{
-      var i=toolboxContent.findIndex(cat => cat.name === "Actions");
+      var i=toolboxContent.findIndex(cat => cat.name === category);
       if(i!==-1){
-        var j=toolboxContent[i].contents.findIndex(block=> block.type === "movement");
+        var j=toolboxContent[i].contents.findIndex(b=> b.type === block);
         if(j!==-1) toolboxContent[i].contents.splice(j);
+      }
+    }
+    console.log(JSON.stringify(toolboxContent));
+  }
+
+  private setCategoryEnabled= async(category: string)=> {
+    var categoryDefinitions={"Variables":{"kind":"category","name":"Variables","custom":"VARIABLE","colour":"#a55b80"}};
+
+    var check=(document.getElementById(category+"SwitchCheck") as HTMLInputElement);
+    var toolboxContent= this.levelJSON.blockly.toolbox.contents;
+    if(check.checked){
+      var i=toolboxContent.findIndex(cat => cat.name === category);
+      if(i==-1){
+        toolboxContent.push(categoryDefinitions[category]);
+      }
+    }else{
+      var i=toolboxContent.findIndex(cat => cat.name === category);
+      if(i!==-1){
+        toolboxContent.splice(i);
       }
     }
     console.log(JSON.stringify(toolboxContent));
