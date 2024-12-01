@@ -290,8 +290,10 @@ export default class EditorBoard {
                 }
             }
         }
+        if(this.blocklyWorkspace){
+            levelJson.blockly=this.blocklyWorkspace;
+        }
 
-        levelJson.blockly=this.blocklyWorkspace;
         return levelJson;
     }
 }

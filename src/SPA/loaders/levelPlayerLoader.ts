@@ -153,7 +153,6 @@ export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolea
     const toolbox = levelJSON.blockly.toolbox;
     const maxInstances = currentLevelJSON.blockly.maxInstances;
     const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
-
     PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON, fromLevelEditor });
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
 }

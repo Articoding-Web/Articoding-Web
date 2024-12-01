@@ -26,9 +26,11 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   // TODO: pasar nivel y cargarlo
-  init(data: { levelJSON: Level.Level }): void {
+  init(data?: { levelJSON: Level.Level }): void {
+    if(data.levelJSON){
     this.loadedLevel = data.levelJSON.phaser;
     this.loadedBlocklyWorkspace=data.levelJSON.blockly;
+    }
     if (this.loadedLevel) {
       this.numRows = this.loadedLevel.height;
       this.numCols = this.loadedLevel.width;

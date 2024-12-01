@@ -12,6 +12,9 @@ import EnemyObject from './Classes/Enemy.js';
 import loadLevelEditor from '../../../SPA/loaders/levelEditorLoader.js';
 import Level from "../../level";
 import PhaserController from '../../PhaserController.js';
+import BlocklyController from "../Blockly/BlocklyController";
+import { loadLevel } from "../../../SPA/loaders/levelPlayerLoader";
+
 
 // For saving levels
 import { sessionCookieValue } from '../../../SPA/loaders/profileLoader';
