@@ -37,7 +37,6 @@ export default class EnemyObject extends ArticodingSprite {
     }
 
     collide(player: Player): void {
-        player.kill();
     }
 
     private move = () => {
