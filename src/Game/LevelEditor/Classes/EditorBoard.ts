@@ -22,11 +22,14 @@ export default class EditorBoard {
     private rmRowMinus: Phaser.GameObjects.Sprite;
     private addRowBtn: Phaser.GameObjects.Sprite;
     private addRowPlus: Phaser.GameObjects.Sprite;
+    private blocklyWorkspace: Level.Blockly;
 
-    constructor(scene: LevelEditor, rows: number, cols: number, levelLayers?: { background: Level.Layer; players: Level.Layer; objects?: Level.Layer[]; }) {
+    constructor(scene: LevelEditor, rows: number, cols: number, levelLayers?: { background: Level.Layer; players: Level.Layer; objects?: Level.Layer[]; },
+        blocklyLayer?:Level.Blockly) {
         this.scene = scene;
         this.numRows = rows;
         this.numCols = cols;
+        this.blocklyWorkspace=blocklyLayer;
 
         this.calculateScale();
         this.createTiles();
@@ -74,7 +77,6 @@ export default class EditorBoard {
 
         this.createResizeButtons();
     }
-
     private calculateScale() {
         const layerWidth = this.numCols * config.TILE_SIZE;
         const layerHeight = this.numRows * config.TILE_SIZE;
@@ -289,6 +291,7 @@ export default class EditorBoard {
             }
         }
 
+        levelJson.blockly=this.blocklyWorkspace;
         return levelJson;
     }
 }

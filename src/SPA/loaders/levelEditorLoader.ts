@@ -43,7 +43,7 @@ function getLevelEditorHTML() {
             </div>`;
 }
 
-export default function loadLevelEditor(levelJSON?: Level.Phaser) {
+export default function loadLevelEditor(levelJSON?: Level.Level) {
     document.getElementById("content").innerHTML = getLevelEditorHTML();
     const cookie = sessionCookieValue();
     if(!cookie)

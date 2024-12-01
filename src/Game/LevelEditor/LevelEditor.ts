@@ -17,6 +17,7 @@ export default class LevelEditor extends Phaser.Scene {
   board: Board;
   brushPopover: bootstrap.Popover;
   loadedLevel: Level.Phaser;
+  loadedBlocklyWorkspace: Level.Blockly;
   numRows: number;
   numCols: number;
 
@@ -25,8 +26,9 @@ export default class LevelEditor extends Phaser.Scene {
   }
 
   // TODO: pasar nivel y cargarlo
-  init(data: { levelJSON: Level.Phaser }): void {
-    this.loadedLevel = data.levelJSON;
+  init(data: { levelJSON: Level.Level }): void {
+    this.loadedLevel = data.levelJSON.phaser;
+    this.loadedBlocklyWorkspace=data.levelJSON.blockly;
     if (this.loadedLevel) {
       this.numRows = this.loadedLevel.height;
       this.numCols = this.loadedLevel.width;
@@ -77,7 +79,7 @@ export default class LevelEditor extends Phaser.Scene {
     this.events.on('shutdown', this.shutdown, this);
     this.events.on('destroy', this.shutdown, this);
 
-    this.board = new Board(this, this.numRows, this.numCols, this.loadedLevel?.layers);
+    this.board = new Board(this, this.numRows, this.numCols, this.loadedLevel?.layers,this.loadedBlocklyWorkspace);
 
     const paintbrushPopoverTrigger = document.getElementById("paintbrushContent");
     this.brushPopover = new bootstrap.Popover(paintbrushPopoverTrigger);

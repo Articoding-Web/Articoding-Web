@@ -436,7 +436,7 @@ export default class LevelPlayer extends Phaser.Scene {
 
   private loadLevelEditor = async () => {
     await PhaserController.destroyGame();
-    loadLevelEditor(this.levelJSON.phaser);
+    loadLevelEditor(this.levelJSON);
   }
 
 
