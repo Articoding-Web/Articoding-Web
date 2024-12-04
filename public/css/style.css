@@ -63,11 +63,15 @@
 /* Offline file START */
 
 /*.title {
+
+
+
     color: white;
 }
 
 /* Offline file END */
 
+/*NUEVO*/
 
 :root {
     --bs-dark-rgb: 37, 19, 26;
@@ -77,86 +81,58 @@
     --google-yellow-rgb: 244, 180, 0;
 }
 
-/* Navbar START */
-.navbar a {
-    color: white;
+/* Navbar ajustes */
+.navbar {
+    padding: 0.5rem 1rem;
 }
 
-.navbar-brand.abs {
-    position: absolute;
-    width: auto;
-    left: 50%;
-    transform: translateX(-50%);
+.navbar-brand a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.navbar-brand img {
+    margin-right: 0.5rem;
+}
+
+/* Categorías ajustes */
+#categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Ajustes en modales */
+.modal-header {
+    padding: 1rem;
     text-align: center;
 }
 
-/* Navbar END */
-
-/* General START */
-a,
-.card a {
-    text-decoration: none;
-}
-
-#content .row {
-    display: flex;
-    flex-wrap: wrap; /* Permite que los elementos se ajusten automáticamente */
+.modal-footer {
     justify-content: center;
-    width: 100%;
 }
 
-.gold-star {
-    color: var(--google-yellow);
+.modal .btn {
+    margin: 0.5rem;
 }
 
-/* General END */
-
-/* Category levels START */
-#content #categories {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Ajusta columnas automáticamente */
-    gap: 20px;
-}
-
-#content #categories .card {
-    max-width: max(540px, 50vw);
-    margin: auto; /* Centra las tarjetas */
-}
-
+/* Responsividad */
 @media (min-width: 768px) and (max-width: 1024px) {
-    #content #categories .card {
-        max-width: 70%; /* Más ancho en tablets */
+    .navbar-brand {
+        font-size: 1.5rem;
     }
-    
-    .navbar-brand.abs {
-        font-size: 1.5rem; /* Tamaño de fuente para tablets */
+
+    #categories {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
     }
 }
 
 @media (min-width: 1025px) {
-    #content #categories .card {
-        max-width: 50%; /* Más compacto para grandes pantallas */
-    }
-    
-    .navbar-brand.abs {
-        font-size: 2rem;
+    #categories {
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
     }
 }
-
-/* Category levels END */
-
-/* Level Editor START */
-#phaserDiv .selector-icon:hover {
-    cursor: pointer;
-}
-
-/* Level Editor END */
-
-/* Offline file START */
-.title {
-    color: white;
-    font-size: calc(1rem + 1vw); /* Escala proporcionalmente al ancho de la pantalla */
-    line-height: 1.4; /* Mejor legibilidad */
-}
-
-/* Offline file END */
