@@ -1,4 +1,4 @@
-:root {
+/*:root {
     --bs-dark-rgb: 37, 19, 26;
     --bs-secondary-rgb: 84, 55, 64;
     --bs-card-title-color: white;
@@ -7,7 +7,7 @@
 }
 
 /* Navbar START */
-@media (min-width: 768px) {
+/*@media (min-width: 768px) {
     .navbar-brand.abs {
         position: absolute;
         width: auto;
@@ -24,8 +24,7 @@
 /* Navbar END */
 
 /* General START */
-a,
-.card a {
+/*a, .card a {
     text-decoration: none;
 }
 
@@ -41,7 +40,7 @@ a,
 
 /* Category levels START */
 
-#content #categories .card {
+/*#content #categories .card {
     max-width: max(540px, 50vw);
 }
 
@@ -55,7 +54,7 @@ a,
 
 /* Level Editor START */
 
-#phaserDiv .selector-icon:hover {
+/*#phaserDiv .selector-icon:hover {
     cursor: pointer;
 }
 
@@ -63,8 +62,101 @@ a,
 
 /* Offline file START */
 
+/*.title {
+    color: white;
+}
+
+/* Offline file END */
+
+
+:root {
+    --bs-dark-rgb: 37, 19, 26;
+    --bs-secondary-rgb: 84, 55, 64;
+    --bs-card-title-color: white;
+    --google-yellow: #F4B400;
+    --google-yellow-rgb: 244, 180, 0;
+}
+
+/* Navbar START */
+.navbar a {
+    color: white;
+}
+
+.navbar-brand.abs {
+    position: absolute;
+    width: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+/* Navbar END */
+
+/* General START */
+a,
+.card a {
+    text-decoration: none;
+}
+
+#content .row {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos se ajusten automáticamente */
+    justify-content: center;
+    width: 100%;
+}
+
+.gold-star {
+    color: var(--google-yellow);
+}
+
+/* General END */
+
+/* Category levels START */
+#content #categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Ajusta columnas automáticamente */
+    gap: 20px;
+}
+
+#content #categories .card {
+    max-width: max(540px, 50vw);
+    margin: auto; /* Centra las tarjetas */
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    #content #categories .card {
+        max-width: 70%; /* Más ancho en tablets */
+    }
+    
+    .navbar-brand.abs {
+        font-size: 1.5rem; /* Tamaño de fuente para tablets */
+    }
+}
+
+@media (min-width: 1025px) {
+    #content #categories .card {
+        max-width: 50%; /* Más compacto para grandes pantallas */
+    }
+    
+    .navbar-brand.abs {
+        font-size: 2rem;
+    }
+}
+
+/* Category levels END */
+
+/* Level Editor START */
+#phaserDiv .selector-icon:hover {
+    cursor: pointer;
+}
+
+/* Level Editor END */
+
+/* Offline file START */
 .title {
     color: white;
+    font-size: calc(1rem + 1vw); /* Escala proporcionalmente al ancho de la pantalla */
+    line-height: 1.4; /* Mejor legibilidad */
 }
 
 /* Offline file END */
