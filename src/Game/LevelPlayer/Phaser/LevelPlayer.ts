@@ -114,6 +114,7 @@ export default class LevelPlayer extends Phaser.Scene {
     //Variable category limit check
     if(document.contains(document.getElementById("VariablesSwitchCheck"))){
       document.getElementById("VariablesSwitchCheck").addEventListener("click", ()=>{this.setCategoryEnabled("Variables")});
+      this.checkCategoryEnabled("Variables");
     } 
 
     // this.zoom();
@@ -446,22 +447,39 @@ export default class LevelPlayer extends Phaser.Scene {
   private setLimitMenuEventListener=async(block:string)=>{
     if(document.contains(document.getElementById(block+"SwitchCheck"))){
       document.getElementById(block+"SwitchCheck").addEventListener("click", ()=>{this.setBlockEnabled(block)});
+      this.checkBlockEnabled(block);
     } 
     if(document.contains(document.getElementById(block+"NumberCheck"))){
       document.getElementById(block+"NumberCheck").addEventListener("click", ()=>{this.setMaxBlockLimit(block)});
+      this.checkMaxBlockLimit(block);
     }
     if(document.contains(document.getElementById(block+"NumberLimit"))){
       document.getElementById(block+"NumberLimit").addEventListener("change", ()=>{this.setMaxBlockLimit(block)});
     }
   }
 
-  private setMaxBlockLimit(block:string) {
+  private setMaxBlockLimit =async(block: string)=> {
     var check=(document.getElementById(block+"NumberCheck") as HTMLInputElement);
     var maxInstances= this.levelJSON.blockly.maxInstances;
     if(check.checked){
       maxInstances[block]=Number((document.getElementById(block+"NumberLimit") as HTMLInputElement).value);
     }else{
       delete maxInstances[block];
+    }
+    await PhaserController.destroyGame();
+    loadLevel(this.levelJSON,true);
+
+    console.log(JSON.stringify(this.levelJSON.blockly));
+  }
+
+  private checkMaxBlockLimit =async(block: string)=> {
+    var check=(document.getElementById(block+"NumberCheck") as HTMLInputElement);
+    var maxInstances= this.levelJSON.blockly.maxInstances;
+    
+    var max=maxInstances[block];
+    if(max){
+      ((document.getElementById(block+"NumberLimit") as HTMLInputElement).value)=String(max);
+      check.checked=true;
     }
     console.log(JSON.stringify(this.levelJSON.blockly));
   }
@@ -483,6 +501,32 @@ export default class LevelPlayer extends Phaser.Scene {
         if(j!==-1) toolboxContent[i].contents.splice(j);
       }
     }
+
+    await PhaserController.destroyGame();
+    loadLevel(this.levelJSON,true);
+
+    console.log(JSON.stringify(toolboxContent));
+  }
+
+  private checkBlockEnabled= async(block: string)=> {
+    var category= this.blockMap[block];
+    var check=(document.getElementById(block+"SwitchCheck") as HTMLInputElement);
+    var toolboxContent= this.levelJSON.blockly.toolbox.contents;
+
+    var i=toolboxContent.findIndex(cat => cat.name === category);
+    if(i!==-1){
+      var j=toolboxContent[i].contents.findIndex(b=> b.type === block);
+      if(j===-1){
+        check.checked=false;
+        document.getElementById(block+"NumberLimitForm").hidden=true;
+      } 
+      else{
+        check.checked=true;
+      } 
+    }else{
+      check.checked=true;
+    } 
+    
     console.log(JSON.stringify(toolboxContent));
   }
 
@@ -502,6 +546,23 @@ export default class LevelPlayer extends Phaser.Scene {
         toolboxContent.splice(i);
       }
     }
+    
+    await PhaserController.destroyGame();
+    loadLevel(this.levelJSON,true);
+
+    console.log(JSON.stringify(toolboxContent));
+  }
+
+  private checkCategoryEnabled= async(category: string)=> {
+    var check=(document.getElementById(category+"SwitchCheck") as HTMLInputElement);
+    var toolboxContent= this.levelJSON.blockly.toolbox.contents;
+    
+    var i=toolboxContent.findIndex(cat => cat.name === category);
+    if(i==-1){
+      check.checked=false;
+      document.getElementById(category+"LimitForm").hidden=true;
+    }else check.checked=true;
+
     console.log(JSON.stringify(toolboxContent));
   }
 

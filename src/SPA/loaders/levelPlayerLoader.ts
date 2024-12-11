@@ -77,10 +77,11 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                         <input class="form-check-input" type="checkbox" role="switch" id="${block}SwitchCheck" checked>
                         <label class="form-check-label" for="${block}SwitchCheck">Enable</label>
                 </div>
+                <span id="${block}NumberLimitForm">
                 <div>
                 <label class="form-check-label" for="${block}NumberCheck">Usage Limit</label>
                 </div>
-                <div class="input-group mb-3">
+                <div class="input-group mb-3" >
                     <div class="input-group-text">
                     <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Check limit for ${block} block" id="${block}NumberCheck">
                     </div>
@@ -88,7 +89,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                     <input type="number" class="form-control" aria-label="limit for ${block} block"  id="${block}NumberLimit" min="1" value="1">
                     <label class="form-check-label" for="${block}NumberLimit">${block} Number Limit</label>
                     </form>
-                </div>`
+                </div></span>`
     }
 
     //adding variable block limiters
@@ -98,11 +99,12 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                 <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="VariablesSwitchCheck" checked>
                         <label class="form-check-label" for="VariablesSwitchCheck">Enable</label>
-                </div>`
+                </div> <span id=VariablesLimitForm>`
     for(var block of variableBlocks){
         var mayus=block.charAt(0).toUpperCase()+block.slice(1);
         menu+=
-                `<div>
+                `
+                <div>
                 <label class="form-check-label" for="${block}NumberCheck">${mayus} Usage Limit</label>
                 </div>
                 <div class="input-group mb-3">
@@ -115,7 +117,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                     </form>
                 </div>`
     }
-    menu+=`
+    menu+=`</span>
         </div>
     </div>` 
     return fromLevelEditor ? menu:'';
