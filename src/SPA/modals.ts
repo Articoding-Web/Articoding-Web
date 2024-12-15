@@ -24,7 +24,7 @@ export default async function registerModals() {
     restartCurrentLevel(); // Calls the function to restart the level
   });
 
-  const vExitLevelBtn = document.querySelector("#victoryModal .btn-secondary");
+  const vExitLevelBtn = document.querySelector("#victoryModal #exitLevelButton");
   vExitLevelBtn.addEventListener("click", (event) => {
     let categoryIndex = document.getElementById("content").getAttribute("categoryIndex");
     exitToCategory(categoryIndex);
@@ -48,7 +48,7 @@ export default async function registerModals() {
     restartCurrentLevel();
   });
 
-  const dExitLevelBtn = document.querySelector("#defeatModal .btn-secondary");
+  const dExitLevelBtn = document.querySelector("#defeatModal #exitLevelButton2");
   dExitLevelBtn.addEventListener("click", (event) => {
     let categoryIndex = document.getElementById("content").getAttribute("categoryIndex");
     exitToCategory(categoryIndex);

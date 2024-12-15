@@ -121,7 +121,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.createBackground(); // create un tilemap
     this.createPlayers(); // create sprites y obj jugadores
     this.createObjects(); // create sprites obj, incl. cofres
-    this.createStarDisplay(); // create stars container
+    //this.createStarDisplay(); // create stars container
 
     document.addEventListener("execution-finished", this.checkWinCondition);
   }
@@ -345,6 +345,7 @@ export default class LevelPlayer extends Phaser.Scene {
     const totalCofres = this.numChests + this.players.reduce((acc,player) => acc + player.getCollectedChest(), 0);
     let speed = this.gameSpeed;
 
+    /*
     //rules for stars depends of chests
     if (totalCofres > 0) {
       const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
@@ -381,14 +382,16 @@ export default class LevelPlayer extends Phaser.Scene {
       }
     }
     this.updateStarDisplay(stars);
-    this.attempts++;
+    this.attempts++; 
+    */
     if(!this.fromLevelEditor) {
       // Official Level
+      let stars = 0;
       if (hasLost) {
         const event = new CustomEvent("lose");
         document.dispatchEvent(event);
       } else {
-        // stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+        stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
         // const event = new CustomEvent("win", { detail: { stars } });
         // document.dispatchEvent(event);
         const event = new CustomEvent("win", { detail: { stars } });
