@@ -1,7 +1,7 @@
 import { route } from "../../client";
 import config from "../../Game/config.js";
 import { fetchRequest, fillContent } from "../utils";
-import { sessionCookieValue } from "./profileLoader";
+import { appendLoginModal,sessionCookieValue } from "./profileLoader";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -10,7 +10,13 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
+  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+          <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
+  `;
+}
+function getRowHTML2() {
+  return `<div id="display"></div>
+  `;
 }
 
 /**
@@ -98,24 +104,15 @@ async function generateLevelDiv(level) {
 
 async function generateMSG(message) {
   return `
-    <div class="col">
-      <div class="card mx-auto border-dark">
-        <a class="getLevel" href="">
-          <div class="row g-0 text-dark">
-            <div class="col-md-3">
-            </div>
-            <div class="col-md-9">
-              <div class="card-body">
-                <div class="row row-cols-1 row-cols-md-2">
-                  <div class="col">
-                    <h5 class="card-title">${message}</h5>
-                    <p class="card-text"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
+    <div class="container m-5">
+      </div><div class="text-center text-muted bg-body p-2 rounded-5">
+        <h1 class="text-body-emphasis">${message.msg}</h1>
+        <p class="col-lg-6 mx-auto mb-4">
+        ${message.desc}
+        </p>
+        <button class="btn btn-primary px-5 mb-5" type="button" id="${message.buttonName}">
+        ${message.buttonMsg}
+        </button>
       </div>
     </div>`;
 }
@@ -147,38 +144,54 @@ export default async function loadClass() {
         `${API_ENDPOINT}/level/class/${cookie.id}`,
         "GET"
       );
+      if(levels!=null){
+        let statistics = [];
+        statistics = await fetchRequest(
+          `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
+          "GET"
+        );
+        const statisticsMap = statistics.reduce((map, statistic) => {
+          map[statistic.level] = {
+            stars: statistic.stars,
+            attempts: statistic.attempts,
+          };
+          return map;
+        }, {});
 
-      let statistics = [];
-      statistics = await fetchRequest(
-        `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
-        "GET"
-      );
-      const statisticsMap = statistics.reduce((map, statistic) => {
-        map[statistic.level] = {
-          stars: statistic.stars,
-          attempts: statistic.attempts,
-        };
-        return map;
-      }, {});
+        const levelsWithStatistics = levels.map((level) => {
+          const levelId = level.id;
+          const statistic = statisticsMap[levelId];
+          return {
+            ...level,
+            statistics: statistic || { stars: 0, attempts: 0 },
+          };
+        });
 
-      const levelsWithStatistics = levels.map((level) => {
-        const levelId = level.id;
-        const statistic = statisticsMap[levelId];
-        return {
-          ...level,
-          statistics: statistic || { stars: 0, attempts: 0 },
-        };
-      });
+        await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
-      await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-
-      // Add getLevel event listener
-      document.querySelectorAll("a.getLevel").forEach((level) => {
-        level.addEventListener("click", playLevel);
-      });
+        // Add getLevel event listener
+        document.querySelectorAll("a.getLevel").forEach((level) => {
+          level.addEventListener("click", playLevel);
+        });
+      }else{//Sin grupo
+        document.getElementById("content").innerHTML = getRowHTML2();
+        var messages=[{msg:"No perteneces a ninguna clase",desc:"Unete a una clase para acceder a sus niveles",buttonName:"joinGroup",buttonMsg:"Unirse a una clase"}];
+        const textElement = document.getElementById("display");
+  
+        await fillContent(textElement, messages, generateMSG);
+        document.getElementById("joinGroup").addEventListener("click", (e: MouseEvent) => {
+              //Todo menu unirse
+        });
+      }
     }else{//Sin sesión
-      var messages=["Inicia sesión"]
-      await fillContent(divElement, messages, generateMSG);
+      document.getElementById("content").innerHTML = getRowHTML2();
+      var messages=[{msg:"No hay sesión iniciada",desc:"Inicia sesión para acceder a tu clase",buttonName:"altLogin",buttonMsg:"Iniciar Sesión"}];
+      const textElement = document.getElementById("display");
+
+      await fillContent(textElement, messages, generateMSG);
+      document.getElementById("altLogin").addEventListener("click", (e: MouseEvent) => {
+            appendLoginModal();
+      });
     }
   } catch(error) {
     if (error.status === 503) { // Offline mode
