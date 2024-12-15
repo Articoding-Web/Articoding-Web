@@ -6,6 +6,7 @@ import loadCommunity from "./loaders/communityLoader";
 import loadProfile, { sessionCookieValue } from "./loaders/profileLoader";
 import XAPISingleton from "../xAPI/xapi";
 import { getSpecificUUID } from "./utils";
+import loadClass from "./loaders/classLoader";
 const URL_EDITOR = "editor" 
 const URL_PROFILE= "profile"
 const URL_COMMUNITY = "community"
@@ -53,6 +54,12 @@ export async function setPageLevelEditor(levelId?: number) {
 export async function setPageCommunity() {
   const [userName, uuid] = getUserNameAndUUID();
   loadCommunity();
+  let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
+  await XAPISingleton.sendStatement(statement);
+}
+export async function setPageClass() {
+  const [userName, uuid] = getUserNameAndUUID();
+  loadClass();
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
 }

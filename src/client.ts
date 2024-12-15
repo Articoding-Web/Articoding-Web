@@ -47,6 +47,9 @@ function setNavbarListeners() {
   );
 
   // TODO: Manual
+  document.getElementById("manual").addEventListener("click", (e: MouseEvent) =>{ 
+    routeIfNewPath("/class", e)}
+  );
 
   // Editor
   document.getElementById("editor").addEventListener("click", (e: MouseEvent) =>{ 
