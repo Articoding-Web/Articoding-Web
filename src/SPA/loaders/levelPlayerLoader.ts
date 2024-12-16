@@ -66,13 +66,16 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
             <h5 class="offcanvas-title" id="offcanvasBlockLimitLabel">Blocks limits</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">`
+        <div class="offcanvas-body"><div class="accordion" id="blockLimitAccordion">`
 
     //adding normal blocks limiters
     for(var block in blockMap) {
         var mayus=block.charAt(0).toUpperCase()+block.slice(1);
-        menu+=`
-                <div><h5>${mayus} block</h5></div>
+        menu+=`<div class="accordion-item">
+                <div class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${mayus}" aria-expanded="true" aria-controls="collapse${mayus}">
+                <h5>${mayus} block</h5><img src="./images/${mayus}Block.png" alt="${mayus}blockImage"
+                class=""></button></div>
+                <div id="collapse${mayus}" class="accordion-collapse collapse show">
                 <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="${block}SwitchCheck" checked>
                         <label class="form-check-label" for="${block}SwitchCheck">Enable</label>
@@ -89,23 +92,30 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                     <input type="number" class="form-control" aria-label="limit for ${block} block"  id="${block}NumberLimit" min="1" value="1">
                     <label class="form-check-label" for="${block}NumberLimit">${block} Number Limit</label>
                     </form>
-                </div></span>`
+                </div></span>
+                </div>
+                </div>
+                `
     }
 
     //adding variable block limiters
     var variableBlocks=["variables_set","variables_get","math_change"];
-    menu+= `
-                <div><h5>Variable blocks</h5></div>
+    menu+= `    <div class="accordion-item">
+                <div class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVariables" aria-expanded="true" aria-controls="collapseVariables">
+                <h5>Variable blocks</h5></div>
+                <div id="collapseVariables" class="accordion-collapse collapse show">
                 <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="VariablesSwitchCheck" checked>
                         <label class="form-check-label" for="VariablesSwitchCheck">Enable</label>
-                </div> <span id=VariablesLimitForm>`
+                </div> <span id=VariablesLimitForm>
+                `
     for(var block of variableBlocks){
         var mayus=block.charAt(0).toUpperCase()+block.slice(1);
         menu+=
                 `
                 <div>
                 <label class="form-check-label" for="${block}NumberCheck">${mayus} Usage Limit</label>
+                <img src="./images/${mayus}Block.png" alt="${mayus}blockImage"class="">
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-text">
@@ -117,7 +127,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                     </form>
                 </div>`
     }
-    menu+=`</span>
+    menu+=`</span></div></div>
         </div>
     </div>` 
     return fromLevelEditor ? menu:'';
