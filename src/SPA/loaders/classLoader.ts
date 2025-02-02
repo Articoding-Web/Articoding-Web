@@ -11,7 +11,8 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
   `;
 }
@@ -103,6 +104,32 @@ async function generateLevelDiv(level) {
     </div>`;
 }
 
+
+/**
+ *
+ * @param {Object} set category with id, name, levels and description
+ * @returns String of HTMLDivElement
+ */
+async function generateSetDiv(set) {
+  return `<div class="col">
+              <div class="card mx-auto border-dark d-flex flex-column h-100">
+                <a class="set" href="set/${set.id}">
+                    <h5 class="card-header card-title text-dark">
+                      ${set.name}
+                    </h5>
+                    <div class="card-body text-dark">
+                      <h6 class="card-subtitle mb-2 text-muted">
+                        Levels: ${set.id}
+                      </h6>
+                      ${set.description}
+                    </div>
+                </a>
+              </div>
+            </div>`;
+}
+
+
+
 async function generateMSG(message) {
   var msg=`<div class="container m-5">
       </div><div class="text-center text-muted bg-body p-2 rounded-5">
@@ -129,7 +156,26 @@ export async function playLevel(event) {
   const anchorTag = event.target.closest("a.getLevel");
   const id = anchorTag.href.split("level/")[1];
   history.pushState({ id }, "", `level?id=${id}`);
+  route();
+}
 
+export async function loadSet(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.set");
+  const id = anchorTag.href.split("set/")[1];
+  history.pushState({ id }, "", `set?id=${id}`);
+  route();
+}
+
+/**
+ * Sets content and starts phaser LevelPlayer
+ * @param {Event} event - click event of <a> to href with level id
+ */
+export async function playSet(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.set");
+  const id = anchorTag.href.split("level/")[1];
+  history.pushState({ id }, "", `level?id=${id}`);
   route();
 }
 
@@ -219,36 +265,50 @@ export default async function loadClass() {
         `${API_ENDPOINT}/level/class/${cookie.id}`,
         "GET"
       );
-      if(levels!=null){
-        if(levels.length!=0){
-        let statistics = [];
-        statistics = await fetchRequest(
-          `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
-          "GET"
-        );
-        const statisticsMap = statistics.reduce((map, statistic) => {
-          map[statistic.level] = {
-            stars: statistic.stars,
-            attempts: statistic.attempts,
-          };
-          return map;
-        }, {});
+      const sets = await fetchRequest(
+        `${API_ENDPOINT}/level/class/${cookie.id}/sets`,
+        "GET"
+      );
+      if(levels!=null || sets!=null){
+        if(levels.length!=0 || sets.length!=0){
+          if(levels.length!=0){
+            let statistics = [];
+            statistics = await fetchRequest(
+              `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
+              "GET"
+            );
+            const statisticsMap = statistics.reduce((map, statistic) => {
+              map[statistic.level] = {
+                stars: statistic.stars,
+                attempts: statistic.attempts,
+              };
+              return map;
+            }, {});
 
-        const levelsWithStatistics = levels.map((level) => {
-          const levelId = level.id;
-          const statistic = statisticsMap[levelId];
-          return {
-            ...level,
-            statistics: statistic || { stars: 0, attempts: 0 },
-          };
-        });
+            const levelsWithStatistics = levels.map((level) => {
+              const levelId = level.id;
+              const statistic = statisticsMap[levelId];
+              return {
+                ...level,
+                statistics: statistic || { stars: 0, attempts: 0 },
+              };
+            });
 
-        await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+            await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
-        // Add getLevel event listener
-        document.querySelectorAll("a.getLevel").forEach((level) => {
-          level.addEventListener("click", playLevel);
-        });
+            // Add getLevel event listener
+            document.querySelectorAll("a.getLevel").forEach((level) => {
+              level.addEventListener("click", playLevel);
+            });
+          }
+          if(sets.length!=0){
+            console.log(sets);
+            const setDiv = document.getElementById("sets");
+            await fillContent(setDiv, sets, generateSetDiv);
+            document.querySelectorAll("a.set").forEach((set) => {
+              set.addEventListener("click", loadSet);
+            });
+          }
         }else{//No hay niveles en el grupo
           document.getElementById("content").innerHTML = getRowHTML2();
           var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];

@@ -3,6 +3,7 @@ import loadHome from "./loaders/homeLoader";
 import loadLevelEditor from "./loaders/levelEditorLoader";
 import playLevelById from "./loaders/levelPlayerLoader";
 import loadCommunity from "./loaders/communityLoader";
+import loadSetById from "./loaders/setLoader";
 import loadProfile, { sessionCookieValue } from "./loaders/profileLoader";
 import XAPISingleton from "../xAPI/xapi";
 import { getSpecificUUID } from "./utils";
@@ -32,6 +33,14 @@ export async function setPageOfficalCategoryById(params: URLSearchParams) {
   loadCategoryById(idCategory);
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, urlCategory);
   await XAPISingleton.sendStatement(statement);
+}
+
+export async function setPageSetById(params: URLSearchParams) {
+  const [userName, uuid] = getUserNameAndUUID();
+  const idSet= params.get("id") 
+  let urlCategory = `set?id=${idSet}`;
+  //loadSetById(idSet);
+  loadSetById(idSet);
 }
 
 export async function setPageLevelPlayer(params: URLSearchParams) {
