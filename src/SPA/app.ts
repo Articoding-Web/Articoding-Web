@@ -2,6 +2,7 @@ import loadCategoryById from "./loaders/categoryLoader";
 import loadHome from "./loaders/homeLoader";
 import loadLevelEditor from "./loaders/levelEditorLoader";
 import playLevelById from "./loaders/levelPlayerLoader";
+import { playClassLevelById } from "./loaders/levelPlayerLoader";
 import loadCommunity from "./loaders/communityLoader";
 import loadSetById from "./loaders/setLoader";
 import loadProfile, { sessionCookieValue } from "./loaders/profileLoader";
@@ -45,12 +46,20 @@ export async function setPageSetById(params: URLSearchParams) {
 
 export async function setPageLevelPlayer(params: URLSearchParams) {
   const [userName, uuid] = getUserNameAndUUID();
-
   const idLevel = params.get("id") 
   let urlLevel = `level?id=${idLevel}`;
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, urlLevel);
   await XAPISingleton.sendStatement(statement);
   playLevelById(idLevel);
+}
+
+export async function setClassLevelPlayer(params: URLSearchParams) {
+  const [userName, uuid] = getUserNameAndUUID();
+  const idLevel = params.get("id") 
+  let urlLevel = `level?id=${idLevel}`;
+  let statement = XAPISingleton.screenAccessedStatement(uuid, userName, urlLevel);
+  await XAPISingleton.sendStatement(statement);
+  playClassLevelById(idLevel);
 }
 
 export async function setPageLevelEditor(levelId?: number) {

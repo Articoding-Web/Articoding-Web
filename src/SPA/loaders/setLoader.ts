@@ -63,7 +63,7 @@ export async function generateLevelDiv(level) {
   return `
     <div class="col">
       <div class="card mx-auto border-dark">
-        <a class="getLevel" href="${API_ENDPOINT}/level/${id}">
+        <a class="getLevel" href="${API_ENDPOINT}/sets/level/${id}">
           <div class="row g-0 text-dark">
             <div class="col-md-3">
               ${
@@ -103,9 +103,8 @@ export async function generateLevelDiv(level) {
 export async function playLevel(event) {
   event.preventDefault();
   const anchorTag = event.target.closest("a.getLevel");
-  const id = anchorTag.href.split("level/")[1];
-  history.pushState({ id }, "", `level?id=${id}`);
-
+  const id = anchorTag.href.split("sets/level/")[1];
+  history.pushState({ id }, "", `classLevel?id=${id}`);
   route();
 }
 

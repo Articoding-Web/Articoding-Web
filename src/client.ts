@@ -19,6 +19,7 @@ export async function route() {
   const url = new URL(window.location.href);
   const setPageFunction = router[url.pathname];
 
+  console.log(url.pathname);
   if (setPageFunction) {
     setPageFunction(url.searchParams);
   } else {

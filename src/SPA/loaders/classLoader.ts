@@ -155,7 +155,7 @@ export async function playLevel(event) {
   event.preventDefault();
   const anchorTag = event.target.closest("a.getLevel");
   const id = anchorTag.href.split("level/")[1];
-  history.pushState({ id }, "", `level?id=${id}`);
+  history.pushState({ id }, "", `classLevel?id=${id}`);
   route();
 }
 

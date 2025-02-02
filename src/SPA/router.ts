@@ -6,6 +6,7 @@ import {
   setPageOfficalCategoryById,
   setPageProfile,
   setPageHome,
+  setClassLevelPlayer,
   setPageSetById,
 } from "./app";
 
@@ -13,6 +14,7 @@ const router = {
   "/community": setPageCommunity,
   "/class": setPageClass,
   "/category": setPageOfficalCategoryById,
+  "/classLevel": setClassLevelPlayer,
   "/set": setPageSetById,
   "/level": setPageLevelPlayer,
   "/editor": setPageLevelEditor,

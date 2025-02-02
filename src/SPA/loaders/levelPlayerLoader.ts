@@ -154,6 +154,28 @@ export default async function playLevelById(id: string) {
     }
 }
 
+/**
+ * Fetches a level by its ID and starts it
+ * @param {String} id - The ID of the level to start
+ */
+export async function playClassLevelById(id: string) {
+    try {
+        const level = await fetchRequest(`${API_ENDPOINT}/level/sets/level/${id}`, "GET");
+        loadLevel(JSON.parse(level.data), false, level.category);
+
+        if (id === "1") {
+            TourController.startIfNotFinished("LevelPlayer");
+        }
+    
+        document.getElementById("levelPlayerTourBtn").onclick = () => { TourController.start("LevelPlayer") };
+    } catch(error) {
+        if (error.status === 503) { // Offline mode
+            console.log("Received a 503 web error");
+            window.location.reload();
+        }
+    }
+}
+
 export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolean, category?: string) {
     if (category) {
         document.getElementById("content").setAttribute("categoryIndex", category);
