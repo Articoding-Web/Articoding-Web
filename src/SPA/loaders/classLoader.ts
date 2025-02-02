@@ -228,13 +228,13 @@ export function appendJoinGroupModal() {
 }
 
 async function useRegister(modal : bootstrap.Modal):Promise<any> {
-  const groupId = (document.getElementById("group") as HTMLInputElement)
+  const groupCode = (document.getElementById("group") as HTMLInputElement)
     .value;
   const cookie = sessionCookieValue();
   const userId= cookie.id;
   ;
   const postData = {
-    groupId: groupId,
+    groupCode: groupCode,
     userId:userId
   };
   try{
