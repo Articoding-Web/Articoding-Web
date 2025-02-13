@@ -59,6 +59,7 @@ function getBlockLimitButton(fromLevelEditor: boolean) {
             </button>` :'';
 }
 function getBlockLimitMenu(fromLevelEditor: boolean) {
+    var nameMap={"movement":"Actions", "math_number":"Numbers","for_X_times":"Loops", "changeStatus":"Change Trap"};
     var blockMap={"movement":"Actions", "math_number":"Numbers","for_X_times":"Loops", "changeStatus":"Actions"};
     var menu=
     `<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBlockLimit" aria-labelledby="offcanvasBlockLimitLabel">
@@ -73,7 +74,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
         var mayus=block.charAt(0).toUpperCase()+block.slice(1);
         menu+=`<div class="accordion-item">
                 <div class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${mayus}" aria-expanded="true" aria-controls="collapse${mayus}">
-                <h5>${mayus} block</h5><img src="./images/${mayus}Block.png" alt="${mayus}blockImage"
+                <h5>${nameMap[block]} block</h5><img src="./images/${mayus}Block.png" alt="${mayus}blockImage"
                 class=""></button></div>
                 <div id="collapse${mayus}" class="accordion-collapse collapse show">
                 <div class="form-check form-switch">
@@ -90,7 +91,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                     </div>
                     <form class="form-floating">
                     <input type="number" class="form-control" aria-label="limit for ${block} block"  id="${block}NumberLimit" min="1" value="1">
-                    <label class="form-check-label" for="${block}NumberLimit">${block} Number Limit</label>
+                    <label class="form-check-label" for="${block}NumberLimit">${nameMap[block]} Number Limit</label>
                     </form>
                 </div></span>
                 </div>
@@ -99,6 +100,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
     }
 
     //adding variable block limiters
+    var variableBlocksName = {"variables_set":"Set Variable", "variables_get":"Variable", "math_change":"Change Variable"};
     var variableBlocks=["variables_set","variables_get","math_change"];
     menu+= `    <div class="accordion-item">
                 <div class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVariables" aria-expanded="true" aria-controls="collapseVariables">
@@ -114,7 +116,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
         menu+=
                 `
                 <div>
-                <label class="form-check-label" for="${block}NumberCheck">${mayus} Usage Limit</label>
+                <label class="form-check-label" for="${block}NumberCheck">${variableBlocksName[block]} Usage Limit</label>
                 <img src="./images/${mayus}Block.png" alt="${mayus}blockImage"class="">
                 </div>
                 <div class="input-group mb-3">
@@ -123,7 +125,7 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
                     </div>
                     <form class="form-floating">
                     <input type="number" class="form-control" aria-label="limit for ${block} block"  id="${block}NumberLimit" value="1">
-                    <label class="form-check-label" for="${block}NumberLimit">${block} Number Limit</label>
+                    <label class="form-check-label" for="${block}NumberLimit">${variableBlocksName[block]} Number Limit</label>
                     </form>
                 </div>`
     }
