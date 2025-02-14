@@ -11,7 +11,9 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
+  return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">SETS</h2>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
+          <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
   `;
