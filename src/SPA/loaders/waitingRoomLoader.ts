@@ -55,80 +55,6 @@ function generateCommunityDivPlaceholder() {
           </div>`;
 }
 
-/**
- *
- * @param {Object} level with id, title, etc
- * @returns String of HTMLDivElement
- */
-async function generateLevelDiv(level) {
-  if (!level || !level.statistics) {
-    throw new Error("Invalid level data");
-  }
-
-  const { id, miniature, title, description = "Blockleap level" } = level;
-  const { stars, attempts } = level.statistics;
-
-  return `
-    <div class="col">
-      <div class="card mx-auto border-dark">
-        <a class="getLevel" href="${API_ENDPOINT}/level/${id}">
-          <div class="row g-0 text-dark">
-            <div class="col-md-3">
-              ${
-                miniature
-                  ? `<img src="${miniature}" class="img-fluid rounded-start" alt="${title}">`
-                  : ""
-              }
-            </div>
-            <div class="col-md-9">
-              <div class="card-body">
-                <div class="row row-cols-1 row-cols-md-2">
-                  <div class="col">
-                    <h5 class="card-title">${title}</h5>
-                    <p class="card-text">${description}</p>
-                  </div>
-                  <div class="col align-self-center text-md-end">
-                    <h5>
-                      <span>
-                        ${stars} <i class="bi bi-star-fill gold-star"></i>
-                        ${attempts} <i class="bi bi-play-fill"></i>
-                      </span>
-                    </h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>`;
-}
-
-
-/**
- *
- * @param {Object} set category with id, name, levels and description
- * @returns String of HTMLDivElement
- */
-async function generateSetDiv(set) {
-  return `<div class="col">
-              <div class="card mx-auto border-dark d-flex flex-column h-100">
-                <a class="set" href="set/${set.id}">
-                    <h5 class="card-header card-title text-dark">
-                      ${set.name}
-                    </h5>
-                    <div class="card-body text-dark">
-                      <h6 class="card-subtitle mb-2 text-muted">
-                        Levels: ${set.id}
-                      </h6>
-                      ${set.description}
-                    </div>
-                </a>
-              </div>
-            </div>`;
-}
-
-
 
 async function generateMSG(message) {
   var msg=`<div class="container m-5">
@@ -147,37 +73,10 @@ async function generateMSG(message) {
   return msg
 }
 
-/**
- * Sets content and starts phaser LevelPlayer
- * @param {Event} event - click event of <a> to href with level id
- */
-export async function playLevel(event) {
-  event.preventDefault();
-  const anchorTag = event.target.closest("a.getLevel");
-  const id = anchorTag.href.split("level/")[1];
-  history.pushState({ id }, "", `classLevel?id=${id}`);
-  route();
-}
 
-export async function loadSet(event) {
-  event.preventDefault();
-  const anchorTag = event.target.closest("a.set");
-  const id = anchorTag.href.split("set/")[1];
-  history.pushState({ id }, "", `set?id=${id}`);
-  route();
-}
 
-/**
- * Sets content and starts phaser LevelPlayer
- * @param {Event} event - click event of <a> to href with level id
- */
-export async function playSet(event) {
-  event.preventDefault();
-  const anchorTag = event.target.closest("a.set");
-  const id = anchorTag.href.split("level/")[1];
-  history.pushState({ id }, "", `level?id=${id}`);
-  route();
-}
+
+
 
 export function appendJoinGroupModal() {
   let joinGroupHtml = `
@@ -251,95 +150,53 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   }
 }
 
-export default async function loadClass() {
-  document.getElementById("content").innerHTML = getRowHTML();
-  const divElement = document.getElementById("categories");
-
-  // Load placeholders
-  await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
-
-  try {
-    const cookie = sessionCookieValue();
-    if((cookie !== null)){
-      const levels = await fetchRequest(
-        `${API_ENDPOINT}/level/class/${cookie.id}`,
-        "GET"
-      );
-      const sets = await fetchRequest(
-        `${API_ENDPOINT}/level/class/${cookie.id}/sets`,
-        "GET"
-      );
-      if(levels!=null || sets!=null){
-        if(levels.length!=0 || sets.length!=0){
-          if(levels.length!=0){
-            let statistics = [];
-            statistics = await fetchRequest(
-              `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
-              "GET"
-            );
-            const statisticsMap = statistics.reduce((map, statistic) => {
-              map[statistic.level] = {
-                stars: statistic.stars,
-                attempts: statistic.attempts,
-              };
-              return map;
-            }, {});
-
-            const levelsWithStatistics = levels.map((level) => {
-              const levelId = level.id;
-              const statistic = statisticsMap[levelId];
-              return {
-                ...level,
-                statistics: statistic || { stars: 0, attempts: 0 },
-              };
-            });
-
-            await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-
-            // Add getLevel event listener
-            document.querySelectorAll("a.getLevel").forEach((level) => {
-              level.addEventListener("click", playLevel);
-            });
-          }
-          if(sets.length!=0){
-            console.log(sets);
-            const setDiv = document.getElementById("sets");
-            await fillContent(setDiv, sets, generateSetDiv);
-            document.querySelectorAll("a.set").forEach((set) => {
-              set.addEventListener("click", loadSet);
-            });
-          }
-        }else{//No hay niveles en el grupo
-          document.getElementById("content").innerHTML = getRowHTML2();
-          var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];
-          const textElement = document.getElementById("display");
-          await fillContent(textElement, messages, generateMSG);
-
-        }
-      }else{//Sin grupo
-        document.getElementById("content").innerHTML = getRowHTML2();
-        var messages=[{msg:"No perteneces a ninguna clase",desc:"Unete a una clase para acceder a sus niveles",buttonName:"joinGroup",buttonMsg:"Unirse a una clase"}];
-        const textElement = document.getElementById("display");
+export default async function loadWaitingRoom() {
+    document.getElementById("content").innerHTML = getRowHTML2();
+    const textElement = document.getElementById("display");
   
+    try {
+      const cookie = sessionCookieValue();
+      
+      if(cookie !== null){
+        const classes = await fetchRequest(
+          `${API_ENDPOINT}/group/findByUser/${cookie.id}`,
+          "GET"
+        );
+  
+        if(classes!=null){
+          await fillContent(textElement, classes, async (group) => {
+          return `<div class="col">
+                    <div class="card mx-auto border-dark d-flex flex-column h-100">
+                      <h5 class="card-header card-title text-dark">${group.name}</h5>
+                      <div class="card-body text-dark">
+                        <h6 class="card-subtitle mb-2 text-muted">ID: ${group.id}</h6>
+                        ${group.description}
+                      </div>
+                      <div class="card-footer text-center">
+                        <button class="btn btn-primary" onclick="appendJoinGroupModal()">Unirse</button>
+                      </div>
+                    </div>
+                  </div>`;
+        });
+        } else {
+            var messages = [{ msg: "No perteneces a ninguna clase", desc: "Únete a una clase para acceder", buttonName: "joinGroup", buttonMsg: "Unirse a una clase" }];
+            await fillContent(textElement, messages, generateMSG);
+            document.getElementById("joinGroup").addEventListener("click", () => {
+                appendJoinGroupModal();
+            });
+        }
+      } else {
+        var messages = [{ msg: "No hay sesión iniciada", desc: "Inicia sesión para acceder a tus clases", buttonName: "altLogin", buttonMsg: "Iniciar Sesión" }];
         await fillContent(textElement, messages, generateMSG);
-        document.getElementById("joinGroup").addEventListener("click", (e: MouseEvent) => {
-          appendJoinGroupModal();
+        document.getElementById("altLogin").addEventListener("click", () => {
+          appendLoginModal();
         });
       }
-    }else{//Sin sesión
-      document.getElementById("content").innerHTML = getRowHTML2();
-      var messages=[{msg:"No hay sesión iniciada",desc:"Inicia sesión para acceder a tu clase",buttonName:"altLogin",buttonMsg:"Iniciar Sesión"}];
-      const textElement = document.getElementById("display");
-
-      await fillContent(textElement, messages, generateMSG);
-      document.getElementById("altLogin").addEventListener("click", (e: MouseEvent) => {
-            appendLoginModal();
-      });
-    }
-  } catch(error) {
-    if (error.status === 503) { // Offline mode
-      console.log("Received a 503 web error");
-      window.location.reload();
+    } catch(error) {
+      if (error.status === 503) {
+        console.log("Received a 503 web error");
+        window.location.reload();
+      }
     }
   }
-}
+  
