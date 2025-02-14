@@ -21,41 +21,6 @@ function getRowHTML2() {
   `;
 }
 
-/**
- *
- * @returns String of HTMLDivElement of a category placeholder
- */
-function generateCommunityDivPlaceholder() {
-  return `<div class="col placeholder-col">
-              <div class="card mx-auto border-dark">
-                  <div class="row g-0 text-dark">
-                      <div class="placeholder bg-secondary col-md-3">
-
-                      </div>
-                      <div class="col-md-9">
-                          <div class="card-body">
-                            <div class="row row-cols-1 row-cols-md-2">
-                                <div class="col">
-                                    <h5 class="placeholder row card-title bg-secondary"></h5>
-                                    <p class="placeholder row card-text bg-secondary"></p>
-                                </div>
-                                <div class="col align-self-center text-md-end">
-                                    <h5>
-                                        <span>
-                                            <span class="placeholder col-1 bg-secondary"></span> <i class="placeholder bi bi-star-fill gold-star bg-secondary"></i>
-                                            <span class="placeholder col-1 bg-secondary"></span> <i class="placeholder bi bi-play-fill bg-secondary"></i>
-                                        </span>
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                      </div>
-                  </div>
-              </div>
-          </div>`;
-}
-
-
 async function generateMSG(message) {
   var msg=`<div class="container m-5">
       </div><div class="text-center text-muted bg-body p-2 rounded-5">
