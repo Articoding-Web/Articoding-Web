@@ -76,9 +76,10 @@ export async function setPageLevelEditor(levelId?: number) {
   await XAPISingleton.sendStatement(statement);
 }
 
-export async function setPageClass() {
+export async function setPageClass(params: URLSearchParams) {
   const [userName, uuid] = getUserNameAndUUID();
-  loadClass();
+  const idLevel = params.get("id") 
+  loadClass(idLevel);
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
 }

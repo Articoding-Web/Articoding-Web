@@ -110,6 +110,10 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   }
 }
 
+//Toca implementar para SPA en vez de enrutar directamente
+async function loadClass() {//TODO ejemplos en otros loaders
+}
+
 export default async function loadWaitingRoom() {
     document.getElementById("content").innerHTML = getRowHTML2();
     const textElement = document.getElementById("display");
@@ -135,11 +139,10 @@ export default async function loadWaitingRoom() {
                     <div class="card mx-auto border-dark d-flex flex-column h-100">
                       <h5 class="card-header card-title text-dark">${group.name}</h5>
                       <div class="card-body text-dark">
-                        
                         ${group.description}
                       </div>
                       <div class="card-footer text-center">
-                        <button class="btn btn-primary" onclick="appendJoinGroupModal()">Unirse</button>
+                        <a class="btn btn-primary" href="/class?${group.id}">Unirse</a>
                       </div>
                     </div>
                   </div>`;

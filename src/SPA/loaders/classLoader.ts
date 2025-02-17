@@ -251,10 +251,10 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   }
 }
 
-export default async function loadClass() {
+export default async function loadClass(id) {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
-
+  console.log(id);
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
