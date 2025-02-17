@@ -38,11 +38,6 @@ async function generateMSG(message) {
   return msg
 }
 
-
-
-
-
-
 export function appendJoinGroupModal() {
   let joinGroupHtml = `
         <div id="joinGroupModal" class="modal fade" tabindex="-1" aria-labelledby="joinGroupLabel" aria-hidden="true">
@@ -127,14 +122,20 @@ export default async function loadWaitingRoom() {
           `${API_ENDPOINT}/group/findByUser/${cookie.id}`,
           "GET"
         );
-  
-        if(classes!=null){
-          await fillContent(textElement, classes, async (group) => {
+      
+        if(classes.length){
+
+          const group = await fetchRequest(
+            `${API_ENDPOINT}/group/${classes[0].group}`,
+            "GET"
+          );
+
+          await fillContent(textElement, group, async (group) => {
           return `<div class="col">
                     <div class="card mx-auto border-dark d-flex flex-column h-100">
                       <h5 class="card-header card-title text-dark">${group.name}</h5>
                       <div class="card-body text-dark">
-                        <h6 class="card-subtitle mb-2 text-muted">ID: ${group.id}</h6>
+                        
                         ${group.description}
                       </div>
                       <div class="card-footer text-center">
