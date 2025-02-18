@@ -10,22 +10,15 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  *
  * @returns String of HTMLDivElement for showing levels/categories
  */
-function getRowHTML() {
-  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
-          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
-          <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
-  `;
-}
+
 function getRowHTML2() {
   return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">CLASSES</h2>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="display"></div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="joinButton">
              <div class="text-center w-100">
-                <button id="join" class="btn btn-success btn-lg w-30">New class</button>
+                <button id="join" class="btn btn-success btn-lg w-30">Join new class</button>
               </div>
           </div>
-          
-
   `;
 }
 
@@ -151,17 +144,16 @@ export default async function loadWaitingRoom() {
                         ${group.description}
                       </div>
                       <div class="card-footer text-center">
-                        <a class="btn btn-primary" href="/class?id=${group.id}">Unirse</a>
+                        <a class="btn btn-primary" href="/class?id=${group.id}">Join</a>
                       </div>
                     </div>
                   </div>`;
         });
-/*
-        await fillContent(textElement, messages, generateMSG);
-        document.getElementById("joinGroup").addEventListener("click", () => {
+
+        document.getElementById("join").addEventListener("click", () => {
             appendJoinGroupModal();
         });
-*/
+
         } else {
             var messages = [{ msg: "No perteneces a ninguna clase", desc: "Únete a una clase para acceder", buttonName: "joinGroup", buttonMsg: "Unirse a una clase" }];
             await fillContent(textElement, messages, generateMSG);
