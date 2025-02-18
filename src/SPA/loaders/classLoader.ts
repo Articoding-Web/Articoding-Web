@@ -106,12 +106,12 @@ async function generateLevelDiv(level) {
     </div>`;
 }
 
-
 /**
  *
  * @param {Object} set category with id, name, levels and description
  * @returns String of HTMLDivElement
  */
+
 async function generateSetDiv(set) {
   return `<div class="col">
               <div class="card mx-auto border-dark d-flex flex-column h-100">

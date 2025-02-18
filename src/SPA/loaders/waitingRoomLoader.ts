@@ -17,7 +17,15 @@ function getRowHTML() {
   `;
 }
 function getRowHTML2() {
-  return `<div id="display"></div>
+  return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">CLASSES</h2>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="display"></div>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="joinButton">
+             <div class="text-center w-100">
+                <button id="join" class="btn btn-success btn-lg w-30">New class</button>
+              </div>
+          </div>
+          
+
   `;
 }
 
@@ -60,6 +68,7 @@ export function appendJoinGroupModal() {
                         <span id="text-error-joinGroup"></span>
                     </div>
                 </div>
+            
             </div>
         </div>
     `;
@@ -142,11 +151,17 @@ export default async function loadWaitingRoom() {
                         ${group.description}
                       </div>
                       <div class="card-footer text-center">
-                        <a class="btn btn-primary" href="/class?${group.id}">Unirse</a>
+                        <a class="btn btn-primary" href="/class?id=${group.id}">Unirse</a>
                       </div>
                     </div>
                   </div>`;
         });
+/*
+        await fillContent(textElement, messages, generateMSG);
+        document.getElementById("joinGroup").addEventListener("click", () => {
+            appendJoinGroupModal();
+        });
+*/
         } else {
             var messages = [{ msg: "No perteneces a ninguna clase", desc: "Únete a una clase para acceder", buttonName: "joinGroup", buttonMsg: "Unirse a una clase" }];
             await fillContent(textElement, messages, generateMSG);
