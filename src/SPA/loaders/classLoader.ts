@@ -130,8 +130,6 @@ async function generateSetDiv(set) {
             </div>`;
 }
 
-
-
 async function generateMSG(message) {
   var msg=`<div class="container m-5">
       </div><div class="text-center text-muted bg-body p-2 rounded-5">

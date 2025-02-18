@@ -2,6 +2,7 @@ import loadCategoryById from "./loaders/categoryLoader";
 import loadHome from "./loaders/homeLoader";
 import loadLevelEditor from "./loaders/levelEditorLoader";
 import loadWaitingRoom from "./loaders/waitingRoomLoader";
+import { loadWaitingRoomProfesor } from "./loaders/waitingRoomLoader";
 import playLevelById from "./loaders/levelPlayerLoader";
 import { playClassLevelById } from "./loaders/levelPlayerLoader";
 import loadCommunity from "./loaders/communityLoader";
@@ -84,11 +85,20 @@ export async function setPageClass(params: URLSearchParams) {
   await XAPISingleton.sendStatement(statement);
 }
 
-
-//aqui
 export async function setPageWaitingRoom(params: URLSearchParams) {
+  const cookie = sessionCookieValue();
   const [userName, uuid] = getUserNameAndUUID();
-  loadWaitingRoom();
+  let role = "";
+  if(cookie!=null){
+    role = cookie.role;
+  }
+ 
+  if(role=="Profesor"){
+     loadWaitingRoomProfesor();
+  } else {
+      loadWaitingRoom();
+  }
+    
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_EDITOR);
   await XAPISingleton.sendStatement(statement);
 }
