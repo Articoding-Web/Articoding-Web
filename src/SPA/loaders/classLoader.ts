@@ -10,8 +10,8 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  *
  * @returns String of HTMLDivElement for showing levels/categories
  */
-function getRowHTML() {
-  return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">SETS</h2>
+function getRowHTML(classId) {
+  return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">${classId[0].name}</h2>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
@@ -254,7 +254,12 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
 }
 
 export default async function loadClass(id) {
-  document.getElementById("content").innerHTML = getRowHTML();
+  const classId = await fetchRequest(
+    `${API_ENDPOINT}/group/${id}`, 
+    "GET"
+  );
+
+  document.getElementById("content").innerHTML = getRowHTML(classId);
   const divElement = document.getElementById("categories");
   console.log(id);
   // Load placeholders
@@ -264,11 +269,11 @@ export default async function loadClass(id) {
     const cookie = sessionCookieValue();
     if((cookie !== null)){
       const levels = await fetchRequest(
-        `${API_ENDPOINT}/level/class/${cookie.id}`,
+        `${API_ENDPOINT}/level/class/${id}`,
         "GET"
       );
       const sets = await fetchRequest(
-        `${API_ENDPOINT}/level/class/${cookie.id}/sets`,
+        `${API_ENDPOINT}/level/class/${id}/sets`,
         "GET"
       );
       if(levels!=null || sets!=null){
