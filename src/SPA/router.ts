@@ -1,6 +1,7 @@
 import {
   setPageCommunity,
   setPageClass,
+  setPageWaitingRoom,
   setPageLevelEditor,
   setPageLevelPlayer,
   setPageOfficalCategoryById,
@@ -12,7 +13,8 @@ import {
 
 const router = {
   "/community": setPageCommunity,
-  "/class": setPageClass,
+  "/class": setPageClass, 
+  "/waiting-room": setPageWaitingRoom,
   "/category": setPageOfficalCategoryById,
   "/classLevel": setClassLevelPlayer,
   "/set": setPageSetById,

@@ -1,6 +1,7 @@
 import loadCategoryById from "./loaders/categoryLoader";
 import loadHome from "./loaders/homeLoader";
 import loadLevelEditor from "./loaders/levelEditorLoader";
+import loadWaitingRoom from "./loaders/waitingRoomLoader";
 import playLevelById from "./loaders/levelPlayerLoader";
 import { playClassLevelById } from "./loaders/levelPlayerLoader";
 import loadCommunity from "./loaders/communityLoader";
@@ -62,6 +63,12 @@ export async function setClassLevelPlayer(params: URLSearchParams) {
   playClassLevelById(idLevel);
 }
 
+export async function setPageCommunity() {
+  const [userName, uuid] = getUserNameAndUUID();
+  loadCommunity();
+  let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
+  await XAPISingleton.sendStatement(statement);
+}
 export async function setPageLevelEditor(levelId?: number) {
   const [userName, uuid] = getUserNameAndUUID();
   loadLevelEditor();
@@ -69,16 +76,20 @@ export async function setPageLevelEditor(levelId?: number) {
   await XAPISingleton.sendStatement(statement);
 }
 
-export async function setPageCommunity() {
+export async function setPageClass(params: URLSearchParams) {
   const [userName, uuid] = getUserNameAndUUID();
-  loadCommunity();
+  const idLevel = params.get("id") 
+  loadClass(idLevel);
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
 }
-export async function setPageClass() {
+
+
+//aqui
+export async function setPageWaitingRoom(params: URLSearchParams) {
   const [userName, uuid] = getUserNameAndUUID();
-  loadClass();
-  let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
+  loadWaitingRoom();
+  let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_EDITOR);
   await XAPISingleton.sendStatement(statement);
 }
 

@@ -49,7 +49,7 @@ function setNavbarListeners() {
 
   // TODO: Manual
   document.getElementById("manual").addEventListener("click", (e: MouseEvent) =>{ 
-    routeIfNewPath("/class", e)}
+    routeIfNewPath("/waiting-room", e)}
   );
 
   // Editor
