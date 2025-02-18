@@ -230,9 +230,6 @@ export async function loadWaitingRoomProfesor() {
         return `<div class="col">
                   <div class="card mx-auto border-dark d-flex flex-column h-100">
                     <h5 class="card-header card-title text-dark">${group.name}</h5>
-                    <div class="card-body text-dark">
-                      ${group.description}
-                    </div>
                     <div class="card-footer text-center">
                       <a class="btn btn-primary" href="/class?id=${group.id}">Join</a>
                     </div>
