@@ -132,7 +132,7 @@ export default async function loadWaitingRoom() {
         if(classes.length){
 
           const group = await fetchRequest(
-            `${API_ENDPOINT}/group/${classes[0].group}`,
+            `${API_ENDPOINT}/group/${classes.map(a => a.group)}`,
             "GET"
           );
 
