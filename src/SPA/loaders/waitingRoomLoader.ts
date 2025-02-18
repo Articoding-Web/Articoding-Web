@@ -155,9 +155,9 @@ export default async function loadWaitingRoom() {
         });
 
         } else {
-            var messages = [{ msg: "No perteneces a ninguna clase", desc: "Únete a una clase para acceder", buttonName: "joinGroup", buttonMsg: "Unirse a una clase" }];
+            var messages = [{ msg: "No perteneces a ninguna clase", desc: "Únete a una clase para acceder", buttonName: "", buttonMsg: "" }];
             await fillContent(textElement, messages, generateMSG);
-            document.getElementById("joinGroup").addEventListener("click", () => {
+            document.getElementById("join").addEventListener("click", () => {
                 appendJoinGroupModal();
             });
         }
