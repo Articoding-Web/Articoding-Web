@@ -11,6 +11,7 @@ import loadProfile, { sessionCookieValue } from "./loaders/profileLoader";
 import XAPISingleton from "../xAPI/xapi";
 import { getSpecificUUID } from "./utils";
 import loadClass from "./loaders/classLoader";
+import {loadClassProfesor} from "./loaders/classLoader";
 const URL_EDITOR = "editor" 
 const URL_PROFILE= "profile"
 const URL_COMMUNITY = "community"
@@ -78,9 +79,20 @@ export async function setPageLevelEditor(levelId?: number) {
 }
 
 export async function setPageClass(params: URLSearchParams) {
+  const cookie = sessionCookieValue();
   const [userName, uuid] = getUserNameAndUUID();
-  const idLevel = params.get("id") 
-  loadClass(idLevel);
+  const idClass = params.get("id") 
+  let role = "";
+  if(cookie!=null){
+    role = cookie.role;
+  }
+
+  if(role=="Profesor"){
+    loadClassProfesor(idClass);
+  } else{
+    loadClass(idClass);
+  }
+  
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
 }

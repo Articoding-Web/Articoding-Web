@@ -23,6 +23,15 @@ function getRowHTML2() {
   `;
 }
 
+function getRowHTML3(classId){
+  return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">${classId[0].name} Profesor</h2>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
+          <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+          <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
+  `;
+}
+
 /**
  *
  * @returns String of HTMLDivElement of a category placeholder
@@ -249,6 +258,106 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   catch(error) {
     console.error('Error general:', error);
   }
+}
+
+export async function loadClassProfesor(id) {
+
+  const classId = await fetchRequest(
+    `${API_ENDPOINT}/group/${id}`, 
+    "GET"
+  );
+
+  document.getElementById("content").innerHTML = getRowHTML3(classId);
+  const divElement = document.getElementById("categories");
+  console.log(id);
+  // Load placeholders
+  await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
+
+  try {
+    const cookie = sessionCookieValue();
+    if((cookie !== null)){
+      const levels = await fetchRequest(
+        `${API_ENDPOINT}/level/class/${id}`,
+        "GET"
+      );
+      const sets = await fetchRequest(
+        `${API_ENDPOINT}/level/class/${id}/sets`,
+        "GET"
+      );
+      if(levels!=null || sets!=null){
+        if(levels.length!=0 || sets.length!=0){
+          if(levels.length!=0){
+            let statistics = [];
+            statistics = await fetchRequest(
+              `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
+              "GET"
+            );
+            const statisticsMap = statistics.reduce((map, statistic) => {
+              map[statistic.level] = {
+                stars: statistic.stars,
+                attempts: statistic.attempts,
+              };
+              return map;
+            }, {});
+
+            const levelsWithStatistics = levels.map((level) => {
+              const levelId = level.id;
+              const statistic = statisticsMap[levelId];
+              return {
+                ...level,
+                statistics: statistic || { stars: 0, attempts: 0 },
+              };
+            });
+
+            await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+
+            // Add getLevel event listener
+            document.querySelectorAll("a.getLevel").forEach((level) => {
+              level.addEventListener("click", playLevel);
+            });
+          }
+          if(sets.length!=0){
+            console.log(sets);
+            const setDiv = document.getElementById("sets");
+            await fillContent(setDiv, sets, generateSetDiv);
+            document.querySelectorAll("a.set").forEach((set) => {
+              set.addEventListener("click", loadSet);
+            });
+          }
+        }else{//No hay niveles en el grupo
+          document.getElementById("content").innerHTML = getRowHTML2();
+          var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];
+          const textElement = document.getElementById("display");
+          await fillContent(textElement, messages, generateMSG);
+
+        }
+      }else{//Sin grupo
+        document.getElementById("content").innerHTML = getRowHTML2();
+        var messages=[{msg:"No perteneces a ninguna clase",desc:"Unete a una clase para acceder a sus niveles",buttonName:"joinGroup",buttonMsg:"Unirse a una clase"}];
+        const textElement = document.getElementById("display");
+  
+        await fillContent(textElement, messages, generateMSG);
+        document.getElementById("joinGroup").addEventListener("click", (e: MouseEvent) => {
+          appendJoinGroupModal();
+        });
+      }
+    }else{//Sin sesión
+      document.getElementById("content").innerHTML = getRowHTML2();
+      var messages=[{msg:"No hay sesión iniciada",desc:"Inicia sesión para acceder a tu clase",buttonName:"altLogin",buttonMsg:"Iniciar Sesión"}];
+      const textElement = document.getElementById("display");
+
+      await fillContent(textElement, messages, generateMSG);
+      document.getElementById("altLogin").addEventListener("click", (e: MouseEvent) => {
+            appendLoginModal();
+      });
+    }
+  } catch(error) {
+    if (error.status === 503) { // Offline mode
+      console.log("Received a 503 web error");
+      window.location.reload();
+    }
+  }
+
 }
 
 export default async function loadClass(id) {
