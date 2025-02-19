@@ -25,10 +25,16 @@ function getRowHTML2() {
 
 function getRowHTML3(classId){
   return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">${classId[0].name} Profesor</h2>
+          <div class="text-center w-100">
+              <button id="addSets" class="btn btn-success btn-lg w-30">Add Sets</button>
+              <button id="addLevels" class="btn btn-success btn-lg w-30">Add Levels</button>
+              <button id="seeCode" class="btn btn-success btn-lg w-30">Class Code</button>
+          </div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
+            
   `;
 }
 
@@ -266,10 +272,17 @@ export async function loadClassProfesor(id) {
     `${API_ENDPOINT}/group/${id}`, 
     "GET"
   );
-
+  console.log(classId);
+  /*
+  const classCode = await fetchRequest(
+    `${API_ENDPOINT}/group/findByCode/${id}`, 
+    "GET"
+  );
+  console.log(classCode);
+*/
   document.getElementById("content").innerHTML = getRowHTML3(classId);
   const divElement = document.getElementById("categories");
-  console.log(id);
+ 
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
@@ -317,13 +330,25 @@ export async function loadClassProfesor(id) {
             });
           }
           if(sets.length!=0){
-            console.log(sets);
             const setDiv = document.getElementById("sets");
             await fillContent(setDiv, sets, generateSetDiv);
             document.querySelectorAll("a.set").forEach((set) => {
               set.addEventListener("click", loadSet);
             });
           }
+
+      
+      document.getElementById("addSets").addEventListener("click", () => {
+        
+      });
+
+      document.getElementById("addLevels").addEventListener("click", () => {
+        
+      });
+      document.getElementById("seeCode").addEventListener("click", () => {
+        
+      });
+
         }else{//No hay niveles en el grupo
           document.getElementById("content").innerHTML = getRowHTML2();
           var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];
