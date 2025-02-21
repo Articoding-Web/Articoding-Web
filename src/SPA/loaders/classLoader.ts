@@ -241,6 +241,47 @@ export function appendJoinGroupModal() {
   joinGroupModalInstance.show();
 
 }
+export function appendSeeCodeModal(code, classId) {
+  // Aquí creamos el HTML del modal con los valores dinámicos
+  let joinGroupHtml = `
+   <div id="seeCodeModal" class="modal fade" tabindex="-1" aria-labelledby="joinGroupLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="joinGroupLabel">${classId[0].name} Code</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="classCode" value="${code}" readonly>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+  `;
+
+  // Crea el elemento del modal y añádelo al DOM
+  let seeCode = document.createElement("div");
+  seeCode.innerHTML = joinGroupHtml;
+  document.body.appendChild(seeCode);
+
+  // Selecciona el modal que acabamos de añadir
+  let seeCodeModalElement = document.querySelector("#seeCodeModal") as HTMLElement;
+  let seeCodeModalInstance = new bootstrap.Modal(seeCodeModalElement);
+
+  // Evento para remover el modal del DOM cuando se cierre
+  seeCodeModalElement.addEventListener("hidden.bs.modal", function () {
+    seeCodeModalElement.remove();
+  });
+
+  // Muestra el modal
+  seeCodeModalInstance.show();
+}
+
+
 
 async function useRegister(modal : bootstrap.Modal):Promise<any> {
   const groupCode = (document.getElementById("group") as HTMLInputElement)
@@ -272,14 +313,14 @@ export async function loadClassProfesor(id) {
     `${API_ENDPOINT}/group/${id}`, 
     "GET"
   );
-  console.log(classId);
-  /*
+  
+  
   const classCode = await fetchRequest(
     `${API_ENDPOINT}/group/findByCode/${id}`, 
     "GET"
   );
-  console.log(classCode);
-*/
+  console.log(classCode.code);
+
   document.getElementById("content").innerHTML = getRowHTML3(classId);
   const divElement = document.getElementById("categories");
  
@@ -345,8 +386,8 @@ export async function loadClassProfesor(id) {
       document.getElementById("addLevels").addEventListener("click", () => {
         
       });
-      document.getElementById("seeCode").addEventListener("click", () => {
-        
+      document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
+           appendSeeCodeModal(classCode.code,classId);
       });
 
         }else{//No hay niveles en el grupo
@@ -393,7 +434,7 @@ export default async function loadClass(id) {
 
   document.getElementById("content").innerHTML = getRowHTML(classId);
   const divElement = document.getElementById("categories");
-  console.log(id);
+  
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
