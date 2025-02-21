@@ -255,6 +255,8 @@ export function appendSeeCodeModal(code, classId) {
                         <form>
                             <div class="mb-3">
                                 <input type="text" class="form-control" id="classCode" value="${code}" readonly>
+                                 <button class="btn btn-outline-secondary" type="button" id="copyCodeBtn">Copiar</button>
+                                 <div id="messageContainer"></div>
                             </div>
                         </form>
                     </div>
@@ -279,6 +281,29 @@ export function appendSeeCodeModal(code, classId) {
 
   // Muestra el modal
   seeCodeModalInstance.show();
+
+ // Copiar al portapapeles cuando se haga clic en el botón
+ const copyCodeBtn = document.getElementById("copyCodeBtn") as HTMLButtonElement;
+ const classCodeInput = document.getElementById("classCode") as HTMLInputElement;
+
+ copyCodeBtn.addEventListener("click", () => {
+  // Usamos la Clipboard API para copiar el código al portapapeles
+  navigator.clipboard.writeText(classCodeInput.value)
+    .then(() => {
+      // Crear un elemento de texto o actualizar el existente
+      let message = document.createElement('p'); // O usa un contenedor existente si lo prefieres
+      message.textContent = "Código copiado al portapapeles!";
+      message.style.color = "green"; // Puedes personalizar el estilo
+      message.style.marginTop = "10px"; // Espaciado
+      // Añadir el mensaje debajo del botón (asumiendo que tienes un contenedor para el mensaje)
+      document.getElementById("messageContainer").innerHTML = '';
+      document.getElementById("messageContainer").appendChild(message);
+    })
+    .catch(err => {
+      console.error("Error al copiar al portapapeles: ", err);
+    });
+});
+
 }
 
 
