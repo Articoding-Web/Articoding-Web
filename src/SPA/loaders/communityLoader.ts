@@ -4,13 +4,19 @@ import { fetchRequest, fillContent } from "../utils";
 import { sessionCookieValue } from "./profileLoader";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
-
+const itemsPerPage=5;
 /**
  *
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
+  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+          <div id="pageDiv" class="d-flex justify-content-center mt-3">
+            <nav aria-label="pages">
+              <ul class="pagination pagination-lg" id="paginationList">
+              </ul>
+            </nav>
+          </div>`;
 }
 
 /**
@@ -45,6 +51,34 @@ function generateCommunityDivPlaceholder() {
                   </div>
               </div>
           </div>`;
+}
+ async function loadLevelStats(levels){
+  const cookie = sessionCookieValue();
+
+  let statistics = [];
+  if (cookie !== null) {
+    statistics = await fetchRequest(
+      `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
+      "GET"
+    );
+  }
+  const statisticsMap = statistics.reduce((map, statistic) => {
+    map[statistic.level] = {
+      stars: statistic.stars,
+      attempts: statistic.attempts,
+    };
+    return map;
+  }, {});
+
+  const levelsWithStatistics = levels.map((level) => {
+    const levelId = level.id;
+    const statistic = statisticsMap[levelId];
+    return {
+      ...level,
+      statistics: statistic || { stars: 0, attempts: 0 },
+    };
+  });
+  return levelsWithStatistics;
 }
 
 /**
@@ -96,6 +130,46 @@ async function generateLevelDiv(level) {
     </div>`;
 }
 
+
+async function loadPagination(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.getPage");   
+  const page = anchorTag.href.split("level/community/levels/")[1];
+  history.pushState({page}, "", `community?page=${page}`);
+
+  const res = await fetchRequest(
+    `${API_ENDPOINT}/level/community/levels/${page}`,
+    "GET"
+  );
+7
+  const levels= res.rows;
+  const levelsWithStatistics = await loadLevelStats(levels);
+  const divElement = document.getElementById("categories");
+  const totalPages=(res.count/itemsPerPage)+1;
+  await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+  loadPageNav(totalPages,page);
+
+  // Add getLevel event listener
+  document.querySelectorAll("a.getLevel").forEach((level) => {
+    level.addEventListener("click", playLevel);
+  });
+  document.querySelectorAll("a.getPage").forEach((page) => {
+    page.addEventListener("click", loadPagination);
+  });
+
+}
+async function loadPageNav(pages,currentPage){
+  const list= document.getElementById("paginationList");
+  let items='';
+  for(let i=1; i<=pages;i++){
+    if(i==currentPage)
+      items+=`<li class="page-item"><a class="page-link active getPage" href="${API_ENDPOINT}/level/community/levels/${i}">${i}</a></li>`
+    else
+      items+=`<li class="page-item"><a class="page-link getPage" href="${API_ENDPOINT}/level/community/levels/${i}">${i}</a></li>`
+  }
+  list.innerHTML=items;
+}
+
 /**
  * Sets content and starts phaser LevelPlayer
  * @param {Event} event - click event of <a> to href with level id
@@ -108,8 +182,7 @@ export async function playLevel(event) {
 
   route();
 }
-
-export default async function loadCommunity() {
+export default async function loadCommunity(page='1') {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
 
@@ -118,45 +191,24 @@ export default async function loadCommunity() {
 
   try {
     const res = await fetchRequest(
-      `${API_ENDPOINT}/level/community/levels`,
+      `${API_ENDPOINT}/level/community/levels/${page}`,
       "GET"
     );
-
-    console.log(res);
     const levels= res.rows;
-    console.log(levels);
-    const cookie = sessionCookieValue();
-
-    let statistics = [];
-    if (cookie !== null) {
-      statistics = await fetchRequest(
-        `${API_ENDPOINT}/play/communityStatistics?user=${cookie.id}/`,
-        "GET"
-      );
-    }
-    const statisticsMap = statistics.reduce((map, statistic) => {
-      map[statistic.level] = {
-        stars: statistic.stars,
-        attempts: statistic.attempts,
-      };
-      return map;
-    }, {});
-
-    const levelsWithStatistics = levels.map((level) => {
-      const levelId = level.id;
-      const statistic = statisticsMap[levelId];
-      return {
-        ...level,
-        statistics: statistic || { stars: 0, attempts: 0 },
-      };
-    });
-
+    const levelsWithStatistics = await loadLevelStats(levels);
+    const totalPages=(res.count/itemsPerPage)+1;
     await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+    loadPageNav(totalPages,page);
 
     // Add getLevel event listener
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
     });
+    document.querySelectorAll("a.getPage").forEach((page) => {
+      page.addEventListener("click", loadPagination);
+    });
+    
+
   } catch(error) {
     if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
