@@ -3,6 +3,7 @@ import config from "../../Game/config.js";
 import { fetchRequest, fillContent } from "../utils";
 import * as bootstrap from 'bootstrap';
 import { appendLoginModal,sessionCookieValue } from "./profileLoader";
+import { group } from "console";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -241,7 +242,7 @@ export function appendJoinGroupModal() {
   joinGroupModalInstance.show();
 
 }
-export function AddLevelsMenu(levels: { title: string }[], classLevels: { title: string }[]) {
+export function AddLevelsMenu(levels, classLevels, groupId) {
   // Eliminar dropdown existente si ya está en el DOM
   let existingDropdown = document.getElementById("dropdownMenu");
   if (existingDropdown) {
@@ -251,9 +252,20 @@ export function AddLevelsMenu(levels: { title: string }[], classLevels: { title:
   // Convertir los niveles de la clase en un conjunto para búsqueda rápida
   const classLevelTitles = new Set(classLevels.map(level => level.title));
 
-  // Separar los niveles en seleccionados y no seleccionados
-  const selectedLevels = levels.filter(level => classLevelTitles.has(level.title));
-  const unselectedLevels = levels.filter(level => !classLevelTitles.has(level.title));
+  // Separar los niveles en seleccionados y no seleccionados, incluyendo el id del nivel
+  const selectedLevels = levels
+    .filter(level => classLevelTitles.has(level.title))
+    .map(level => ({
+      ...level, // mantiene todas las propiedades del objeto
+      classId: level.id // añade el id del nivel
+    }));
+
+  const unselectedLevels = levels
+    .filter(level => !classLevelTitles.has(level.title))
+    .map(level => ({
+      ...level, // mantiene todas las propiedades del objeto
+      classId: level.id // añade el id del nivel
+    }));
 
   // Generar opciones dinámicamente para los niveles seleccionados
   let selectedOptionsHTML = selectedLevels
@@ -322,7 +334,6 @@ export function AddLevelsMenu(levels: { title: string }[], classLevels: { title:
   </div>
 `;
 
-
   // Insertar el menú en el body
   document.body.appendChild(dropdown);
 
@@ -338,52 +349,68 @@ export function AddLevelsMenu(levels: { title: string }[], classLevels: { title:
 
   // Evento para obtener los niveles seleccionados y deseleccionados al hacer clic en "Guardar Cambios"
   document.getElementById("saveChangesButton")?.addEventListener("click", function () {
-    // Obtener todos los checkboxes marcados
-    const selectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
-      .map(checkbox => checkbox.id); // Obtener el ID del checkbox (que es el título del nivel)
-
-    // Filtrar para obtener solo los niveles que no estaban seleccionados antes (niveles nuevos seleccionados)
-    const newSelectedLevels = selectedLevels.filter(level => !classLevelTitles.has(level));
-
-    // Filtrar para obtener solo los niveles que estaban seleccionados anteriormente y ahora están desmarcados
-    const deselectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:not(:checked)"))
-      .map(checkbox => checkbox.id)
-      .filter(level => classLevelTitles.has(level));
-    
-
-    if (newSelectedLevels.length > 0) {
-
-      console.log(newSelectedLevels);
-      //insertar en la base de datos de la clase
-    }
-
-    if (deselectedLevels.length > 0) {
-      console.log(deselectedLevels);
-      //eliminar de la clase 
-    }
+    handleSaveChanges(levels, classLevelTitles,groupId);
+     });
+}
 
 
-    // Crear un mensaje de "Cambios Guardados"
-    const successMessage = document.createElement("div");
-    successMessage.textContent = "Cambios guardados correctamente!";
-    successMessage.style.position = "fixed";
-    successMessage.style.top = "20px";
-    successMessage.style.left = "50%";
-    successMessage.style.transform = "translateX(-50%)";
-    successMessage.style.padding = "10px 20px";
-    successMessage.style.backgroundColor = "green";
-    successMessage.style.color = "white";
-    successMessage.style.borderRadius = "5px";
-    successMessage.style.fontSize = "16px";
-    successMessage.style.zIndex = "1000";
+async function handleSaveChanges(levels, classLevelTitles,groupId) {
+  // Obtener todos los checkboxes marcados
+  const selectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
+  .map(checkbox => checkbox.id); // Obtener el ID del checkbox (que es el título del nivel)
 
-    // Insertar el mensaje en el body
-    document.body.appendChild(successMessage);
-    
-    setTimeout(() => {
-      successMessage.remove();
-    }, 3000);
-  });
+  // Filtrar para obtener solo los niveles completos (con el id) que no estaban seleccionados antes (niveles nuevos seleccionados)
+  const newSelectedLevels = selectedLevels
+  .map(title => levels.find(level => level.title === title)) // Encontrar el objeto completo
+  .filter(level => level && !classLevelTitles.has(level.title)); // Filtrar los nuevos seleccionados
+
+  // Filtrar para obtener solo los niveles que estaban seleccionados anteriormente y ahora están desmarcados
+  const deselectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:not(:checked)"))
+  .map(checkbox => checkbox.id)
+  .map(title => levels.find(level => level.title === title)) // Encontrar el objeto completo
+  .filter(level => level && classLevelTitles.has(level.title)); // Filtrar los deseleccionados
+
+
+  
+  if (newSelectedLevels.length > 0) {
+  
+    const postData = {
+      levels: newSelectedLevels,
+      id: groupId,
+    };
+
+  await fetchRequest(
+    `${API_ENDPOINT}/group/addLevel`,
+    "POST",
+    JSON.stringify(postData)
+  );
+  }
+
+  if (deselectedLevels.length > 0) {
+  console.log(deselectedLevels);
+  //eliminar de la clase 
+  }
+
+  // Crear un mensaje de "Cambios Guardados"
+  const successMessage = document.createElement("div");
+  successMessage.textContent = "Cambios guardados correctamente!";
+  successMessage.style.position = "fixed";
+  successMessage.style.top = "20px";
+  successMessage.style.left = "50%";
+  successMessage.style.transform = "translateX(-50%)";
+  successMessage.style.padding = "10px 20px";
+  successMessage.style.backgroundColor = "green";
+  successMessage.style.color = "white";
+  successMessage.style.borderRadius = "5px";
+  successMessage.style.fontSize = "16px";
+  successMessage.style.zIndex = "1000";
+
+  // Insertar el mensaje en el body
+  document.body.appendChild(successMessage);
+
+  setTimeout(() => {
+  successMessage.remove();
+  }, 3000);
 }
 
 export function appendSeeCodeModal(code, classId) {
@@ -560,7 +587,7 @@ export async function loadClassProfesor(id) {
 
       document.getElementById("addLevels").addEventListener("click", () => {
       
-         AddLevelsMenu(userLevels,levels); 
+         AddLevelsMenu(userLevels,levels,classId); 
       });
       document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
            appendSeeCodeModal(classCode.code,classId);
