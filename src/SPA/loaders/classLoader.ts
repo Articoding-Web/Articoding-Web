@@ -241,6 +241,151 @@ export function appendJoinGroupModal() {
   joinGroupModalInstance.show();
 
 }
+export function AddLevelsMenu(levels: { title: string }[], classLevels: { title: string }[]) {
+  // Eliminar dropdown existente si ya está en el DOM
+  let existingDropdown = document.getElementById("dropdownMenu");
+  if (existingDropdown) {
+    existingDropdown.remove();
+  }
+
+  // Convertir los niveles de la clase en un conjunto para búsqueda rápida
+  const classLevelTitles = new Set(classLevels.map(level => level.title));
+
+  // Separar los niveles en seleccionados y no seleccionados
+  const selectedLevels = levels.filter(level => classLevelTitles.has(level.title));
+  const unselectedLevels = levels.filter(level => !classLevelTitles.has(level.title));
+
+  // Generar opciones dinámicamente para los niveles seleccionados
+  let selectedOptionsHTML = selectedLevels
+    .map(level => {
+      return `
+        <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
+          <input type="checkbox" checked id="${level.title}" />
+          <label for="${level.title}" style="cursor: pointer;">${level.title}</label>
+        </div>
+      `;
+    })
+    .join("");
+
+  // Generar opciones dinámicamente para los niveles no seleccionados
+  let unselectedOptionsHTML = unselectedLevels
+    .map(level => {
+      return `
+        <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
+          <input type="checkbox" id="${level.title}" />
+          <label for="${level.title}" style="cursor: pointer;">${level.title}</label>
+        </div>
+      `;
+    })
+    .join("");
+
+  // Crear el dropdown en HTML
+  let dropdown = document.createElement("div");
+  dropdown.id = "dropdownMenu";
+  dropdown.className = "dropdown-menu show";
+  dropdown.style.position = "fixed"; 
+  dropdown.style.background = "white";
+  dropdown.style.border = "1px solid gray";
+  dropdown.style.padding = "15px";
+  dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+  dropdown.style.zIndex = "1000";
+  dropdown.style.minWidth = "250px";
+  dropdown.style.textAlign = "left";
+  dropdown.style.borderRadius = "8px";
+
+  // Agregar contenido al menú
+  dropdown.innerHTML = `
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h4 style="margin: 0; font-size: 16px;">Selecciona Niveles</h4>
+    <button id="closeMenuButton" style="border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+      x
+    </button>
+  </div>
+  <hr>
+  <div>
+    <h5 style="margin-top: 0;">Niveles Seleccionados</h5>
+    <div style="max-height: 200px; overflow-y: auto;">
+      ${selectedOptionsHTML}
+    </div>
+  </div>
+  <hr>
+  <div>
+    <h5 style="margin-top: 0;">Niveles No Seleccionados</h5>
+    <div style="max-height: 200px; overflow-y: auto;">
+      ${unselectedOptionsHTML}
+    </div>
+  </div>
+  <div style="display: flex; justify-content: center; margin-top: 15px;">
+    <button id="saveChangesButton" style="padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Guardar Cambios
+    </button>
+  </div>
+`;
+
+
+  // Insertar el menú en el body
+  document.body.appendChild(dropdown);
+
+  // Centrar el menú en la pantalla
+  dropdown.style.top = `50%`;
+  dropdown.style.left = `50%`;
+  dropdown.style.transform = "translate(-50%, -50%)"; // Centrarlo correctamente
+
+  // Evento para cerrar el menú cuando se presiona el botón de cerrar
+  document.getElementById("closeMenuButton")?.addEventListener("click", function () {
+    dropdown.remove();
+  });
+
+  // Evento para obtener los niveles seleccionados y deseleccionados al hacer clic en "Guardar Cambios"
+  document.getElementById("saveChangesButton")?.addEventListener("click", function () {
+    // Obtener todos los checkboxes marcados
+    const selectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
+      .map(checkbox => checkbox.id); // Obtener el ID del checkbox (que es el título del nivel)
+
+    // Filtrar para obtener solo los niveles que no estaban seleccionados antes (niveles nuevos seleccionados)
+    const newSelectedLevels = selectedLevels.filter(level => !classLevelTitles.has(level));
+
+    // Filtrar para obtener solo los niveles que estaban seleccionados anteriormente y ahora están desmarcados
+    const deselectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:not(:checked)"))
+      .map(checkbox => checkbox.id)
+      .filter(level => classLevelTitles.has(level));
+    
+
+    if (newSelectedLevels.length > 0) {
+
+      console.log(newSelectedLevels);
+      //insertar en la base de datos de la clase
+    }
+
+    if (deselectedLevels.length > 0) {
+      console.log(deselectedLevels);
+      //eliminar de la clase 
+    }
+
+
+    // Crear un mensaje de "Cambios Guardados"
+    const successMessage = document.createElement("div");
+    successMessage.textContent = "Cambios guardados correctamente!";
+    successMessage.style.position = "fixed";
+    successMessage.style.top = "20px";
+    successMessage.style.left = "50%";
+    successMessage.style.transform = "translateX(-50%)";
+    successMessage.style.padding = "10px 20px";
+    successMessage.style.backgroundColor = "green";
+    successMessage.style.color = "white";
+    successMessage.style.borderRadius = "5px";
+    successMessage.style.fontSize = "16px";
+    successMessage.style.zIndex = "1000";
+
+    // Insertar el mensaje en el body
+    document.body.appendChild(successMessage);
+    
+    setTimeout(() => {
+      successMessage.remove();
+    }, 3000);
+  });
+}
+
 export function appendSeeCodeModal(code, classId) {
   // Aquí creamos el HTML del modal con los valores dinámicos
   let joinGroupHtml = `
@@ -265,16 +410,15 @@ export function appendSeeCodeModal(code, classId) {
         </div>
   `;
 
-  // Crea el elemento del modal y añádelo al DOM
   let seeCode = document.createElement("div");
   seeCode.innerHTML = joinGroupHtml;
   document.body.appendChild(seeCode);
 
-  // Selecciona el modal que acabamos de añadir
+
   let seeCodeModalElement = document.querySelector("#seeCodeModal") as HTMLElement;
   let seeCodeModalInstance = new bootstrap.Modal(seeCodeModalElement);
 
-  // Evento para remover el modal del DOM cuando se cierre
+  
   seeCodeModalElement.addEventListener("hidden.bs.modal", function () {
     seeCodeModalElement.remove();
   });
@@ -287,15 +431,15 @@ export function appendSeeCodeModal(code, classId) {
  const classCodeInput = document.getElementById("classCode") as HTMLInputElement;
 
  copyCodeBtn.addEventListener("click", () => {
-  // Usamos la Clipboard API para copiar el código al portapapeles
+  
   navigator.clipboard.writeText(classCodeInput.value)
     .then(() => {
-      // Crear un elemento de texto o actualizar el existente
-      let message = document.createElement('p'); // O usa un contenedor existente si lo prefieres
+      
+      let message = document.createElement('p'); 
       message.textContent = "Código copiado al portapapeles!";
-      message.style.color = "green"; // Puedes personalizar el estilo
-      message.style.marginTop = "10px"; // Espaciado
-      // Añadir el mensaje debajo del botón (asumiendo que tienes un contenedor para el mensaje)
+      message.style.color = "green"; 
+      message.style.marginTop = "10px"; 
+      
       document.getElementById("messageContainer").innerHTML = '';
       document.getElementById("messageContainer").appendChild(message);
     })
@@ -338,13 +482,13 @@ export async function loadClassProfesor(id) {
     `${API_ENDPOINT}/group/${id}`, 
     "GET"
   );
-  
+
   
   const classCode = await fetchRequest(
     `${API_ENDPOINT}/group/findByCode/${id}`, 
     "GET"
   );
-  console.log(classCode.code);
+  
 
   document.getElementById("content").innerHTML = getRowHTML3(classId);
   const divElement = document.getElementById("categories");
@@ -361,6 +505,10 @@ export async function loadClassProfesor(id) {
       );
       const sets = await fetchRequest(
         `${API_ENDPOINT}/level/class/${id}/sets`,
+        "GET"
+      );
+      const userLevels = await fetchRequest(
+        `${API_ENDPOINT}/level/userLevels/${cookie.id}`,
         "GET"
       );
       if(levels!=null || sets!=null){
@@ -405,11 +553,14 @@ export async function loadClassProfesor(id) {
 
       
       document.getElementById("addSets").addEventListener("click", () => {
-        
+         
       });
 
+      
+
       document.getElementById("addLevels").addEventListener("click", () => {
-        
+      
+         AddLevelsMenu(userLevels,levels); 
       });
       document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
            appendSeeCodeModal(classCode.code,classId);
@@ -507,7 +658,7 @@ export default async function loadClass(id) {
             });
           }
           if(sets.length!=0){
-            console.log(sets);
+          
             const setDiv = document.getElementById("sets");
             await fillContent(setDiv, sets, generateSetDiv);
             document.querySelectorAll("a.set").forEach((set) => {

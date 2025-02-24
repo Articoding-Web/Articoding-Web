@@ -96,6 +96,26 @@ createGroup.innerHTML = createGroupHtml;
   if (joinBtn) {
     joinBtn.addEventListener("click", async function (event) {
       await createRegister(createGroupModalInstance);
+
+      const successMessage = document.createElement("div");
+      successMessage.textContent = "Clase creada!";
+      successMessage.style.position = "fixed";
+      successMessage.style.top = "20px";
+      successMessage.style.left = "50%";
+      successMessage.style.transform = "translateX(-50%)";
+      successMessage.style.padding = "10px 20px";
+      successMessage.style.backgroundColor = "green";
+      successMessage.style.color = "white";
+      successMessage.style.borderRadius = "5px";
+      successMessage.style.fontSize = "16px";
+      successMessage.style.zIndex = "1000";
+  
+      // Insertar el mensaje en el body
+      document.body.appendChild(successMessage);
+      
+      setTimeout(() => {
+        successMessage.remove();
+      }, 3000);
     });
   }
 
@@ -170,6 +190,27 @@ export function appendJoinGroupModal() {
   if (joinBtn) {
     joinBtn.addEventListener("click", async function (event) {
       await useRegister(joinGroupModalInstance);
+
+      const successMessage = document.createElement("div");
+      successMessage.textContent = "Te has unido a la clase correctamente!";
+      successMessage.style.position = "fixed";
+      successMessage.style.top = "20px";
+      successMessage.style.left = "50%";
+      successMessage.style.transform = "translateX(-50%)";
+      successMessage.style.padding = "10px 20px";
+      successMessage.style.backgroundColor = "green";
+      successMessage.style.color = "white";
+      successMessage.style.borderRadius = "5px";
+      successMessage.style.fontSize = "16px";
+      successMessage.style.zIndex = "1000";
+  
+      // Insertar el mensaje en el body
+      document.body.appendChild(successMessage);
+      
+      setTimeout(() => {
+        successMessage.remove();
+      }, 3000);
+
     });
   }
 
