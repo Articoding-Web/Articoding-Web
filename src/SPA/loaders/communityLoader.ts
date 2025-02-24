@@ -117,11 +117,14 @@ export default async function loadCommunity() {
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
 
   try {
-    const levels = await fetchRequest(
+    const res = await fetchRequest(
       `${API_ENDPOINT}/level/community/levels`,
       "GET"
     );
 
+    console.log(res);
+    const levels= res.rows;
+    console.log(levels);
     const cookie = sessionCookieValue();
 
     let statistics = [];
