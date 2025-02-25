@@ -242,6 +242,14 @@ export function appendJoinGroupModal() {
   joinGroupModalInstance.show();
 
 }
+
+export function AddSetsMenu(sets, classSets, groupId) {
+
+
+  
+}
+
+
 export function AddLevelsMenu(levels, classLevels, groupId) {
   // Eliminar dropdown existente si ya está en el DOM
   let existingDropdown = document.getElementById("dropdownMenu");
@@ -349,12 +357,12 @@ export function AddLevelsMenu(levels, classLevels, groupId) {
 
   // Evento para obtener los niveles seleccionados y deseleccionados al hacer clic en "Guardar Cambios"
   document.getElementById("saveChangesButton")?.addEventListener("click", function () {
-    handleSaveChanges(levels, classLevelTitles,groupId);
+    handleSaveLevelChanges(levels, classLevelTitles,groupId);
      });
 }
 
 
-async function handleSaveChanges(levels, classLevelTitles,groupId) {
+async function handleSaveLevelChanges(levels, classLevelTitles,groupId) {
   // Obtener todos los checkboxes marcados
   const selectedLevels = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
   .map(checkbox => checkbox.id); // Obtener el ID del checkbox (que es el título del nivel)
@@ -369,8 +377,6 @@ async function handleSaveChanges(levels, classLevelTitles,groupId) {
   .map(checkbox => checkbox.id)
   .map(title => levels.find(level => level.title === title)) // Encontrar el objeto completo
   .filter(level => level && classLevelTitles.has(level.title)); // Filtrar los deseleccionados
-
-
   
   if (newSelectedLevels.length > 0) {
   
@@ -516,7 +522,6 @@ export async function loadClassProfesor(id) {
     `${API_ENDPOINT}/group/${id}`, 
     "GET"
   );
-
   
   const classCode = await fetchRequest(
     `${API_ENDPOINT}/group/findByCode/${id}`, 
@@ -545,19 +550,12 @@ export async function loadClassProfesor(id) {
         `${API_ENDPOINT}/level/userLevels/${cookie.id}`,
         "GET"
       );
-
-
-      document.getElementById("addSets").addEventListener("click", () => {
-        AddLevelsMenu(userLevels,levels,classId); 
-      });
-
-      document.getElementById("addLevels").addEventListener("click", () => {
-         AddLevelsMenu(userLevels,levels,classId); 
-      });
-      document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
-         appendSeeCodeModal(classCode.code,classId);
-      });
-
+      /*
+      const userSets = await fetchRequest(
+        `${API_ENDPOINT}/set/userSets/${cookie.id}`,
+        "GET"
+      );
+*/
       if(levels!=null || sets!=null){
         if(levels.length!=0 || sets.length!=0){
           if(levels.length!=0){
@@ -597,13 +595,34 @@ export async function loadClassProfesor(id) {
               set.addEventListener("click", loadSet);
             });
           }
+
+          /*
+          document.getElementById("addSets").addEventListener("click", (e: MouseEvent) => {
+            AddSetsMenu(userSets,userSets,classId); 
+          });
+    */
+          document.getElementById("addLevels").addEventListener("click", (e: MouseEvent) => {
+             AddLevelsMenu(userLevels,levels,classId); 
+          });
+          document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
+             appendSeeCodeModal(classCode.code,classId);
+          });
         }else{//No hay niveles en el grupo
           
             document.getElementById("content").innerHTML = getRowHTML3(classId);
             var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, Añade niveles",buttonName:"",buttonMsg:""}];
             const textElement = document.getElementById("display");
             await fillContent(textElement, messages, generateMSG);
-
+            document.getElementById("addSets").addEventListener("click", (e: MouseEvent) => {
+              //AddSetsMenu(userSets,userSets,classId); 
+            });
+      
+            document.getElementById("addLevels").addEventListener("click", (e: MouseEvent) => {
+               AddLevelsMenu(userLevels,levels,classId); 
+            });
+            document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
+               appendSeeCodeModal(classCode.code,classId);
+            });
         }
       }else{//Sin grupo
         document.getElementById("content").innerHTML = getRowHTML2();

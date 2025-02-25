@@ -32,7 +32,7 @@ function getRowHTML() {
           <div class="text-center w-100">
             <button id="create" class="btn btn-success btn-lg w-30">Create new class</button>
             <button id="join" class="btn btn-success btn-lg w-30">Join new class</button>
-          /div>
+          </div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="display"></div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="joinButton">
 
