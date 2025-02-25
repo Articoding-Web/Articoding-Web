@@ -10,7 +10,14 @@ const itemsPerPage=5;
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+  return `<div id="selectDiv" class="d-flex justify-content-center mt-3">
+            <select id="levelSelect" name="tags[]" multiple="multiple" style="width: 75% , height:100%">
+              <option value="LP">Loops</option>
+              <option value="VR">Variable</option>
+              <option value="BS">Basic</option>
+            </select>
+          </div>
+          <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div id="pageDiv" class="d-flex justify-content-center mt-3">
             <nav aria-label="pages">
               <ul class="pagination pagination-lg" id="paginationList">
@@ -18,7 +25,6 @@ function getRowHTML() {
             </nav>
           </div>`;
 }
-
 /**
  *
  * @returns String of HTMLDivElement of a category placeholder
@@ -207,12 +213,13 @@ export default async function loadCommunity(page='1') {
     document.querySelectorAll("a.getPage").forEach((page) => {
       page.addEventListener("click", loadPagination);
     });
-    
+
 
   } catch(error) {
     if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
       window.location.reload();
     }
-  }
+  }$('#levelSelect').select2({placeholder:"Filter by tags",allowClear:true});
+
 }
