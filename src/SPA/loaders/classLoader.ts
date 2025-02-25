@@ -387,8 +387,15 @@ async function handleSaveChanges(levels, classLevelTitles,groupId) {
   }
 
   if (deselectedLevels.length > 0) {
-  console.log(deselectedLevels);
-  //eliminar de la clase 
+    const postData = {
+      levels: deselectedLevels,
+      id: groupId,
+    };
+    await fetchRequest(
+      `${API_ENDPOINT}/group/deleteLevel`,
+      "POST",
+      JSON.stringify(postData)
+    );
   }
 
   // Crear un mensaje de "Cambios Guardados"
@@ -538,6 +545,19 @@ export async function loadClassProfesor(id) {
         `${API_ENDPOINT}/level/userLevels/${cookie.id}`,
         "GET"
       );
+
+
+      document.getElementById("addSets").addEventListener("click", () => {
+        AddLevelsMenu(userLevels,levels,classId); 
+      });
+
+      document.getElementById("addLevels").addEventListener("click", () => {
+         AddLevelsMenu(userLevels,levels,classId); 
+      });
+      document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
+         appendSeeCodeModal(classCode.code,classId);
+      });
+
       if(levels!=null || sets!=null){
         if(levels.length!=0 || sets.length!=0){
           if(levels.length!=0){
@@ -577,27 +597,12 @@ export async function loadClassProfesor(id) {
               set.addEventListener("click", loadSet);
             });
           }
-
-      
-      document.getElementById("addSets").addEventListener("click", () => {
-         
-      });
-
-      
-
-      document.getElementById("addLevels").addEventListener("click", () => {
-      
-         AddLevelsMenu(userLevels,levels,classId); 
-      });
-      document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
-           appendSeeCodeModal(classCode.code,classId);
-      });
-
         }else{//No hay niveles en el grupo
-          document.getElementById("content").innerHTML = getRowHTML2();
-          var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];
-          const textElement = document.getElementById("display");
-          await fillContent(textElement, messages, generateMSG);
+          
+            document.getElementById("content").innerHTML = getRowHTML3(classId);
+            var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, Añade niveles",buttonName:"",buttonMsg:""}];
+            const textElement = document.getElementById("display");
+            await fillContent(textElement, messages, generateMSG);
 
         }
       }else{//Sin grupo
@@ -627,6 +632,9 @@ export async function loadClassProfesor(id) {
     }
   }
 
+
+
+  
 }
 
 export default async function loadClass(id) {
@@ -692,7 +700,7 @@ export default async function loadClass(id) {
               set.addEventListener("click", loadSet);
             });
           }
-        }else{//No hay niveles en el grupo
+        } else{//No hay niveles en el grupo
           document.getElementById("content").innerHTML = getRowHTML2();
           var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];
           const textElement = document.getElementById("display");

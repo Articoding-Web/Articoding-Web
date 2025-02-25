@@ -18,22 +18,24 @@ function getRowHTML3() {
 
 function getRowHTML2() {
   return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">CLASSES</h2>
+          <div class="text-center w-100">
+              <button id="join" class="btn btn-success btn-lg w-30">Join new class</button>
+          </div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="display"></div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="joinButton">
-             <div class="text-center w-100">
-                <button id="join" class="btn btn-success btn-lg w-30">Join new class</button>
-              </div>
+            
           </div>
   `;
 }
 function getRowHTML() {
   return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">CLASSES</h2>
+          <div class="text-center w-100">
+            <button id="create" class="btn btn-success btn-lg w-30">Create new class</button>
+            <button id="join" class="btn btn-success btn-lg w-30">Join new class</button>
+          /div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="display"></div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="joinButton">
-             <div class="text-center w-100">
-                <button id="create" class="btn btn-success btn-lg w-30">Create new class</button>
-                <button id="join" class="btn btn-success btn-lg w-30">Join new class</button>
-              </div>
+
           </div>
   `;
 }
