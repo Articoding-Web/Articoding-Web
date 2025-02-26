@@ -39,6 +39,9 @@ function getRowHTML3(classId){
   `;
 }
 
+
+
+
 /**
  *
  * @returns String of HTMLDivElement of a category placeholder
@@ -136,9 +139,6 @@ async function generateSetDiv(set) {
                       ${set.name}
                     </h5>
                     <div class="card-body text-dark">
-                      <h6 class="card-subtitle mb-2 text-muted">
-                        Levels: ${set.id}
-                      </h6>
                       ${set.description}
                     </div>
                 </a>

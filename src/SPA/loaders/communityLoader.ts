@@ -4,7 +4,7 @@ import { fetchRequest, fillContent } from "../utils";
 import { sessionCookieValue } from "./profileLoader";
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
-const itemsPerPage=5;
+const itemsPerPage=6;
 /**
  *
  * @returns String of HTMLDivElement for showing levels/categories

@@ -40,6 +40,22 @@ function getRowHTML() {
   `;
 }
 
+/**
+ *
+ * @param {Event} event
+ * Gets levels of a category from DB and shows them on screen
+ */
+async function loadClassLevels(event) {
+  event.preventDefault();
+
+  const anchorTag = event.target.closest("a.class");
+
+  const id = anchorTag.href.split("class/")[1];
+  history.pushState({ id }, "", `class?id=${id}`);
+
+  route();
+}
+
 async function generateMSG(message) {
   var msg=`<div class="container m-5">
       </div><div class="text-center text-muted bg-body p-2 rounded-5">
@@ -272,15 +288,18 @@ export async function loadWaitingRoomProfesor() {
         await fillContent(textElement, group, async (group) => {
         return `<div class="col">
                   <div class="card mx-auto border-dark d-flex flex-column h-100">
+                  <a class="class" href="/class/${group.id}">
                     <h5 class="card-header card-title text-dark">${group.name}</h5>
-
-                    <div class="card-footer text-center">
-                      <a class="btn btn-primary" href="/class?id=${group.id}">Join</a>
-                    </div>
-                  </div>
-                </div>`;
+                     <div class="card-body text-dark">
+                        ${group.description}
+                      </div>
+                </a>`;
       });
 
+      document.querySelectorAll("a.class").forEach((anchorTag) => {
+        anchorTag.addEventListener("click", loadClassLevels);
+      });
+      
       document.getElementById("create").addEventListener("click", () => {
           appendCreateGroupModal();
       });
@@ -340,17 +359,19 @@ export default async function loadWaitingRoom() {
           );
 
           await fillContent(textElement, group, async (group) => {
-          return `<div class="col">
-                    <div class="card mx-auto border-dark d-flex flex-column h-100">
-                      <h5 class="card-header card-title text-dark">${group.name}</h5>
-                     
-                      <div class="card-footer text-center">
-                        <a class="btn btn-primary" href="/class?id=${group.id}">Join</a>
-                      </div>
-                    </div>
-                  </div>`;
-        });
-
+            return `<div class="col">
+                      <div class="card mx-auto border-dark d-flex flex-column h-100">
+                      <a class="class" href="/class/${group.id}">
+                        <h5 class="card-header card-title text-dark">${group.name}</h5>
+                         <div class="card-body text-dark">
+                            ${group.description}
+                          </div>
+                    </a>`;
+          });
+    
+          document.querySelectorAll("a.class").forEach((anchorTag) => {
+            anchorTag.addEventListener("click", loadClassLevels);
+          });
         document.getElementById("join").addEventListener("click", () => {
             appendJoinGroupModal();
         });
