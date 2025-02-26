@@ -44,6 +44,7 @@ export default class LevelPlayer extends Phaser.Scene {
   private players: Player[] = [];
   private objects: ArticodingSprite[] = [];
   private numChests = 0;
+  private totalCofres = 0;
 
   private gridPhysics: GridPhysics;
 
@@ -337,48 +338,13 @@ export default class LevelPlayer extends Phaser.Scene {
     //si no esta en  modo edicion de nivel 
     let stars = 0;
     //total cofres recogidos
-    let totalCofres = this.numChests + this.players.reduce((acc,player) => acc + player.getCollectedChest(), 0);
+    for(let totalcofres1 of this.levelJSON.phaser.layers.objects){
+      if(totalcofres1.spriteSheet === "chest") this.totalCofres = totalcofres1.objects.length;
+    }
+    //let totalCofres1 = this.levelJSON.phaser.layers.
+    //let totalCofres = this.numChests + this.players.reduce((acc,player) => acc + player.getCollectedChest(), 0);
     let speed = this.gameSpeed;
     
-    /*
-    //rules for stars depends of chests
-    if (totalCofres > 0) {
-      const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
-      const estrellasPorCofres = Math.floor((cofresRecogidos / totalCofres) * 3); // Proporcional a cofres recogidos
-      stars += estrellasPorCofres;
-    }
-    //theres no enough chests to complete all stars
-    const estrellasMaximas = 3;
-    if (stars < estrellasMaximas) {
-        const bloquesUsados = e.detail.numUsedBlocks;
-
-        const minBloquesRequeridos = this.levelJSON.blockly.maxInstances || Number.MAX_SAFE_INTEGER;
-
-        // 1. Specific block for specific levels
-
-        //change the specific block depends of the level and when you create a level
-        if (this.levelJSON.blockly.toolbox.contents.some(category =>
-            category.contents.some(block => block.type === "snBlockspecificLoopBlock" && bloquesUsados.includes(block.type)))) {
-            stars++;
-        }
-
-        // 2. Eficience (min blocks)
-        if (stars < estrellasMaximas && bloquesUsados <= minBloquesRequeridos) {
-          stars++;
-      }
-
-      // 3. not crash to the wall or quiqk time
-      if (stars < estrellasMaximas) {
-        if (!playerBounced) {
-            stars++;
-        } else if (e.detail.shortestPath && bloquesUsados <= e.detail.shortestPath) {
-            stars++;
-        }
-      }
-    }
-    this.updateStarDisplay(stars);
-    this.attempts++; 
-    */
     if(!this.fromLevelEditor) {
       // Official Level
       if (hasLost) {
@@ -388,35 +354,35 @@ export default class LevelPlayer extends Phaser.Scene {
         let loopAct = this.blockyController.getUsedLoop();
         let blocksUsed = this.blockyController.getUsedBlocks();
         
-        if(totalCofres >= 3){
+        if(this.totalCofres >= 3){
           if(this.levelJSON.LoopUsed ){ // ha usado un loop, una estrella
             if(loopAct)stars++; // si se usa loop una estrella por eso, resto de cosas solo se pueden repartir dos estrellas
             const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
-            const estrellasPorCofres = Math.floor((cofresRecogidos / totalCofres) * 2); // Proporcional a cofres recogidos
+            const estrellasPorCofres = Math.floor((cofresRecogidos / this.totalCofres) * 2); // Proporcional a cofres recogidos
             stars += estrellasPorCofres;
           }
           else{
             const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
-            const estrellasPorCofres = Math.floor((cofresRecogidos / totalCofres) * 3); // Proporcional a cofres recogidos
+            const estrellasPorCofres = Math.floor((cofresRecogidos / this.totalCofres) * 3); // Proporcional a cofres recogidos
             stars += estrellasPorCofres;
           }
         }
-        else if(totalCofres <= 2){ //2 o menos cofres
+        else if(this.totalCofres <= 2){ //2 o menos cofres
           if(this.levelJSON.LoopUsed){
             if(loopAct) stars++;
-            if(totalCofres === 1){
+            if(this.totalCofres === 1){
               if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
             }
-            else if(totalCofres === 0){
+            else if(this.totalCofres === 0){
               if(blocksUsed <= this.levelJSON.MinBlocksUsed + 2) stars++;
               if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
             }
           }
           else{ // dos o menos cofres y no se usa loop, se tiene en cuenta el min block used
-            if(totalCofres === 2){
+            if(this.totalCofres === 2){
               if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
             }
-            else if(totalCofres === 1){
+            else if(this.totalCofres === 1){
               if(blocksUsed <= this.levelJSON.MinBlocksUsed + 2) stars++;
               if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
             }
@@ -435,6 +401,8 @@ export default class LevelPlayer extends Phaser.Scene {
        
         const event = new CustomEvent("win", { detail: { stars } });
         document.dispatchEvent(event);
+       
+       // this.showVictoryModal(stars);
       }
 
       const nBlocks = e.detail.numberBlocks;
@@ -479,6 +447,22 @@ export default class LevelPlayer extends Phaser.Scene {
   };
   }
   
+  // private showVictoryModal(stars: number) {
+  //   const starContainer = document.querySelector('.stars');
+  //   starContainer.innerHTML = ''; // Limpiar el contenedor de estrellas
+  
+  //   // Crear estrellas y actualizar su color según el número de estrellas ganadas
+  //   for (let i = 0; i < 3; i++) {
+  //     const star = document.createElement('i');
+  //     star.classList.add('bi', 'bi-star-fill', 'h2');
+  //     star.style.color = i < stars ? '#ffd700' : '#555555'; // Dorado si se ha ganado la estrella, gris si no
+  //     starContainer.appendChild(star);
+  //   }
+  
+  //   // Mostrar el modal de victoria
+  //   const victoryModal = new bootstrap.Modal(document.getElementById('victoryModal'));
+  //   victoryModal.show();
+  // }
   
   private changeAnimSpeed = (e: Event) => {
     const val = parseInt((e.currentTarget as HTMLInputElement).value);
