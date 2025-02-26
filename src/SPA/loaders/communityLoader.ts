@@ -10,13 +10,19 @@ const itemsPerPage=5;
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return `<div id="selectDiv" class="d-flex justify-content-center mt-3">
-            <select id="levelSelect" name="tags[]" multiple="multiple" style="width: 75% , height:100%">
-              <option value="LP">Loops</option>
-              <option value="VR">Variable</option>
-              <option value="BS">Basic</option>
-            </select>
-          </div>
+  return `<div class="container">
+            <div id="selectDiv" class="mt-3 p-1">
+              <select id="levelSelect" name="tags[]" multiple="multiple" style="width: 100%">
+                <option value="LP">Loops</option>
+                <option value="VR">Variable</option>
+                <option value="BS">Basic</option>
+              </select>
+            </div>
+            <div class="mt-3">
+              <button class="btn btn-primary w-100 px-5" type="button" id="filterButton"><i class="bi bi-search"></i> Search
+              </button>
+            </div>
+            </div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div id="pageDiv" class="d-flex justify-content-center mt-3">
             <nav aria-label="pages">
@@ -142,27 +148,7 @@ async function loadPagination(event) {
   const anchorTag = event.target.closest("a.getPage");   
   const page = anchorTag.href.split("level/community/levels/")[1];
   history.pushState({page}, "", `community?page=${page}`);
-
-  const res = await fetchRequest(
-    `${API_ENDPOINT}/level/community/levels/${page}`,
-    "GET"
-  );
-7
-  const levels= res.rows;
-  const levelsWithStatistics = await loadLevelStats(levels);
-  const divElement = document.getElementById("categories");
-  const totalPages=(res.count/itemsPerPage)+1;
-  await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-  loadPageNav(totalPages,page);
-
-  // Add getLevel event listener
-  document.querySelectorAll("a.getLevel").forEach((level) => {
-    level.addEventListener("click", playLevel);
-  });
-  document.querySelectorAll("a.getPage").forEach((page) => {
-    page.addEventListener("click", loadPagination);
-  });
-
+  loadLevels(page);
 }
 async function loadPageNav(pages,currentPage){
   const list= document.getElementById("paginationList");
@@ -175,7 +161,31 @@ async function loadPageNav(pages,currentPage){
   }
   list.innerHTML=items;
 }
-
+async function filterSearch(){
+  loadLevels(1);
+}
+async function loadLevels(page){
+  const divElement = document.getElementById("categories");
+  const selectData=$('#levelSelect').select2('data');
+  const map=selectData.map(i=>i.text);
+  let data={page:page,tags:map};
+    const res = await fetchRequest(
+      `${API_ENDPOINT}/level/community/levels/${JSON.stringify(data)}`,
+      "GET"
+    );
+    const levels= res.rows;
+    const levelsWithStatistics = await loadLevelStats(levels);
+    const totalPages=(res.count/itemsPerPage)+1;
+    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+    loadPageNav(totalPages,page);
+    // Add getLevel event listener
+    document.querySelectorAll("a.getLevel").forEach((level) => {
+      level.addEventListener("click", playLevel);
+    });
+    document.querySelectorAll("a.getPage").forEach((page) => {
+      page.addEventListener("click", loadPagination);
+    });
+}
 /**
  * Sets content and starts phaser LevelPlayer
  * @param {Event} event - click event of <a> to href with level id
@@ -194,32 +204,16 @@ export default async function loadCommunity(page='1') {
 
   // Load placeholders
   await fillContent(divElement, new Array(10), generateCommunityDivPlaceholder);
-
+  $('#levelSelect').select2({placeholder:"Filter by tags",allowClear:true});
+  $('#filterButton').on("click",filterSearch);
   try {
-    const res = await fetchRequest(
-      `${API_ENDPOINT}/level/community/levels/${page}`,
-      "GET"
-    );
-    const levels= res.rows;
-    const levelsWithStatistics = await loadLevelStats(levels);
-    const totalPages=(res.count/itemsPerPage)+1;
-    await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-    loadPageNav(totalPages,page);
-
-    // Add getLevel event listener
-    document.querySelectorAll("a.getLevel").forEach((level) => {
-      level.addEventListener("click", playLevel);
-    });
-    document.querySelectorAll("a.getPage").forEach((page) => {
-      page.addEventListener("click", loadPagination);
-    });
-
-
+    loadLevels(page);
   } catch(error) {
     if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
       window.location.reload();
     }
-  }$('#levelSelect').select2({placeholder:"Filter by tags",allowClear:true});
+  }
+  
 
 }
