@@ -5,6 +5,7 @@ import config from '../../config';
 import EmptyLevel from './EmptyLevel';
 import Level from '../../level';
 
+
 export default class EditorBoard {
     private dropZoneTiles: DropZoneTile[][] = [];
     private scaleFactor: number;
@@ -30,6 +31,7 @@ export default class EditorBoard {
         this.numRows = rows;
         this.numCols = cols;
         this.blocklyWorkspace=blocklyLayer;
+        
 
         this.calculateScale();
         this.createTiles();
@@ -293,7 +295,6 @@ export default class EditorBoard {
         if(this.blocklyWorkspace){
             levelJson.blockly=this.blocklyWorkspace;
         }
-
         return levelJson;
     }
 }

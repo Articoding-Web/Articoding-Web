@@ -5,6 +5,7 @@ import { loadLevel } from "../../SPA/loaders/levelPlayerLoader";
 import PhaserController from "../PhaserController";
 import Level from "../level";
 import config from '../config';
+import blocks from "../LevelPlayer/Blockly/Blocks/blocks";
 
 // TODO: eliminar magic numbers
 const MIN_ZOOM = 0.5;
@@ -20,6 +21,7 @@ export default class LevelEditor extends Phaser.Scene {
   loadedBlocklyWorkspace: Level.Blockly;
   numRows: number;
   numCols: number;
+  usedLoop: boolean = false;
 
   constructor() {
     super("LevelEditor");
@@ -172,15 +174,24 @@ export default class LevelEditor extends Phaser.Scene {
 
   async saveLevel() {
     let levelJSON = this.board.toJSON();
+    
+    // ver la solucion: si se lo pasa, si utiliza loop, num instrucciones utilizado en la solucion
     if (levelJSON.phaser.layers.players.objects.length <= 0 || levelJSON.phaser.layers.objects.some(obj => obj.spriteSheet === "exit" && obj.objects.length <= 0)) {
       console.error("Does not have player or exit");
       return;
     }
 
+   // this.usedLoop = this.checkIfUsedLoop(this.loadedBlocklyWorkspace);
+    
     await PhaserController.destroyGame();
     loadLevel(levelJSON, true);
   }
 
+  // private checkIfUsedLoop(workspace: Level.Blockly): boolean {
+  //   if (!workspace) return false;
+  //   const loopBlocks = ["controls_repeat_ext", "controls_whileUntil", "controls_for", "controls_forEach"];
+  //   return workspace.workspaceBlocks.some(block => loopBlocks.includes(blocks));
+  // }
   cameraMove(pointer) {
     if (!pointer.isDown) return;
 

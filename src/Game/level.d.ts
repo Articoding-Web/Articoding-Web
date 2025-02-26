@@ -1,5 +1,7 @@
 declare namespace Level {
     interface Level {
+        LoopUsed: boolean;
+        MinBlocksUsed: number;
         phaser: Phaser;
         blockly: Blockly;
     }
@@ -76,6 +78,7 @@ declare namespace Level {
         kind: string;
         enabled?: boolean;
     }
+
 }
 
 export default Level;
