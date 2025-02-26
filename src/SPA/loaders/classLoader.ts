@@ -644,7 +644,7 @@ export async function loadClassProfesor(id) {
             appendLoginModal();
       });
     }
-  } catch(error) {
+  } catch(error) { 
     if (error.status === 503) { // Offline mode
       console.log("Received a 503 web error");
       window.location.reload();
