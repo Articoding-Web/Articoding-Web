@@ -175,7 +175,7 @@ async function loadLevels(page){
     );
     const levels= res.rows;
     const levelsWithStatistics = await loadLevelStats(levels);
-    const totalPages=(res.count/itemsPerPage)+1;
+    let totalPages=(res.count/itemsPerPage);if((res.count%itemsPerPage)!=0)totalPages++;
     await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
     loadPageNav(totalPages,page);
     // Add getLevel event listener
