@@ -65,9 +65,12 @@ export async function setClassLevelPlayer(params: URLSearchParams) {
   playClassLevelById(idLevel);
 }
 
-export async function setPageCommunity() {
+export async function setPageCommunity(params: URLSearchParams) {
   const [userName, uuid] = getUserNameAndUUID();
-  loadCommunity();
+  const page = params.get("page");
+  if(page)
+    loadCommunity(page);
+  else loadCommunity();
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
 }
