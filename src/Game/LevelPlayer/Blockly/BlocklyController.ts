@@ -19,6 +19,9 @@ import { Statement } from "@xapi/xapi";
 const BLOCK_OFFSET = 50;
 
 export default class BlocklyController {
+ 
+  private static usedLoop: boolean = false;
+  private static numBlocksUsed: number = 0;
   private static startBlock: Blockly.BlockSvg;
   private static workspace: Blockly.WorkspaceSvg;
   private static code: BlockCode[];
@@ -175,7 +178,12 @@ export default class BlocklyController {
     e.stopPropagation();
     //this.workspace.getAllBlocks(true)[0].select();
       let prepBlocks = this.workspace.getAllBlocks(true);
+     //cantidad de bloques utilizados se guarda en numBlockUsed para guardarlo en el json del nivel 
+      this.numBlocksUsed = prepBlocks.length;
       for (let block of prepBlocks) {
+        //se ha usado algun bucle loop
+        if(block.type === "for_X_times")
+          this.usedLoop = true;
         if (this.changeData) {
           this.workspace.getBlockById(this.changeData.blockId).setFieldValue(this.changeData.newValue, this.changeData.name);
           this.changeData = null;
@@ -256,4 +264,12 @@ export default class BlocklyController {
       BlocklyController.workspace = undefined;
     }
   }
+
+  public getUsedLoop(): boolean {
+    return BlocklyController.usedLoop;  
+  }
+  
+  public getUsedBlocks(): number {
+    return BlocklyController.numBlocksUsed;
+    }
 }

@@ -34,6 +34,9 @@ export default class LevelPlayer extends Phaser.Scene {
   private mapCoordX: number;
   private mapCoordY: number;
   private scaleFactor: number;
+  private blockyController: BlocklyController;
+
+  private loopUsed: boolean = false;
 
   private blockMap={"movement":"Actions", "math_number":"Numbers","for_X_times":"Loops", "changeStatus":"Actions", "variables_set":"Variables","variables_get":"Variables",
     "math_change": "Variables"};
@@ -66,6 +69,7 @@ export default class LevelPlayer extends Phaser.Scene {
     this.backgroundLayerJson = background;
     this.playersLayerJson = players;
     this.objectsLayers = objects;   
+    this.blockyController = new BlocklyController();
   }
 
   preload() {
@@ -326,25 +330,16 @@ export default class LevelPlayer extends Phaser.Scene {
       } else if (player.getHasBounced()) {
         playerBounced = true;
       }
-      this.numChests -= player.getCollectedChest();
+      this.numChests -= player.getCollectedChest(); //resta comfres recogidos al num de cofres toales que habia en el nivel
     }
-    for (let x in this.players) {
-      const player = this.players[x];
-      if (!player.getIsAlive() || !player.hasReachedExit()) {
-        player.die();
-        hasLost = true;
-      } else if (player.getHasBounced()) {
-        playerBounced = true;
-      }
-
-      this.numChests -= player.getCollectedChest();
-    }
+    //numChest = cofres en el nivel (- cofres recogidos)
     let nAttempt = ++this.attempts;
-    //ESTRELLAS AQUI
+    //si no esta en  modo edicion de nivel 
     let stars = 0;
-    const totalCofres = this.numChests + this.players.reduce((acc,player) => acc + player.getCollectedChest(), 0);
+    //total cofres recogidos
+    let totalCofres = this.numChests + this.players.reduce((acc,player) => acc + player.getCollectedChest(), 0);
     let speed = this.gameSpeed;
-
+    
     /*
     //rules for stars depends of chests
     if (totalCofres > 0) {
@@ -386,14 +381,58 @@ export default class LevelPlayer extends Phaser.Scene {
     */
     if(!this.fromLevelEditor) {
       // Official Level
-      let stars = 0;
       if (hasLost) {
         const event = new CustomEvent("lose");
         document.dispatchEvent(event);
-      } else {
-        stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
-        // const event = new CustomEvent("win", { detail: { stars } });
-        // document.dispatchEvent(event);
+      } else { // ESTRELLAS
+        let loopAct = this.blockyController.getUsedLoop();
+        let blocksUsed = this.blockyController.getUsedBlocks();
+        
+        if(totalCofres >= 3){
+          if(this.levelJSON.LoopUsed ){ // ha usado un loop, una estrella
+            if(loopAct)stars++; // si se usa loop una estrella por eso, resto de cosas solo se pueden repartir dos estrellas
+            const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
+            const estrellasPorCofres = Math.floor((cofresRecogidos / totalCofres) * 2); // Proporcional a cofres recogidos
+            stars += estrellasPorCofres;
+          }
+          else{
+            const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
+            const estrellasPorCofres = Math.floor((cofresRecogidos / totalCofres) * 3); // Proporcional a cofres recogidos
+            stars += estrellasPorCofres;
+          }
+        }
+        else if(totalCofres <= 2){ //2 o menos cofres
+          if(this.levelJSON.LoopUsed){
+            if(loopAct) stars++;
+            if(totalCofres === 1){
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
+            }
+            else if(totalCofres === 0){
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed + 2) stars++;
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
+            }
+          }
+          else{ // dos o menos cofres y no se usa loop, se tiene en cuenta el min block used
+            if(totalCofres === 2){
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
+            }
+            else if(totalCofres === 1){
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed + 2) stars++;
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
+            }
+            else{
+              if (!playerBounced) stars++; // no se ha chocado 
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed + 2) stars++; // numero de movimientos eficiente
+              if(blocksUsed <= this.levelJSON.MinBlocksUsed) stars++;
+            }
+          }
+          const cofresRecogidos = this.players.reduce((acc, player) => acc + player.getCollectedChest(), 0);
+          const estrellasPorCofres = cofresRecogidos; // Proporcional a cofres recogidos
+          stars += estrellasPorCofres;
+        }
+        this.createStarDisplay();
+        this.updateStarDisplay(stars);
+       
         const event = new CustomEvent("win", { detail: { stars } });
         document.dispatchEvent(event);
       }
@@ -404,9 +443,15 @@ export default class LevelPlayer extends Phaser.Scene {
       document.dispatchEvent(statisticEvent);
 
     } else {
+      if (hasLost) {
+        const event = new CustomEvent("lose");
+        document.dispatchEvent(event);
+      } else {
       //save level if its in the editor
       // From Level Editor
       const object = sessionCookieValue();
+      this.levelJSON.MinBlocksUsed = this.blockyController.getUsedBlocks();
+      this.levelJSON.LoopUsed = this.blockyController.getUsedLoop();
       if (object !== null) {
         console.log(JSON.stringify(this.levelJSON));
         if (window.confirm("Save Level?")) {
@@ -419,7 +464,7 @@ export default class LevelPlayer extends Phaser.Scene {
             self: null,
             title: levelName,
             data: JSON.stringify(this.levelJSON),
-            minBlocks: null,
+            minBlocks: this.levelJSON.MinBlocksUsed,
             description: levelDescription,
           };
           try {
@@ -432,7 +477,9 @@ export default class LevelPlayer extends Phaser.Scene {
       } else alert("You need to sign in before saving a level");
     }
   };
-
+  }
+  
+  
   private changeAnimSpeed = (e: Event) => {
     const val = parseInt((e.currentTarget as HTMLInputElement).value);
     const newVal = (val % 3) + 1;  // between 1 - 3
@@ -504,7 +551,8 @@ export default class LevelPlayer extends Phaser.Scene {
         if(j!==-1) toolboxContent[i].contents.splice(j);
       }
     }
-
+ // stars = 1 + (!playerBounced && this.numChests === 0 ? 1 : 0) + 1; // TODO: minBlocks star
+        
     await PhaserController.destroyGame();
     loadLevel(this.levelJSON,true);
 
