@@ -14,8 +14,11 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  */
 function getRowHTML(classId) {
   return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">${classId[0].name}</h2>
+          <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">Grupos de ejercicios</h2>
+          <p class="text-center w-75 mx-auto pt-2" style="color: white;">Dentro encontrarás ejercicios</p>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
+          <p class="text-center w-75 mx-auto pt-2" style="color: white;">Niveles para esta clase</p>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
   `;
@@ -31,10 +34,14 @@ function getRowHTML3(classId){
               <button id="addSets" class="btn btn-success btn-lg w-30">Add Sets</button>
               <button id="addLevels" class="btn btn-success btn-lg w-30">Add Levels</button>
               <button id="seeCode" class="btn btn-success btn-lg w-30">Class Code</button>
-              <button id="students" class="btn btn-success btn-lg w-30">Students</button>
+              <button id="students" class="btn btn-success btn-lg w-30">Students List</button>
           </div>
+
+          <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">Grupos de ejercicios</h2>
+          <p class="text-center w-75 mx-auto pt-2" style="color: white;">Dentro encontrarás ejercicios</p>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
+          <p class="text-center w-75 mx-auto pt-2" style="color: white;">Niveles para esta clase</p>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
             
@@ -583,7 +590,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
     console.error('Error general:', error);
   }
 }
-
+/*
 async function loadPagination(event) {
   event.preventDefault();
   const anchorTag = event.target.closest("a.getPage");   
@@ -592,7 +599,7 @@ async function loadPagination(event) {
 }
 
 async function loadPageNav(pages,currentPage){
-/*
+
   const list= document.getElementById("paginationList");
   let items='';
   for(let i=1; i<=pages;i++){
@@ -603,9 +610,9 @@ async function loadPageNav(pages,currentPage){
   }
   list.innerHTML=items;
 
-  */
+  
 }
-
+*/
 export async function loadClassProfesor(id,page='1') {
 
   const classId = await fetchRequest(
@@ -642,10 +649,24 @@ export async function loadClassProfesor(id,page='1') {
   try {
     const cookie = sessionCookieValue();
     if((cookie !== null)){
+
+    /*
+      Para la paginacion
+      const selectData=$('#levelSelect').select2('data');
+      const map=selectData.map(i=>i.text);
+      let data={page:page,tags:map};
+
+         const levels = await fetchRequest(
+        `${API_ENDPOINT}/level/class/${JSON.stringify(data)}`,
+        "GET"
+      );
+    */    
+
       const levels = await fetchRequest(
         `${API_ENDPOINT}/level/class/${id}`,
         "GET"
       );
+
       const sets = await fetchRequest(
         `${API_ENDPOINT}/level/class/${id}/sets`,
         "GET"
@@ -684,14 +705,16 @@ export async function loadClassProfesor(id,page='1') {
                 statistics: statistic || { stars: 0, attempts: 0 },
               };
             }); 
-            let totalPages=(levels.length/itemsPerPage);if((levels.length%itemsPerPage)!=0)totalPages++;
-            console.log(totalPages);
+            
             await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+            /*
+            let totalPages=(levels.length/itemsPerPage);if((levels.length%itemsPerPage)!=0)totalPages++;
             loadPageNav(totalPages,page);
             
             document.querySelectorAll("a.getPage").forEach((page) => {
               page.addEventListener("click", loadPagination);
             });
+            */
 
             // Add getLevel event listener
             document.querySelectorAll("a.getLevel").forEach((level) => {
