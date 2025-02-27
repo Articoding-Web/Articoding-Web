@@ -150,6 +150,7 @@ async function loadPagination(event) {
   history.pushState({page}, "", `community?page=${page}`);
   loadLevels(page);
 }
+
 async function loadPageNav(pages,currentPage){
   const list= document.getElementById("paginationList");
   let items='';

@@ -4,6 +4,7 @@ import { fetchRequest, fillContent } from "../utils";
 import * as bootstrap from 'bootstrap';
 import { appendLoginModal,sessionCookieValue } from "./profileLoader";
 import { group } from "console";
+const itemsPerPage=6;
 
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 
@@ -30,6 +31,7 @@ function getRowHTML3(classId){
               <button id="addSets" class="btn btn-success btn-lg w-30">Add Sets</button>
               <button id="addLevels" class="btn btn-success btn-lg w-30">Add Levels</button>
               <button id="seeCode" class="btn btn-success btn-lg w-30">Class Code</button>
+              <button id="students" class="btn btn-success btn-lg w-30">Students</button>
           </div>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">PARA TI</h2>
@@ -243,12 +245,77 @@ export function appendJoinGroupModal() {
 
 }
 
-export function AddSetsMenu(sets, classSets, groupId) {
-
-
+export function AddSetsMenu() {
   
 }
 
+
+export function StudentsMenu(students) {
+    // Eliminar dropdown existente si ya está en el DOM
+
+    console.log(students);
+    let existingDropdown = document.getElementById("dropdownMenu");
+    if (existingDropdown) {
+      existingDropdown.remove();
+    }
+
+    // Crear el dropdown en HTML
+  let dropdown = document.createElement("div");
+  dropdown.id = "dropdownMenu";
+  dropdown.className = "dropdown-menu show";
+  dropdown.style.position = "fixed"; 
+  dropdown.style.background = "white";
+  dropdown.style.border = "1px solid gray";
+  dropdown.style.padding = "15px";
+  dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+  dropdown.style.zIndex = "1000";
+  dropdown.style.minWidth = "250px";
+  dropdown.style.textAlign = "left";
+  dropdown.style.borderRadius = "8px";
+
+    console.log(students);
+
+    const studentsHTML = students.map(student => `<div style="padding: 5px 0;">${student}</div>`).join("");
+
+    dropdown.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="margin: 0; font-size: 16px;">Students</h5>
+        <button id="closeMenuButton" style="border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+          x
+        </button>
+      </div>
+      <hr>
+      <div>
+      
+        <div style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column;">
+          ${studentsHTML}
+        </div>
+      </div>
+      <hr>
+      <div style="display: flex; justify-content: center; margin-top: 15px;">
+        <button id="studentslistButton" style="padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Perfecto
+        </button>
+      </div>
+    `;
+  // Insertar el menú en el body
+  document.body.appendChild(dropdown);
+
+  // Centrar el menú en la pantalla
+  dropdown.style.top = `50%`;
+  dropdown.style.left = `50%`;
+  dropdown.style.transform = "translate(-50%, -50%)"; // Centrarlo correctamente
+
+  // Evento para cerrar el menú cuando se presiona el botón de cerrar
+  document.getElementById("closeMenuButton")?.addEventListener("click", function () {
+    dropdown.remove();
+  });
+  document.getElementById("studentslistButton")?.addEventListener("click", function () {
+    dropdown.remove();
+  });
+
+
+}
 
 export function AddLevelsMenu(levels, classLevels, groupId) {
   // Eliminar dropdown existente si ya está en el DOM
@@ -358,6 +425,7 @@ export function AddLevelsMenu(levels, classLevels, groupId) {
   // Evento para obtener los niveles seleccionados y deseleccionados al hacer clic en "Guardar Cambios"
   document.getElementById("saveChangesButton")?.addEventListener("click", function () {
     handleSaveLevelChanges(levels, classLevelTitles,groupId);
+    dropdown.remove();
      });
 }
 
@@ -516,7 +584,29 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
   }
 }
 
-export async function loadClassProfesor(id) {
+async function loadPagination(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.getPage");   
+  const page = anchorTag.href.split("level/class/levels/")[1];
+  history.pushState({page}, "", `class?page=${page}`);
+}
+
+async function loadPageNav(pages,currentPage){
+/*
+  const list= document.getElementById("paginationList");
+  let items='';
+  for(let i=1; i<=pages;i++){
+    if(i==currentPage)
+      items+=`<li class="page-item"><a class="page-link active getPage" href="${API_ENDPOINT}/level/class/levels/${i}">${i}</a></li>`
+    else
+      items+=`<li class="page-item"><a class="page-link getPage" href="${API_ENDPOINT}/level/class/levels/${i}">${i}</a></li>`
+  }
+  list.innerHTML=items;
+
+  */
+}
+
+export async function loadClassProfesor(id,page='1') {
 
   const classId = await fetchRequest(
     `${API_ENDPOINT}/group/${id}`, 
@@ -527,7 +617,21 @@ export async function loadClassProfesor(id) {
     `${API_ENDPOINT}/group/findByCode/${id}`, 
     "GET"
   );
+ 
   
+  const idsStudents = await fetchRequest(
+    `${API_ENDPOINT}/group/students/${id}`, 
+    "GET"
+  );
+
+  
+  const userIds = idsStudents.map(student => student.user);
+
+  const studentsNames = await fetchRequest(
+    `${API_ENDPOINT}/user/names/${userIds}`,
+    "GET"
+  );
+
 
   document.getElementById("content").innerHTML = getRowHTML3(classId);
   const divElement = document.getElementById("categories");
@@ -579,9 +683,15 @@ export async function loadClassProfesor(id) {
                 ...level,
                 statistics: statistic || { stars: 0, attempts: 0 },
               };
-            });
-
+            }); 
+            let totalPages=(levels.length/itemsPerPage);if((levels.length%itemsPerPage)!=0)totalPages++;
+            console.log(totalPages);
             await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
+            loadPageNav(totalPages,page);
+            
+            document.querySelectorAll("a.getPage").forEach((page) => {
+              page.addEventListener("click", loadPagination);
+            });
 
             // Add getLevel event listener
             document.querySelectorAll("a.getLevel").forEach((level) => {
@@ -596,17 +706,20 @@ export async function loadClassProfesor(id) {
             });
           }
 
-          /*
+          
           document.getElementById("addSets").addEventListener("click", (e: MouseEvent) => {
-            AddSetsMenu(userSets,userSets,classId); 
+            AddSetsMenu(); 
           });
-    */
+    
           document.getElementById("addLevels").addEventListener("click", (e: MouseEvent) => {
              AddLevelsMenu(userLevels,levels,classId); 
           });
           document.getElementById("seeCode").addEventListener("click", (e: MouseEvent) => {
              appendSeeCodeModal(classCode.code,classId);
           });
+          document.getElementById("students").addEventListener("click", (e: MouseEvent) => {
+             StudentsMenu(studentsNames); 
+         });
         }else{//No hay niveles en el grupo
           
             document.getElementById("content").innerHTML = getRowHTML3(classId);
@@ -656,7 +769,7 @@ export async function loadClassProfesor(id) {
   
 }
 
-export default async function loadClass(id) {
+export default async function loadClass(id,page = '1') {
   const classId = await fetchRequest(
     `${API_ENDPOINT}/group/${id}`, 
     "GET"

@@ -90,11 +90,22 @@ export async function setPageClass(params: URLSearchParams) {
     role = cookie.role;
   }
 
-  if(role=="Profesor"){
-    loadClassProfesor(idClass);
-  } else{
-    loadClass(idClass);
+  const page = params.get("page");
+  if(page)
+    if(role=="Profesor"){
+      loadClassProfesor(idClass,page);
+    } else{
+      loadClass(idClass,page);
+    }
+  else {
+    if(role=="Profesor"){
+      loadClassProfesor(idClass);
+    } else{
+      loadClass(idClass);
+    }
   }
+
+
   
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_COMMUNITY);
   await XAPISingleton.sendStatement(statement);
