@@ -21,6 +21,12 @@ function getRowHTML(classId) {
           <p class="text-center w-75 mx-auto pt-2" style="color: white;">Niveles para esta clase</p>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
+           <div id="pageDiv" class="d-flex justify-content-center mt-3">
+            <nav aria-label="pages">
+              <ul class="pagination pagination-lg" id="paginationList">
+              </ul>
+            </nav>
+          </div>
   `;
 }
 function getRowHTML2() {
@@ -44,6 +50,12 @@ function getRowHTML3(classId){
           <p class="text-center w-75 mx-auto pt-2" style="color: white;">Niveles para esta clase</p>
           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
           <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
+           <div id="pageDiv" class="d-flex justify-content-center mt-3">
+            <nav aria-label="pages">
+              <ul class="pagination pagination-lg" id="paginationList">
+              </ul>
+            </nav>
+          </div>
             
   `;
 }
@@ -252,9 +264,7 @@ export function appendJoinGroupModal() {
 
 }
 
-export function AddSetsMenu() {
-  
-}
+
 
 
 export function StudentsMenu(students) {
@@ -267,20 +277,19 @@ export function StudentsMenu(students) {
     }
 
     // Crear el dropdown en HTML
-  let dropdown = document.createElement("div");
-  dropdown.id = "dropdownMenu";
-  dropdown.className = "dropdown-menu show";
-  dropdown.style.position = "fixed"; 
-  dropdown.style.background = "white";
-  dropdown.style.border = "1px solid gray";
-  dropdown.style.padding = "15px";
-  dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
-  dropdown.style.zIndex = "1000";
-  dropdown.style.minWidth = "250px";
-  dropdown.style.textAlign = "left";
-  dropdown.style.borderRadius = "8px";
+    let dropdown = document.createElement("div");
+    dropdown.id = "dropdownMenu";
+    dropdown.className = "dropdown-menu show";
+    dropdown.style.position = "fixed"; 
+    dropdown.style.background = "white";
+    dropdown.style.border = "1px solid gray";
+    dropdown.style.padding = "15px";
+    dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    dropdown.style.zIndex = "1000";
+    dropdown.style.minWidth = "250px";
+    dropdown.style.textAlign = "left";
+    dropdown.style.borderRadius = "8px";
 
-    console.log(students);
 
     const studentsHTML = students.map(student => `<div style="padding: 5px 0;">${student}</div>`).join("");
 
@@ -321,6 +330,185 @@ export function StudentsMenu(students) {
     dropdown.remove();
   });
 
+
+}
+
+
+export function AddSetsMenu(sets,classSets,groupId) {
+  let existingDropdown = document.getElementById("dropdownMenu");
+  if (existingDropdown) {
+    existingDropdown.remove();
+  }
+    const setLevelTitles = new Set(classSets.map(set => set.name));
+
+    const selectedSets = sets
+    .filter(set => setLevelTitles.has(set. name))
+    .map(set => ({
+      ...set,
+      classId: set.id 
+    }));
+
+  const unselectedSets = sets
+    .filter(set => !setLevelTitles.has(set.name))
+    .map(set => ({
+      ...set, 
+      classId: set.id 
+    }));
+
+
+     // Generar opciones dinámicamente para los niveles seleccionados
+  let selectedOptionsHTML = selectedSets
+  .map(set => {
+    return `
+      <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
+        <input type="checkbox" checked id="${set.name}" />
+        <label for="${set.name}" style="cursor: pointer;">${set.name}</label>
+      </div>
+    `;
+  })
+  .join("");
+
+// Generar opciones dinámicamente para los niveles no seleccionados
+let unselectedOptionsHTML = unselectedSets
+  .map(set => {
+    return `
+      <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
+        <input type="checkbox" id="${set.name}" />
+        <label for="${set.name}" style="cursor: pointer;">${set.name}</label>
+      </div>
+    `;
+  })
+  .join("");
+
+    // Crear el dropdown en HTML
+    let dropdown = document.createElement("div");
+    dropdown.id = "dropdownMenu";
+    dropdown.className = "dropdown-menu show";
+    dropdown.style.position = "fixed"; 
+    dropdown.style.background = "white";
+    dropdown.style.border = "1px solid gray";
+    dropdown.style.padding = "15px";
+    dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    dropdown.style.zIndex = "1000";
+    dropdown.style.minWidth = "250px";
+    dropdown.style.textAlign = "left";
+    dropdown.style.borderRadius = "8px";
+
+    
+  // Agregar contenido al menú
+  dropdown.innerHTML = `
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h4 style="margin: 0; font-size: 16px;">Selecciona Sets</h4>
+    <button id="closeMenuButton" style="border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+      x
+    </button>
+  </div>
+  <hr>
+  <div>
+    <h5 style="margin-top: 0;">Sets Seleccionados</h5>
+    <div style="max-height: 200px; overflow-y: auto;">
+      ${selectedOptionsHTML}
+    </div>
+  </div>
+  <hr>
+  <div>
+    <h5 style="margin-top: 0;">Sets No Seleccionados</h5>
+    <div style="max-height: 200px; overflow-y: auto;">
+      ${unselectedOptionsHTML}
+    </div>
+  </div>
+  <div style="display: flex; justify-content: center; margin-top: 15px;">
+    <button id="saveChangesButton" style="padding: 10px 20px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Guardar Cambios
+    </button>
+  </div>
+`;
+
+  // Insertar el menú en el body
+  document.body.appendChild(dropdown);
+
+  // Centrar el menú en la pantalla
+  dropdown.style.top = `50%`;
+  dropdown.style.left = `50%`;
+  dropdown.style.transform = "translate(-50%, -50%)"; // Centrarlo correctamente
+
+  // Evento para cerrar el menú cuando se presiona el botón de cerrar
+  document.getElementById("closeMenuButton")?.addEventListener("click", function () {
+    dropdown.remove();
+  });
+  // Evento para obtener los niveles seleccionados y deseleccionados al hacer clic en "Guardar Cambios"
+  document.getElementById("saveChangesButton")?.addEventListener("click", function () {
+    handleSaveSetsChanges(sets, setLevelTitles,groupId);
+    dropdown.remove();
+     });
+}
+
+async function handleSaveSetsChanges(sets, setLevelTitles,groupId) {
+  // Obtener todos los checkboxes marcados
+
+  const selectedSets = Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
+  .map(checkbox => checkbox.id); // Obtener el ID del checkbox (que es el título del nivel)
+
+  
+  const newSelectedSets = sets.filter(set => 
+    selectedSets.includes(set.name) && !setLevelTitles.has(set.name)
+  );
+
+const deselectedSets = sets.filter(set =>
+  !selectedSets.includes(set.name) && setLevelTitles.has(set.name)
+);
+
+
+  if (newSelectedSets.length > 0) {
+  
+    const postData = {
+      sets: newSelectedSets.map(set => set.id), 
+      id: groupId.map(group=>group.id), 
+    };
+   
+
+  await fetchRequest(
+    `${API_ENDPOINT}/group/addSet`,
+    "POST",
+    JSON.stringify(postData)
+  );
+
+  }
+
+  if (deselectedSets.length > 0) {
+    const postData = {
+      sets: deselectedSets.map(set => set.id), 
+      id: groupId.map(group=>group.id), 
+    };
+
+    await fetchRequest(
+      `${API_ENDPOINT}/group/deleteSet`,
+      "POST",
+      JSON.stringify(postData)
+    );
+    
+  }
+
+  // Crear un mensaje de "Cambios Guardados"
+  const successMessage = document.createElement("div");
+  successMessage.textContent = "Cambios guardados correctamente!";
+  successMessage.style.position = "fixed";
+  successMessage.style.top = "20px";
+  successMessage.style.left = "50%";
+  successMessage.style.transform = "translateX(-50%)";
+  successMessage.style.padding = "10px 20px";
+  successMessage.style.backgroundColor = "green";
+  successMessage.style.color = "white";
+  successMessage.style.borderRadius = "5px";
+  successMessage.style.fontSize = "16px";
+  successMessage.style.zIndex = "1000";
+
+  // Insertar el mensaje en el body
+  document.body.appendChild(successMessage);
+
+  setTimeout(() => {
+  successMessage.remove();
+  }, 3000);
 
 }
 
@@ -453,6 +641,7 @@ async function handleSaveLevelChanges(levels, classLevelTitles,groupId) {
   .map(title => levels.find(level => level.title === title)) // Encontrar el objeto completo
   .filter(level => level && classLevelTitles.has(level.title)); // Filtrar los deseleccionados
   
+
   if (newSelectedLevels.length > 0) {
   
     const postData = {
@@ -514,9 +703,9 @@ export function appendSeeCodeModal(code, classId) {
                     <div class="modal-body">
                         <form>
                             <div class="mb-3">
-                                <input type="text" class="form-control" id="classCode" value="${code}" readonly>
-                                 <button class="btn btn-outline-secondary" type="button" id="copyCodeBtn">Copiar</button>
-                                 <div id="messageContainer"></div>
+                                <div class="form-control bg-light border rounded p-2" id="classCode">${code}</div>
+                                <button class="btn btn-outline-secondary" type="button" id="copyCodeBtn">Copiar</button>
+                                <div id="messageContainer"></div>
                             </div>
                         </form>
                     </div>
@@ -671,16 +860,17 @@ export async function loadClassProfesor(id,page='1') {
         `${API_ENDPOINT}/level/class/${id}/sets`,
         "GET"
       );
+      console.log(sets);
       const userLevels = await fetchRequest(
         `${API_ENDPOINT}/level/userLevels/${cookie.id}`,
         "GET"
       );
-      /*
+      
       const userSets = await fetchRequest(
         `${API_ENDPOINT}/set/userSets/${cookie.id}`,
         "GET"
       );
-*/
+
       if(levels!=null || sets!=null){
         if(levels.length!=0 || sets.length!=0){
           if(levels.length!=0){
@@ -731,7 +921,7 @@ export async function loadClassProfesor(id,page='1') {
 
           
           document.getElementById("addSets").addEventListener("click", (e: MouseEvent) => {
-            AddSetsMenu(); 
+            AddSetsMenu(userSets,sets,classId); 
           });
     
           document.getElementById("addLevels").addEventListener("click", (e: MouseEvent) => {
