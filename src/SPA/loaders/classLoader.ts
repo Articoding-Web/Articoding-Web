@@ -506,10 +506,11 @@ const deselectedSets = sets.filter(set =>
   // Insertar el mensaje en el body
   document.body.appendChild(successMessage);
 
+  
   setTimeout(() => {
   successMessage.remove();
   }, 3000);
-
+  loadClassProfesor(groupId);
 }
 
 export function AddLevelsMenu(levels, classLevels, groupId) {
@@ -779,29 +780,7 @@ async function useRegister(modal : bootstrap.Modal):Promise<any> {
     console.error('Error general:', error);
   }
 }
-/*
-async function loadPagination(event) {
-  event.preventDefault();
-  const anchorTag = event.target.closest("a.getPage");   
-  const page = anchorTag.href.split("level/class/levels/")[1];
-  history.pushState({page}, "", `class?page=${page}`);
-}
 
-async function loadPageNav(pages,currentPage){
-
-  const list= document.getElementById("paginationList");
-  let items='';
-  for(let i=1; i<=pages;i++){
-    if(i==currentPage)
-      items+=`<li class="page-item"><a class="page-link active getPage" href="${API_ENDPOINT}/level/class/levels/${i}">${i}</a></li>`
-    else
-      items+=`<li class="page-item"><a class="page-link getPage" href="${API_ENDPOINT}/level/class/levels/${i}">${i}</a></li>`
-  }
-  list.innerHTML=items;
-
-  
-}
-*/
 export async function loadClassProfesor(id,page='1') {
 
   const classId = await fetchRequest(
@@ -886,14 +865,7 @@ export async function loadClassProfesor(id,page='1') {
             }); 
             
             await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
-            /*
-            let totalPages=(levels.length/itemsPerPage);if((levels.length%itemsPerPage)!=0)totalPages++;
-            loadPageNav(totalPages,page);
-            
-            document.querySelectorAll("a.getPage").forEach((page) => {
-              page.addEventListener("click", loadPagination);
-            });
-            */
+ 
 
             // Add getLevel event listener
             document.querySelectorAll("a.getLevel").forEach((level) => {

@@ -295,13 +295,7 @@ async function generateProfileDiv(user, userLevels, totalStars, officialLevelCom
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="card mx-auto border-dark d-flex flex-column h-100">
-          <h5 class="card-header card-title text-dark">
-            Tus niveles que has creado
-          </h5>
-        </div>
-      </div>
+      
       ${levelDivs.join("")}
       `;
   
