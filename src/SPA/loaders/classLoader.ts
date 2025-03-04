@@ -839,28 +839,17 @@ export async function loadClassProfesor(id,page='1') {
     const cookie = sessionCookieValue();
     if((cookie !== null)){
 
-    /*
-      Para la paginacion
-      const selectData=$('#levelSelect').select2('data');
-      const map=selectData.map(i=>i.text);
-      let data={page:page,tags:map};
-
-         const levels = await fetchRequest(
-        `${API_ENDPOINT}/level/class/${JSON.stringify(data)}`,
-        "GET"
-      );
-    */    
+   
 
       const levels = await fetchRequest(
         `${API_ENDPOINT}/level/class/${id}`,
         "GET"
       );
-
       const sets = await fetchRequest(
         `${API_ENDPOINT}/level/class/${id}/sets`,
         "GET"
       );
-      console.log(sets);
+
       const userLevels = await fetchRequest(
         `${API_ENDPOINT}/level/userLevels/${cookie.id}`,
         "GET"
@@ -910,6 +899,11 @@ export async function loadClassProfesor(id,page='1') {
             document.querySelectorAll("a.getLevel").forEach((level) => {
               level.addEventListener("click", playLevel);
             });
+          } else{
+            document.getElementById("content").innerHTML = getRowHTML3(classId);
+            var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, Añade niveles",buttonName:"",buttonMsg:""}];
+            const textElement = document.getElementById("display");
+            await fillContent(textElement, messages, generateMSG);
           }
           if(sets.length!=0){
             const setDiv = document.getElementById("sets");
@@ -1036,6 +1030,11 @@ export default async function loadClass(id,page = '1') {
             document.querySelectorAll("a.getLevel").forEach((level) => {
               level.addEventListener("click", playLevel);
             });
+          } else{
+            document.getElementById("content").innerHTML = getRowHTML3(classId);
+            var messages=[{msg:"Aun no hay niveles en la clase",desc:"Parece que no hay niveles en la clase, Añade niveles",buttonName:"",buttonMsg:""}];
+            const textElement = document.getElementById("display");
+            await fillContent(textElement, messages, generateMSG);
           }
           if(sets.length!=0){
           
@@ -1044,6 +1043,11 @@ export default async function loadClass(id,page = '1') {
             document.querySelectorAll("a.set").forEach((set) => {
               set.addEventListener("click", loadSet);
             });
+          }else{
+            document.getElementById("content").innerHTML = getRowHTML3(classId);
+            var messages=[{msg:"Aun no hay Sets en la clase",desc:"Parece que no hay sets en la clase, espera a que tu profesor añada niveles",buttonName:"",buttonMsg:""}];
+            const textElement = document.getElementById("display");
+            await fillContent(textElement, messages, generateMSG);
           }
         } else{//No hay niveles en el grupo
           document.getElementById("content").innerHTML = getRowHTML2();
