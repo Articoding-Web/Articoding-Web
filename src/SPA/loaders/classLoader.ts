@@ -510,7 +510,6 @@ const deselectedSets = sets.filter(set =>
   setTimeout(() => {
   successMessage.remove();
   }, 3000);
-  loadClassProfesor(groupId);
 }
 
 export function AddLevelsMenu(levels, classLevels, groupId) {

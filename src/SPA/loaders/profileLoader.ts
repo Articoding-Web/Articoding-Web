@@ -201,7 +201,7 @@ export function appendLoginModal() {
   }
 }
 
-function appendCreateSetModal(userLevels: {id: string, title: string}[]) {
+function appendCreateSetModal(userLevels: {id: string, title: string}[], user) {
   let createSetModalHtml = `
   <div id="createSetModal" class="modal fade" tabindex="-1" aria-labelledby="createSetModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -274,17 +274,39 @@ function appendCreateSetModal(userLevels: {id: string, title: string}[]) {
       let postData = {
           name: setName,
           description: setDescription,
-          levels: selectedLevels
+          levels: selectedLevels,
+          user:user.id
       };
 
       try {
-          await fetchRequest(
-              `${API_ENDPOINT}/levelsets/create`,
+           await fetchRequest(
+              `${API_ENDPOINT}/set/create/`,
               "POST",
               JSON.stringify(postData)
-          );
+            );
           createSetModalInstance.hide();
-          alert("Set de niveles creado correctamente");
+          
+  // Crear un mensaje de "Cambios Guardados"
+  const successMessage = document.createElement("div");
+  successMessage.textContent = "Cambios guardados correctamente!";
+  successMessage.style.position = "fixed";
+  successMessage.style.top = "20px";
+  successMessage.style.left = "50%";
+  successMessage.style.transform = "translateX(-50%)";
+  successMessage.style.padding = "10px 20px";
+  successMessage.style.backgroundColor = "green";
+  successMessage.style.color = "white";
+  successMessage.style.borderRadius = "5px";
+  successMessage.style.fontSize = "16px";
+  successMessage.style.zIndex = "1000";
+
+  // Insertar el mensaje en el body
+  document.body.appendChild(successMessage);
+
+  
+  setTimeout(() => {
+  successMessage.remove();
+  }, 3000);
       } catch (error) {
           console.error('Error al crear el set de niveles:', error);
           alert("Hubo un error al crear el set de niveles.");
@@ -292,10 +314,6 @@ function appendCreateSetModal(userLevels: {id: string, title: string}[]) {
   });
 }
 
-
-async function handleSaveSets(){
-  
-}
 
 
 function appendRegisterModal() {
@@ -494,38 +512,11 @@ export default async function loadProfile() {
       "GET"
     );
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
       document.getElementById("createSetBtn").addEventListener("click", (e: MouseEvent) => {
-                    appendCreateSetModal(userLevels); 
+                    appendCreateSetModal(userLevels,user); 
                  });
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
