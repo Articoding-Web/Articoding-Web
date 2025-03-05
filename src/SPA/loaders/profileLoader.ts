@@ -201,6 +201,93 @@ export function appendLoginModal() {
   }
 }
 
+function appendCreateSetModal(){
+  let createSetModalHtml = `
+  <div id="createSetModal" class="modal fade" tabindex="-1" aria-labelledby="createSetModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="createSetModalLabel">Crear Set de Niveles</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="createSetForm">
+                      <div class="mb-3">
+                          <label for="setName" class="form-label">Nombre del Set</label>
+                          <input type="text" class="form-control" id="setName" required>
+                      </div>
+                     <div>
+                          <label for="setDescription" class="form-label">Descripción</label>
+                          <textarea class="form-control" id="setDescription" rows="3" required></textarea>
+                      </div>
+                      <div class="mb-3">
+                          <label for="setLevels" class="form-label">Añadir Niveles</label>
+                          <select multiple class="form-control" id="setLevels">
+                              <!-- Opciones de niveles se llenarán dinámicamente -->
+                          </select>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-primary" id="saveSetBtn">Guardar Set</button>
+              </div>
+          </div>
+      </div>
+  </div>`;
+
+  let createSetModal = document.createElement("div");
+  createSetModal.innerHTML = createSetModalHtml;
+  document.body.appendChild(createSetModal);
+
+  let createSetModalElement = document.querySelector("#createSetModal");
+  let createSetModalInstance = new bootstrap.Modal(createSetModalElement);
+
+  createSetModalElement.addEventListener("hidden.bs.modal", function () {
+      createSetModalElement.remove();
+  });
+
+  createSetModalInstance.show();
+
+  // Llenar dinámicamente las opciones de niveles
+  fetch(`${API_ENDPOINT}/levels`)
+      .then(response => response.json())
+      .then(levels => {
+          let setLevelsSelect = document.getElementById("setLevels");
+          setLevelsSelect.innerHTML = levels.map(level => `<option value="${level.id}">${level.title}</option>`).join("");
+      });
+
+  document.getElementById("saveSetBtn").addEventListener("click", async function (event) {
+      event.preventDefault();
+      let setName = document.getElementById("setName");
+      let setDescription = document.getElementById("setDescription");
+      //let selectedLevels = Array.from(document.getElementById("setLevels").selectedOptions).map(option => option.value);
+
+      let postData = {
+          name: setName,
+          description: setDescription,
+          //levels: selectedLevels
+      };
+
+      try {
+          await fetchRequest(
+              `${API_ENDPOINT}/levelsets/create`,
+              "POST",
+              JSON.stringify(postData)
+          );
+          createSetModalInstance.hide();
+          alert("Set de niveles creado correctamente");
+      } catch (error) {
+          console.error('Error al crear el set de niveles:', error);
+      }
+  });
+}
+
+async function handleSaveSets(){
+  
+}
+
+
 function appendRegisterModal() {
   let registerModalHtml = `
         <div id="registerModal" class="modal fade" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
@@ -292,13 +379,13 @@ async function generateProfileDiv(user, userLevels, totalStars, officialLevelCom
             <button type="submit" class="btn btn-danger" id="logoutBtn">
                 Cerrar Sesion
             </button>
+            <button type="button" class="btn btn-primary" id="createSetBtn">Crear Set de Niveles</button>
           </div>
         </div>
       </div>
       
       ${levelDivs.join("")}
       `;
-  
 }
 
 async function generateLevelDiv(level) {
@@ -393,6 +480,9 @@ export default async function loadProfile() {
     );
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
+      document.getElementById("createSetBtn").addEventListener("click", (e: MouseEvent) => {
+                    appendCreateSetModal(); 
+                 });
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
     });
