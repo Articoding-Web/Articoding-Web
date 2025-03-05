@@ -201,7 +201,7 @@ export function appendLoginModal() {
   }
 }
 
-function appendCreateSetModal(){
+function appendCreateSetModal(userLevels: {id: string, title: string}[]) {
   let createSetModalHtml = `
   <div id="createSetModal" class="modal fade" tabindex="-1" aria-labelledby="createSetModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -222,9 +222,17 @@ function appendCreateSetModal(){
                       </div>
                       <div class="mb-3">
                           <label for="setLevels" class="form-label">Añadir Niveles</label>
-                          <select multiple class="form-control" id="setLevels">
-                              <!-- Opciones de niveles se llenarán dinámicamente -->
-                          </select>
+                          <div id="setLevels" class="form-check">
+                              <!-- Los niveles se llenarán dinámicamente con checkboxes -->
+                              ${userLevels.map(level => `
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" value="${level.id}" id="level-${level.id}">
+                                  <label class="form-check-label" for="level-${level.id}">
+                                    ${level.title}
+                                  </label>
+                                </div>
+                              `).join('')}
+                          </div>
                       </div>
                   </form>
               </div>
@@ -249,24 +257,24 @@ function appendCreateSetModal(){
 
   createSetModalInstance.show();
 
-  // Llenar dinámicamente las opciones de niveles
-  fetch(`${API_ENDPOINT}/levels`)
-      .then(response => response.json())
-      .then(levels => {
-          let setLevelsSelect = document.getElementById("setLevels");
-          setLevelsSelect.innerHTML = levels.map(level => `<option value="${level.id}">${level.title}</option>`).join("");
-      });
-
-  document.getElementById("saveSetBtn").addEventListener("click", async function (event) {
+  document.getElementById("saveSetBtn")?.addEventListener("click", async function (event) {
       event.preventDefault();
-      let setName = document.getElementById("setName");
-      let setDescription = document.getElementById("setDescription");
-      //let selectedLevels = Array.from(document.getElementById("setLevels").selectedOptions).map(option => option.value);
+      let setName = (document.getElementById("setName") as HTMLInputElement).value.trim();
+      let setDescription = (document.getElementById("setDescription") as HTMLTextAreaElement).value.trim();
+      
+      // Obtener los niveles seleccionados (IDs de los checkboxes marcados)
+      const selectedLevels = Array.from((document.getElementById("setLevels") as HTMLDivElement).querySelectorAll('input[type="checkbox"]:checked'))
+                                  .map((checkbox: HTMLInputElement) => checkbox.value);
+
+      if (setName === "" || setDescription === "") {
+          alert("Por favor, completa todos los campos.");
+          return;
+      }
 
       let postData = {
           name: setName,
           description: setDescription,
-          //levels: selectedLevels
+          levels: selectedLevels
       };
 
       try {
@@ -279,9 +287,11 @@ function appendCreateSetModal(){
           alert("Set de niveles creado correctamente");
       } catch (error) {
           console.error('Error al crear el set de niveles:', error);
+          alert("Hubo un error al crear el set de niveles.");
       }
   });
 }
+
 
 async function handleSaveSets(){
   
@@ -478,10 +488,39 @@ export default async function loadProfile() {
       `${API_ENDPOINT}/level/userLevels/${user.id}`,
       "GET"
     );
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
       document.getElementById("createSetBtn").addEventListener("click", (e: MouseEvent) => {
-                    appendCreateSetModal(); 
+                    appendCreateSetModal(userLevels); 
                  });
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
