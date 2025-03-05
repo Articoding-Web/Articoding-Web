@@ -120,9 +120,9 @@ export async function setPageWaitingRoom(params: URLSearchParams) {
   }
  
   if(role=="Profesor"){
-     loadWaitingRoomProfesor();
+    loadWaitingRoomProfesor();
   } else {
-      loadWaitingRoom();
+   loadWaitingRoom();
   }
     
   let statement = XAPISingleton.screenAccessedStatement(uuid, userName, URL_EDITOR);
