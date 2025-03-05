@@ -371,6 +371,11 @@ function generateProfilePlaceholder() {}
 async function generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted) {
   const levelDivs = await Promise.all(userLevels.map(level => generateLevelDiv(level)));
 
+  // Verifica si el rol del usuario es "Profesor"
+  const createSetButton = user.role === 'Profesor' ? `
+    <button type="button" class="btn btn-primary" id="createSetBtn">Crear Set de Niveles</button>
+  ` : '';
+
   return `
       <div class="col">
         <div class="card mx-auto border-dark d-flex flex-column h-100">
@@ -389,13 +394,13 @@ async function generateProfileDiv(user, userLevels, totalStars, officialLevelCom
             <button type="submit" class="btn btn-danger" id="logoutBtn">
                 Cerrar Sesion
             </button>
-            <button type="button" class="btn btn-primary" id="createSetBtn">Crear Set de Niveles</button>
+            ${createSetButton} <!-- Aquí se inserta el botón si el rol es "profesor" -->
           </div>
         </div>
       </div>
       
       ${levelDivs.join("")}
-      `;
+  `;
 }
 
 async function generateLevelDiv(level) {
