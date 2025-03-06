@@ -15,9 +15,15 @@ let registerSubmitBtnAdded = false;
  *
  * @returns String of HTMLDivElement for showing levels/categories
  */
-function getRowHTML() {
+function getRowHTML(user) {
+  const createSetButton = user.role === 'Profesor' ? `
+  <div class="text-center w-100">
+   <button id="createSetBtn" class="btn btn-success btn-lg w-30">Crear Set de Niveles</button>
+   </div>
+` : '';
   return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
            <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS SETS</h2>
+            ${createSetButton}
            <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS NIVELES</h2>
            <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
@@ -328,8 +334,6 @@ function appendCreateSetModal(userLevels: {id: string, title: string}[], user) {
   });
 }
 
-
-
 function appendRegisterModal() {
   let registerModalHtml = `
         <div id="registerModal" class="modal fade" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
@@ -404,9 +408,7 @@ async function generateProfileDiv(data) {
   
 
   // Verifica si el rol del usuario es "Profesor"
-  const createSetButton = data.user.role === 'Profesor' ? `
-    <button type="button" class="btn btn-primary" id="createSetBtn">Crear Set de Niveles</button>
-  ` : '';
+
 
   return `
     <div class="container">
@@ -429,7 +431,6 @@ async function generateProfileDiv(data) {
               <button type="submit" class="btn btn-danger" id="logoutBtn">
                   Cerrar Sesion
               </button>
-              ${createSetButton}
             </div>
           </div>
         </div>
@@ -554,7 +555,7 @@ export default async function loadProfile() {
 
   try {const user = sessionCookieValue();
     if(user.role=="Profesor"){
-      document.getElementById("content").innerHTML = getRowHTML();
+      document.getElementById("content").innerHTML = getRowHTML(user);
     } else{
       document.getElementById("content").innerHTML = getRowHTML2();
     }
