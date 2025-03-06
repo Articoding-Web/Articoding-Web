@@ -24,7 +24,12 @@ function getRowHTML() {
   `;
 }
 
-
+function getRowHTML2() {
+  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+          <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS NIVELES</h2>
+           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="levels"></div>
+  `;
+}
 
 export function sessionCookieValue() {
   const sessionInfo = getCookieValue("session");
@@ -490,6 +495,22 @@ export async function loadSet(event) {
   history.pushState({ id }, "", `set?id=${id}`);
   route();
 }
+async function generateMSG(message) {
+  var msg=`<div class="container m-5">
+      </div><div class="text-center text-muted bg-body p-2 rounded-5">
+        <h1 class="text-body-emphasis">${message.msg}</h1>
+        <p class="col-lg-6 mx-auto mb-4">
+        ${message.desc}
+        </p>`;
+  if(message.buttonName){
+    msg+=`</p><button class="btn btn-primary px-5 mb-5" type="button" id="${message.buttonName}">
+    ${message.buttonMsg}
+    </button>`
+  }
+  msg+=`</div>
+    </div>`
+  return msg
+}
 
 async function logout(){
   let logoutSubmitBtn = document.getElementById("logoutBtn");
@@ -525,11 +546,18 @@ async function playLevel(event) {
   route();
 }
 export default async function loadProfile() {
-  document.getElementById("content").innerHTML = getRowHTML();
-  const divElement = document.getElementById("categories");
+
+  
+  
 
 
   try {const user = sessionCookieValue();
+    if(user.role=="Profesor"){
+      document.getElementById("content").innerHTML = getRowHTML();
+    } else{
+      document.getElementById("content").innerHTML = getRowHTML2();
+    }
+    const divElement = document.getElementById("categories");
     const officialLevelCompleted = await fetchRequest(
       `${API_ENDPOINT}/user/officialLevelsCompleted`,
       "GET",
@@ -566,6 +594,10 @@ export default async function loadProfile() {
       document.querySelectorAll("a.levels").forEach((levelDiv) => {
         userLevels.addEventListener("click", loadLevel);
        });
+  } else{
+      var messages=[{msg:"Aun no has creado ningun nivel",desc:"Crea niveles en el editor para ver tus niveles",buttonName:"",buttonMsg:""}];
+      const textElement = document.getElementById("levels");
+      await fillContent(textElement, messages, generateMSG);
   }
     
 
