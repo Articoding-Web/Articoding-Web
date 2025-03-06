@@ -20,7 +20,8 @@ function getRowHTML() {
            <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS SETS</h2>
            <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS NIVELES</h2>
-           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="levels"></div>
+           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+          <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
   `;
 }
 
@@ -589,7 +590,7 @@ export default async function loadProfile() {
     await fillContent(divElement, [data], generateProfileDiv);
     
     if(userLevels.length!=0){
-      const levelDiv = document.getElementById("levels");
+      const levelDiv = document.getElementById("display");
       await fillContent(levelDiv, userLevels, generateLevelDiv);
       document.querySelectorAll("a.levels").forEach((levelDiv) => {
         userLevels.addEventListener("click", loadLevel);
