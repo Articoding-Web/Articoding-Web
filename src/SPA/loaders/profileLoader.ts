@@ -2,9 +2,10 @@ import * as bootstrap from 'bootstrap';
 import { route } from "../../client";
 
 import config from '../../Game/config.js';
-import { fetchRequest } from '../utils';
+import { fetchRequest, fillContent } from '../utils';
 import XAPISingleton from '../../xAPI/xapi.js';
 import { getUserNameAndUUID, setPageHome } from '../app.js';
+import { loadLevel } from './levelPlayerLoader';
 const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API_PORT}/api`;
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
 // Variable para controlar si el evento click ya se agregó al botón
@@ -15,8 +16,15 @@ let registerSubmitBtnAdded = false;
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
+  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+           <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS SETS</h2>
+           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="sets"></div>
+          <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">TUS NIVELES</h2>
+           <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="levels"></div>
+  `;
 }
+
+
 
 export function sessionCookieValue() {
   const sessionInfo = getCookieValue("session");
@@ -386,40 +394,44 @@ function generateProfilePlaceholder() {}
  * @param {Object} user with id, name and role
  * @returns String of HTMLDivElement
  */
-async function generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted) {
-  const levelDivs = await Promise.all(userLevels.map(level => generateLevelDiv(level)));
+async function generateProfileDiv(data) {
+  
 
   // Verifica si el rol del usuario es "Profesor"
-  const createSetButton = user.role === 'Profesor' ? `
+  const createSetButton = data.user.role === 'Profesor' ? `
     <button type="button" class="btn btn-primary" id="createSetBtn">Crear Set de Niveles</button>
   ` : '';
 
   return `
-      <div class="col">
-        <div class="card mx-auto border-dark d-flex flex-column h-100">
-          <h5 class="card-header card-title text-dark">
-            Tus Datos
-          </h5>
-          <div class="card-body text-dark">
-            <p> Nombre: ${user.name}</p>
-            <p> Rol: ${user.role}</p>
-            <p class="card-subtitle mb-2 text-muted">
-              Niveles Oficiales Completados: ${officialLevelCompleted}
-            </p>
-            <p class="card-subtitle mb-2 text-muted">
-              Estrellas totales conseguidas: ${totalStars}
-            </p>
-            <button type="submit" class="btn btn-danger" id="logoutBtn">
-                Cerrar Sesion
-            </button>
-            ${createSetButton} <!-- Aquí se inserta el botón si el rol es "profesor" -->
+    <div class="container">
+      <!-- Perfil del usuario -->
+      <div class="row w-100 mb-4">
+        <div class="col-12">
+          <div class="card mx-auto border-dark d-flex flex-column h-100">
+            <h5 class="card-header card-title text-dark">
+              Tus Datos
+            </h5>
+            <div class="card-body text-dark">
+              <p> Nombre: ${data.user.name}</p>
+              <p> Rol: ${data.user.role}</p>
+              <p class="card-subtitle mb-2 text-muted">
+                Niveles Oficiales Completados: ${data.officialLevelCompleted}
+              </p>
+              <p class="card-subtitle mb-2 text-muted">
+                Estrellas totales conseguidas: ${data.totalStars}
+              </p>
+              <button type="submit" class="btn btn-danger" id="logoutBtn">
+                  Cerrar Sesion
+              </button>
+              ${createSetButton}
+            </div>
           </div>
         </div>
       </div>
-      
-      ${levelDivs.join("")}
+    </div>
   `;
 }
+
 
 async function generateLevelDiv(level) {
   if (!level) {
@@ -454,6 +466,29 @@ async function generateLevelDiv(level) {
         </a>
       </div>
     </div>`;
+}
+
+async function generateSetDiv(set) {
+  return `<div class="col">
+              <div class="card mx-auto border-dark d-flex flex-column h-100">
+                <a class="set" href="set/${set.id}">
+                    <h5 class="card-header card-title text-dark">
+                      ${set.name}
+                    </h5>
+                    <div class="card-body text-dark">
+                      ${set.description}
+                    </div>
+                </a>
+              </div>
+            </div>`;
+}
+
+export async function loadSet(event) {
+  event.preventDefault();
+  const anchorTag = event.target.closest("a.set");
+  const id = anchorTag.href.split("set/")[1];
+  history.pushState({ id }, "", `set?id=${id}`);
+  route();
 }
 
 async function logout(){
@@ -493,8 +528,6 @@ export default async function loadProfile() {
   document.getElementById("content").innerHTML = getRowHTML();
   const divElement = document.getElementById("categories");
 
-  // Load placeholders
-  // divElement.innerHTML = generateProfilePlaceholder();
 
   try {const user = sessionCookieValue();
     const officialLevelCompleted = await fetchRequest(
@@ -511,9 +544,39 @@ export default async function loadProfile() {
       `${API_ENDPOINT}/level/userLevels/${user.id}`,
       "GET"
     );
+      const userSets = await fetchRequest(
+            `${API_ENDPOINT}/set/userSets/${user.id}`,
+            "GET"
+      );
 
 
-    divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
+   // divElement.innerHTML = await generateProfileDiv(user, totalStars, officialLevelCompleted);
+
+    const data = {
+      user: user,
+      totalStars: totalStars,
+      officialLevelCompleted: officialLevelCompleted,
+    }
+
+    await fillContent(divElement, [data], generateProfileDiv);
+    
+    if(userLevels.length!=0){
+      const levelDiv = document.getElementById("levels");
+      await fillContent(levelDiv, userLevels, generateLevelDiv);
+      document.querySelectorAll("a.levels").forEach((levelDiv) => {
+        userLevels.addEventListener("click", loadLevel);
+       });
+  }
+    
+
+    if(userSets.length!=0){
+      const setDiv = document.getElementById("sets");
+      await fillContent(setDiv, userSets, generateSetDiv);
+      document.querySelectorAll("a.set").forEach((userSets) => {
+        userSets.addEventListener("click", loadSet);
+       });
+  }
+
      // Add getLevel event listener
      if(user.role=="Profesor"){
       document.getElementById("createSetBtn").addEventListener("click", (e: MouseEvent) => {
