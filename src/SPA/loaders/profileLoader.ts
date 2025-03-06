@@ -515,9 +515,12 @@ export default async function loadProfile() {
 
     divElement.innerHTML = await generateProfileDiv(user, userLevels, totalStars, officialLevelCompleted);
      // Add getLevel event listener
+     if(user.role=="Profesor"){
       document.getElementById("createSetBtn").addEventListener("click", (e: MouseEvent) => {
-                    appendCreateSetModal(userLevels,user); 
-                 });
+        appendCreateSetModal(userLevels,user); 
+     });
+     }
+      
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
     });
