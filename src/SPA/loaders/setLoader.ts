@@ -9,14 +9,17 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  *
  * @returns String of HTMLDivElement for showing levels/categories
  */
-function getRowHTML() {
-  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+function getRowHTML(id) {
+  return `<h2 class="text-center w-75 mx-auto pt-3" style="color: white;">${id[0].name}</h2>
+  <h4 class="text-center w-75 mx-auto pt-3" style="color: white;">${id[0].description}</h4>
+  <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
   <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>`;
 }
 
 function getRowHTML2(id) {
   return `
   <h2 class="text-center w-75 mx-auto pt-3" style="color: white;">${id[0].name}</h2>
+  <h4 class="text-center w-75 mx-auto pt-3" style="color: white;">${id[0].description}</h4>
    <div class="d-flex justify-content-center mt-3">
       <button id="addLevels" class="btn btn-success btn-lg">Add Levels</button>
     </div>
@@ -343,7 +346,7 @@ export default async function loadSetById(id: string) {
     if(role=="Profesor"){
       document.getElementById("content").innerHTML = getRowHTML2(set);
     } else {
-      document.getElementById("content").innerHTML = getRowHTML();
+      document.getElementById("content").innerHTML = getRowHTML(set);
     }
   
   const divElement = document.getElementById("categories");
