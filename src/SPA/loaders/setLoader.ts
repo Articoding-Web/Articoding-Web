@@ -10,7 +10,8 @@ const API_ENDPOINT = `${config.API_PROTOCOL}://${config.API_DOMAIN}:${config.API
  * @returns String of HTMLDivElement for showing levels/categories
  */
 function getRowHTML() {
-  return '<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>';
+  return `<div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>`;
 }
 
 function getRowHTML2(id) {
@@ -20,6 +21,7 @@ function getRowHTML2(id) {
       <button id="addLevels" class="btn btn-success btn-lg">Add Levels</button>
     </div>
     <div class="row row-cols-1 g-2 w-75 mx-auto pt-3" id="categories"></div>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2 w-75 mx-auto" id="display"></div>
    
   `;
 }
@@ -296,6 +298,23 @@ async function handleSaveLevelChanges(levels, setLevelTitles,setId) {
   }, 3000);
 }
 
+async function generateMSG(message) {
+  var msg=`<div class="container m-5">
+      </div><div class="text-center text-muted bg-body p-2 rounded-5">
+        <h1 class="text-body-emphasis">${message.msg}</h1>
+        <p class="col-lg-6 mx-auto mb-4">
+        ${message.desc}
+        </p>`;
+  if(message.buttonName){
+    msg+=`</p><button class="btn btn-primary px-5 mb-5" type="button" id="${message.buttonName}">
+    ${message.buttonMsg}
+    </button>`
+  }
+  msg+=`</div>
+    </div>`
+  return msg
+}
+
 
 /**
  * Sets content and starts phaser LevelPlayer
@@ -329,34 +348,38 @@ export default async function loadSetById(id: string) {
   
   const divElement = document.getElementById("categories");
 
-  // Load placeholders
-  await fillContent(
-    divElement,
-    new Array(10),
-    generateCategoryLevelsDivPlaceholder
-  );
+
 
   try {
-    const levels = await fetchRequest(
-      `${API_ENDPOINT}/level/sets/${id}`,
-      "GET"
-    );
+  
 
     const userLevels = await fetchRequest(
       `${API_ENDPOINT}/level/userLevels/${cookie.id}`,
       "GET"
     );
    
+    const levels = await fetchRequest(
+      `${API_ENDPOINT}/level/sets/${id}`,
+      "GET"
+    );
 
-    let statistics = [];
-    if (cookie !== null) {
+    if(levels!=null){
+
+        // Load placeholders
+       await fillContent(
+        divElement,
+        new Array(10),
+        generateCategoryLevelsDivPlaceholder
+        );
+      let statistics = [];
+     if (cookie !== null) {
       statistics = await fetchRequest(
         `${API_ENDPOINT}/play/categoryStatistics?category=${id}&user=${cookie.id}/`,
         "GET"
       );
     }
-    const statisticsMap = statistics.reduce((map, statistic) => {
-      map[statistic.level] = {
+     const statisticsMap = statistics.reduce((map, statistic) => {
+        map[statistic.level] = {
         stars: statistic.stars,
         attempts: statistic.attempts,
       };
@@ -374,6 +397,13 @@ export default async function loadSetById(id: string) {
 
     await fillContent(divElement, levelsWithStatistics, generateLevelDiv);
 
+    } else {
+      var messages=[{msg:"Aun no hay niveles en el set",desc:"Parece que no hay niveles en el set",buttonName:"",buttonMsg:""}];
+      const textElement = document.getElementById("display");
+      await fillContent(textElement, messages, generateMSG);
+    }
+
+    
     // Add getLevel event listener
     document.querySelectorAll("a.getLevel").forEach((level) => {
       level.addEventListener("click", playLevel);
