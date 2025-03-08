@@ -133,7 +133,9 @@ function getBlockLimitMenu(fromLevelEditor: boolean) {
         </div>
     </div>` 
     return fromLevelEditor ? menu:'';
-}                              
+}
+
+
 /**
  * Fetches a level by its ID and starts it
  * @param {String} id - The ID of the level to start

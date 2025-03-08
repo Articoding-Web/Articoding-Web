@@ -427,16 +427,20 @@ export default class LevelPlayer extends Phaser.Scene {
           const levelName = window.prompt("Ingrese un nombre para el nivel:", "Nombre");
           const levelDescription= window.prompt("Ingrese una descripción para el nivel:", "");
           const levelData = {
+            level_id: this.getLevelId(),
             user: object.id,
             category: null,
             self: null,
             title: levelName,
             data: JSON.stringify(this.levelJSON),
             minBlocks: this.levelJSON.MinBlocksUsed,
-            description: levelDescription,
+            description: levelDescription
           };
           try {
-            await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
+            if(levelData.level_id)
+              await fetchRequest(`${API_ENDPOINT}/level/update`, "POST", JSON.stringify(levelData));
+            else
+              await fetchRequest(`${API_ENDPOINT}/level/create`, "POST", JSON.stringify(levelData));
             alert(`Nivel ${levelName} creado exitosamente.`);
           } catch (error) {
             alert("Connection to server failed");
@@ -470,6 +474,11 @@ export default class LevelPlayer extends Phaser.Scene {
     this.gameSpeed = newVal;
     (e.currentTarget as HTMLDivElement).innerHTML = `${newVal}x`;
     (e.currentTarget as HTMLInputElement).value = `${newVal}`;
+  }
+  
+  private getLevelId() {
+    let params = new URLSearchParams(window.location.search);
+    return params.get("id");
   }
 
   private loadLevelEditor = async () => {
