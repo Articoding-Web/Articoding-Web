@@ -15,6 +15,8 @@ let currentFromLevelEditor: boolean = false;
  *
  * @returns String of HTMLElement for LevelPlayer
  */
+
+
 function getLevelPlayerHTML(fromLevelEditor?: boolean) {
     return `<div class="row row-cols-1 row-cols-lg-2 h-100 gx-1">
               <div id="blocklyArea" class="col col-lg-4 h-100 position-relative collapse collapse-horizontal show">
@@ -39,12 +41,31 @@ function getLevelPlayerHTML(fromLevelEditor?: boolean) {
                         <button class="btn btn-light" id="levelPlayerTourBtn">
                             <i class="bi bi-question"></i>
                         </button>
-                  </div>
               </div>
             </div>
             ${getBlockLimitMenu(fromLevelEditor)}`
             ;
 }
+
+function getStarsInfo(levelJSON: Level.Level, fromLevelEditor?: boolean) {
+    if (fromLevelEditor) {
+        return ''; // No mostrar nada si estamos en el editor
+    }
+    currentLevelJSON = levelJSON;
+    if (currentLevelJSON.firstStar === undefined && currentLevelJSON.secondStar === undefined && currentLevelJSON.thirdStar === undefined) {
+        return ''; // No hacer nada si no existen
+    }
+    return `<div style="position: absolute; top: 3%; right: 5%; margin-top: 60px; margin-right: 0px; background: #833c51; color: white; border: 2px solid #ffc107; border-radius: 10px; width: 150px; padding: 10px; font-size: 14px;">
+                    <h2 style="background: #ffc107; color: black; font-size: 12px; text-align: center; padding: 5px; margin: -10px -10px 10px -10px; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                    COLLECT ALL STARS:</h2>
+                    <ul> {
+                        ${currentLevelJSON.firstStar ? `<li><i class="bi bi-star-fill"></i>${currentLevelJSON.firstStar}</li>` : ""}
+                        ${currentLevelJSON.secondStar ? `<li><i class="bi bi-star-fill"></i>${levelJSON.secondStar}</li>` : ""}
+                        ${currentLevelJSON.thirdStar ? `<li><i class="bi bi-star-fill"></i>${levelJSON.thirdStar}</li>` : ""}
+                    </ul>
+                </div>`;
+}
+
 
 function getEditButton(fromLevelEditor: boolean) {
     return `<button class="btn btn-primary" id="editButton">
@@ -191,6 +212,9 @@ export async function loadLevel(levelJSON: Level.Level, fromLevelEditor?: boolea
     const workspaceBlocks = currentLevelJSON.blockly.workspaceBlocks;
     PhaserController.init("LevelPlayer", LevelPlayer, { levelJSON, fromLevelEditor });
     BlocklyController.init(BLOCKLY_DIV_ID, toolbox, maxInstances, workspaceBlocks);
+
+    getStarsInfo(levelJSON, fromLevelEditor);
+    //document.getElementById("phaserDiv").innerHTML += starsInfoHTML;
 }
 
 export function restartCurrentLevel() {
